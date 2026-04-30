@@ -1,0 +1,85 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url('./src/pages/precisosa/hero/hero.css');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --brancoTitle: rgba(255, 255, 255, 0.9);
+  --brancoText: rgba(255, 255, 255, 0.75);
+  --pretoTitle: rgba(0, 0, 0, 0.9);
+  --pretoText: rgba(0, 0, 0, 0.75);
+}
+
+@font-face {
+  font-family: "Clash";
+  src: url('./designsystem/Site/assets/fonts/ClashDisplay-Bold.ttf');
+  font-weight: 700;
+}
+@font-face {
+  font-family: "Clash";
+  src: url('./designsystem/Site/assets/fonts/ClashDisplay-Medium.ttf');
+  font-weight: 500;
+}
+@font-face {
+  font-family: "Clash";
+  src: url('./designsystem/Site/assets/fonts/ClashDisplay-Regular.ttf');
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Clash";
+  src: url('./designsystem/Site/assets/fonts/ClashDisplay-Light.ttf');
+  font-weight: 300;
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  color: var(--brancoTitle);
+  background-color: #000000;
+}
+
+h2 {
+  font-size: 3.8vw;
+  font-family: "Clash", "Inter", Sans-Serif;
+  line-height: 5vw;
+  font-weight: 400;
+}
+
+.home-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4vw;
+}
+
+.home-title {
+  font-family: "Clash", "Inter", sans-serif;
+  font-size: clamp(40px, 6vw, 90px);
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.home-subtitle {
+  font-size: clamp(16px, 1.5vw, 24px);
+  max-width: 650px;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.botoes {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
