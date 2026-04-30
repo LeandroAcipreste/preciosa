@@ -42,7 +42,7 @@ export function initHero() {
     // ==========================================
     const loadHDRI = new Promise((resolve) => {
         const textureLoader = new THREE.TextureLoader();
-        textureLoader.load("../designsystem/Site/assets/img/hdri.png", function (texture) {
+        textureLoader.load("./designsystem/Site/assets/img/hdri.png", function (texture) {
             texture.mapping = THREE.EquirectangularReflectionMapping;
             const pmrem = new THREE.PMREMGenerator(renderizador);
             const envMap = pmrem.fromEquirectangular(texture).texture;
@@ -56,7 +56,7 @@ export function initHero() {
     let objeto;
     const loadGLTF = new Promise((resolve) => {
         const loader = new GLTFLoader();
-        loader.load("../designsystem/Site/assets/img/diamond-compressed.glb", (gltf) => {
+        loader.load("./designsystem/Site/assets/img/diamond-compressed.glb", (gltf) => {
             resolve(gltf.scene); // Avisa que o objeto 3D carregou
         });
     });
