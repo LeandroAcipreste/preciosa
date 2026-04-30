@@ -52,6 +52,27 @@ h2 {
   font-weight: 400;
 }
 
+.preloader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #000;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.preloader-text {
+  color: #ffa7b6;
+  font-family: "Clash", "Inter", sans-serif;
+  font-size: clamp(16px, 2.5vw, 32px);
+  font-weight: 400;
+  letter-spacing: 2px;
+}
+
 .home-content {
   position: relative;
   z-index: 1;

@@ -61,8 +61,9 @@ export function initHero() {
         });
     });
 
-    // Só inicia a animação e adiciona à cena quando AMBOS estiverem prontos
     Promise.all([loadHDRI, loadGLTF]).then(([_, sceneObject]) => {
+
+        // Configuração de timing
         const config = {
             stagger: { each: 0.3, from: "random" },
             duration: 1,
@@ -70,23 +71,52 @@ export function initHero() {
             pauseEntre: 2,
         };
 
+        // Quebra os textos em letras individuais
         const h2s = document.querySelectorAll(".hero-title");
         const splits = Array.from(h2s).map((h2) => splitTextChars(h2));
 
+        // Adiciona o diamante à cena — materiais com opacity 0 para fade-in suave
         objeto = sceneObject;
         objeto.position.z = -12;
         objeto.position.y = 2;
         cena.add(objeto);
 
-        // ==========================================
-        // 🎬 MASTER TIMELINE - LOGICA DO SCRIPT.JS CONVERTIDA PARA TIME
-        // ==========================================
+        // Coleta todos os materiais e ativa transparência com opacity inicial 0
+        const materiais = [];
+        objeto.traverse((child) => {
+            if (child.isMesh && child.material) {
+                const mats = Array.isArray(child.material) ? child.material : [child.material];
+                mats.forEach((mat) => {
+                    mat.transparent = true;
+                    mat.opacity = 0;
+                    materiais.push(mat);
+                });
+            }
+        });
 
-        // 1. TIMELINE DE TEXTOS
-        // Reproduz exatamente a mecânica linear do scroll do script.js
+        // 1. PRELOADER SOME SUAVEMENTE
+        const masterTl = gsap.timeline();
+
+        masterTl.to("#preloader", {
+            opacity: 0,
+            duration: 2,
+            ease: "power2.inOut",
+            onComplete: () => {
+                const pre = document.getElementById("preloader");
+                if (pre) pre.style.display = "none";
+            }
+        });
+
+        // 2. DIAMANTE SURGE SUAVEMENTE (fade-in real via opacity dos materiais)
+        masterTl.to(materiais, {
+            opacity: 1,
+            duration: 2,
+            ease: "power2.inOut"
+        });
+
+        // 3. PALAVRAS SURGEM EM SEQUÊNCIA (enquanto o diamante rola)
         const tlTextos = gsap.timeline();
         splits.forEach((split) => {
-            // Aparecer (no script original era "from", aqui usamos "to" porque o CSS já os deixa em 0)
             tlTextos.to(split.chars, {
                 opacity: 1,
                 filter: "blur(0px)",
@@ -94,10 +124,8 @@ export function initHero() {
                 stagger: config.stagger
             });
 
-            // Pausa
             tlTextos.to({}, { duration: config.pauseEntre });
 
-            // Desaparecer
             tlTextos.to(split.chars, {
                 opacity: 0,
                 filter: `blur(${config.blur})`,
@@ -106,48 +134,26 @@ export function initHero() {
             });
         });
 
-        // Pegamos o tempo total exato da animação de textos 
         const tempoTotal = tlTextos.duration();
 
-        // 2. TIMELINE DO DIAMANTE
+        // 4. DIAMANTE ROLA SINCRONIZADO COM AS PALAVRAS
         const tlDiamante = gsap.timeline();
-        // A proporção original no GSAP era: 
-        // Mover = 1, Rotacionar = 1, ZoomZ = 0.2 (com offset de -0.1). Total virtual = 1.1 "unidades".
         const proporcaoMover = (1 / 1.1) * tempoTotal;
-        const proporcaoZoom = (0.2 / 1.1) * tempoTotal;
+        const proporcaoZoom  = (0.2 / 1.1) * tempoTotal;
         const proporcaoOffset = (0.1 / 1.1) * tempoTotal;
 
-        tlDiamante.to(objeto.position, {
-            x: 0,
-            y: 0,
-            duration: proporcaoMover,
-            ease: "none" // ScrollTrigger (scrub) é sempre linear (none)
-        }, 0);
+        tlDiamante.to(objeto.position, { x: 0, y: 0, duration: proporcaoMover, ease: "none" }, 0);
+        tlDiamante.to(objeto.rotation, { x: 1.5 * Math.PI, duration: proporcaoMover, ease: "none" }, 0);
+        tlDiamante.to(objeto.position, { z: 3.2, duration: proporcaoZoom, ease: "none" }, proporcaoMover - proporcaoOffset);
 
-        tlDiamante.to(objeto.rotation, {
-            x: 1.5 * Math.PI,
-            duration: proporcaoMover,
-            ease: "none"
-        }, 0);
-
-        tlDiamante.to(objeto.position, {
-            z: 3.2,
-            duration: proporcaoZoom,
-            ease: "none"
-        }, proporcaoMover - proporcaoOffset);
-
-        // 3. ENCAPSULANDO NA TL DE INTRODUÇÃO E COMPRIMINDO PARA 5 SEGUNDOS
+        // Agrupa textos + diamante e comprime para 5 segundos
         const tlIntro = gsap.timeline();
         tlIntro.add(tlTextos, 0);
         tlIntro.add(tlDiamante, 0);
-
-        // Mágica do GSAP: Isso força toda a animação das palavras e do diamante 
-        // a rodar em EXATOS 5 segundos, sem perder as proporções perfeitas!
         tlIntro.duration(5);
 
-        // 4. MASTER TL (Agrupa o delay, a intro e a subida da cortina)
-        const masterTl = gsap.timeline({ delay: 0.5 });
-        masterTl.add(tlIntro);
+        // Adiciona a intro à masterTl logo após o preloader sumir
+        masterTl.add(tlIntro, "+=0.3");
 
         // 5. A DIV SOBE MOSTRANDO O CONTEÚDO DE TRÁS (Com duração elegante de 1.5s)
         masterTl.to(".hero-main", {
