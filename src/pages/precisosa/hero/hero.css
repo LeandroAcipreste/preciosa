@@ -6,6 +6,12 @@
     height: 100vh;
     z-index: 10;
     background-color: #000;
+    transform: translateY(0);
+    transition: transform 1.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.hero-main.is-gone {
+    transform: translateY(-100%);
 }
 
 .hero-div3d {
@@ -50,4 +56,12 @@
     height: 100vh;
     position: relative;
     background-color: transparent;
+}
+
+/* Responsividade Hero */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 16vw; /* Maior no mobile para dar leitura */
+        letter-spacing: 2px;
+    }
 }
