@@ -70,7 +70,7 @@ export function initHero() {
         const isMobile = window.innerWidth < 768;
         const startZ = isMobile ? -20 : -12; // Afasta mais no mobile por conta da proporção da tela
         const startY = isMobile ? 3 : 2;
-        const finalZ = isMobile ? -2 : 3.2;  // Não avança tanto no zoom final do mobile
+        const finalZ = isMobile ? 3.5 : 3.2;  // Avança MUITO mais no mobile para preencher toda a tela vertical
 
         objeto = sceneObject;
         objeto.position.z = startZ;
