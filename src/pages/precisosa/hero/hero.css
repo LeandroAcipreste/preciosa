@@ -5,7 +5,7 @@
     width: 100%;
     height: 100vh;
     z-index: 10;
-    background-color: #000;
+    background-color: #fff;
     transform: translateY(0);
     transition: transform 1.5s cubic-bezier(0.76, 0, 0.24, 1);
 }
@@ -35,13 +35,13 @@
 
 .hero-title {
     position: absolute;
-    font-size: 12vw;
+    font-size: 8vw;
     text-align: center;
     color: #ffa7b6;
     /* Adicionado para garantir visibilidade */
     pointer-events: none;
-    /* Evita que o texto bloqueie interação com o 3D se necessário */
-}
+        /* Evita que o texto bloqueie interação com o 3D se necessário */
+    }
 
 .hero-char {
     display: inline-block;
@@ -49,6 +49,13 @@
     opacity: 0;
     filter: blur(20px);
     -webkit-filter: blur(20px);
+    transition: opacity 1s ease, filter 1s ease;
+}
+
+.hero-char.is-visible {
+    opacity: 1;
+    filter: blur(0px);
+    -webkit-filter: blur(0px);
 }
 
 .hero-animations {
@@ -61,7 +68,8 @@
 /* Responsividade Hero */
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 16vw; /* Maior no mobile para dar leitura */
+        font-size: 16vw;
+        /* Maior no mobile para dar leitura */
         letter-spacing: 2px;
     }
 }

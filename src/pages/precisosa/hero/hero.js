@@ -92,103 +92,192 @@ export function initHero() {
 
         // ==========================================
         // 🎬 MASTER TIMELINE
-        // CSS cuida do visual. GSAP só aciona classes e anima Three.js.
+        // Lógica perfeitamente organizada em uma única timeline sequencial
         // ==========================================
-        const config = {
-            stagger: { each: 0.3, from: "random" },
-            duration: 1,
-            blur: "20px",
-            pauseEntre: 2,
-        };
-
         const masterTl = gsap.timeline();
 
-        // 1. PRELOADER SOME → GSAP aciona classe CSS "is-hidden"
+        // 1. PRELOADER SOME ("Iniciando sua experiência...")
         masterTl.add(() => {
             document.getElementById("preloader")?.classList.add("is-hidden");
         });
-        // Aguarda a transição CSS do preloader (2s definidos no CSS)
-        masterTl.to({}, { duration: 2.2 });
+        
+        // Aguarda a transição CSS do preloader terminar (1s + 0.2s margem)
+        masterTl.to({}, { duration: 1.2 });
 
-        // 2. DIAMANTE SURGE → único ponto onde GSAP anima propriedade Three.js (sem alternativa)
+        // 2. DIAMANTE SURGE SOZINHO NO CENTRO
+        // Opacidade vai de 0 a 1 suavemente e mais rápido
         masterTl.to(materiais, {
             opacity: 1,
-            duration: 2,
+            duration: 1.2,
             ease: "power2.inOut"
         });
 
-        // 3. PALAVRAS — GSAP anima opacity/filter dos chars (Three.js context: letras sincronizadas com 3D)
-        const tlTextos = gsap.timeline();
-        splits.forEach((split) => {
-            tlTextos.to(split.chars, {
-                opacity: 1,
-                filter: "blur(0px)",
-                duration: config.duration,
-                stagger: config.stagger
+        // Sem pausa longa, vai direto para as palavras
+        masterTl.to({}, { duration: 0.1 });
+
+        // A partir daqui, calculamos o tempo absoluto na timeline
+        let currentTime = masterTl.duration();
+
+        // 3. PALAVRAS SE FORMAM EM SEQUÊNCIA ("PRECIOSA" -> "CASA DE ACOLHIMENTO" -> "A MULHER")
+        splits.forEach((split, index) => {
+            const chars = [...split.chars];
+            
+            // --- ENTRADA (FADE IN) ---
+            const shuffledIn = gsap.utils.shuffle([...chars]);
+            const staggerIn = Math.min(0.08, 0.8 / chars.length); // Um pouco mais rápido
+            
+            shuffledIn.forEach((char, i) => {
+                masterTl.to(char, {
+                    duration: 0,
+                    onComplete: () => char.classList.add('is-visible')
+                }, currentTime + (i * staggerIn));
             });
-            tlTextos.to({}, { duration: config.pauseEntre });
-            tlTextos.to(split.chars, {
-                opacity: 0,
-                filter: `blur(${config.blur})`,
-                duration: config.duration,
-                stagger: config.stagger
+            
+            // Avança o relógio interno: Stagger + 0.2s margem + 0.9s de tempo de leitura
+            currentTime += (chars.length * staggerIn) + 1.1;
+            
+            // --- SAÍDA (FADE OUT) ---
+            const shuffledOut = gsap.utils.shuffle([...chars]);
+            const staggerOut = Math.min(0.05, 0.5 / chars.length);
+            
+            shuffledOut.forEach((char, i) => {
+                masterTl.to(char, {
+                    duration: 0,
+                    onComplete: () => char.classList.remove('is-visible')
+                }, currentTime + (i * staggerOut));
             });
+            
+            // Avança o relógio: Stagger + 0.2s margem antes da próxima frase
+            currentTime += (chars.length * staggerOut) + 0.2;
+            
+            if (index < splits.length - 1) {
+                currentTime += 0.1;
+            }
         });
-        tlTextos.duration(5); // força exatos 5s
 
-        // 4. DIAMANTE DESCE/ZOOM — Three.js responsivo
-        const tlDiamante = gsap.timeline();
-        tlDiamante.to(objeto.position, { x: 0, y: 0, duration: 2, ease: "power2.out" }, 0);
-        tlDiamante.to(objeto.rotation, { x: 1.5 * Math.PI, duration: 2, ease: "power2.out" }, 0);
-        tlDiamante.to(objeto.position, { z: finalZ, duration: 1.2, ease: "power3.inOut" }, 1.8);
-        tlDiamante.duration(3); // força exatos 3s
+        // 4. DIAMANTE DESCE/ZOOM
+        // Inicia o movimento cruzando com a saída da última palavra
+        const diamondMoveStart = currentTime - 0.5; 
+        
+        // Movimentos mais ágeis e explosivos
+        masterTl.to(objeto.position, { x: 0, y: 0, duration: 1.4, ease: "power2.out" }, diamondMoveStart);
+        masterTl.to(objeto.rotation, { x: 1.5 * Math.PI, duration: 1.4, ease: "power2.out" }, diamondMoveStart);
+        masterTl.to(objeto.position, { z: finalZ, duration: 0.8, ease: "power3.inOut" }, diamondMoveStart + 1.0);
 
-        const tlIntro = gsap.timeline();
-        tlIntro.add(tlTextos, 0);   // t=0  → palavras por 5s
-        tlIntro.add(tlDiamante, 5); // t=5  → diamante por 3s
+        const endIntroTime = diamondMoveStart + 1.8; // Movimento total bem mais curto
 
-        masterTl.add(tlIntro, "+=0.3");
-
-        // 5. CORTINA SOBE → GSAP aciona classe CSS "is-gone"
+        // 5. CORTINA SOBE
         masterTl.add(() => {
             document.querySelector(".hero-main")?.classList.add("is-gone");
-        }, "+=0.3");
+        }, endIntroTime);
 
-        // 6. VÍDEO APARECE → GSAP aciona classe CSS "is-visible"
-        //    O vídeo só começa a tocar aqui (não desperdiça banda durante a intro)
+        // 6. VÍDEO PRINCIPAL APARECE
         masterTl.add(() => {
             const video = document.getElementById("home-video");
             if (video) {
-                video.play().catch(() => { }); // catch para silenciar erros de autoplay
+                // Removemos o video.play() para que o vídeo só se mova no scroll!
                 video.classList.add("is-visible");
             }
-        }, "-=1"); // começa 1s antes da cortina terminar de subir
+        }, endIntroTime - 1.0); // O vídeo aparece enquanto a cortina está subindo
+
+        // 7. ANIMAÇÃO DE ESCRITA DO TÍTULO FINAL E SURGIMENTO DO SUBTÍTULO
+        // Prepara os elementos no frame 0. Usamos -50% em cima e embaixo para o clip-path não cortar a letra P
+        masterTl.set(".home-title", { clipPath: "inset(-50% 100% -50% 0)", webkitClipPath: "inset(-50% 100% -50% 0)" }, 0);
+        masterTl.set(".home-subtitle", { opacity: 0, y: 30 }, 0);
+
+        // Revela o título como se estivesse sendo escrito (da esquerda para a direita)
+        masterTl.to(".home-title", {
+            clipPath: "inset(-50% 0% -50% 0)",
+            webkitClipPath: "inset(-50% 0% -50% 0)",
+            duration: 2.5,
+            ease: "power2.inOut"
+        }, endIntroTime + 0.5); // Começa logo após a cortina terminar de subir
+
+        // Revela o subtítulo em seguida
+        masterTl.to(".home-subtitle", {
+            opacity: 1,
+            y: 0,
+            duration: 1.5,
+            ease: "power2.out"
+        }, endIntroTime + 2.5); // Começa quando a escrita estiver terminando
+
+        // Avança o playhead interno para garantir que a timeline alcance o fim das animações
+        const finalTime = endIntroTime + 4.0;
+        masterTl.to({}, { duration: 0.1 }, finalTime);
 
         // ==========================================
-        // 🖱️ SCROLL → VÍDEO SCRUBBING
-        // requestAnimationFrame leve: GSAP ScrollTrigger lê o progresso,
-        // JS atualiza apenas video.currentTime (não pode ser CSS)
+        // 🖱️ SCROLL → VÍDEO SCRUBBING (Senior GSAP Approach)
+        // Usa o motor do GSAP para suavizar a interpolação do tempo (scrub)
         // ==========================================
         masterTl.add(() => {
             const video = document.getElementById("home-video");
             if (!video) return;
 
-            // Pausa o autoplay para o scroll assumir o controle
+            // Pausa o vídeo para que o scroll assuma o controle 100%
             video.pause();
 
-            ScrollTrigger.create({
-                trigger: ".home-content",
-                start: "top top",
-                end: "+=2000", // A tela fica travada (pinned) por 2000px de scroll
-                pin: true,     // Essencial: prende a tela enquanto o scroll avança o vídeo
-                scrub: 1,    // suavização leve (evita jank)
-                onUpdate: (self) => {
-                    if (video.readyState >= 2) {
-                        // Calcula o tempo do vídeo baseado no progresso (0 a 1)
-                        video.currentTime = self.progress * video.duration;
+            const setupScrub = () => {
+                // Cria uma timeline atrelada ao ScrollTrigger
+                let tlVideo = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: ".home-content",
+                        start: "top top",
+                        end: "+=2000", // A tela fica travada (pinned) por 2000px de scroll
+                        pin: true,     // Prende a tela enquanto o scroll avança o vídeo
+                        scrub: 1.5     // Suavização premium de 1.5s para evitar qualquer solavanco (jank)
                     }
+                });
+
+                // Anima o texto sumindo (fade out) e subindo logo no início do scroll (primeiros 20%)
+                tlVideo.to(".home-text-wrapper", {
+                    opacity: 0,
+                    y: -80,
+                    ease: "power2.inOut",
+                    duration: 0.2
+                }, 0);
+
+                // Faz a nova frase ir se formando, PALAVRA por PALAVRA, enquanto o cristal sobe
+                const purposeText = document.querySelector(".home-purpose-text");
+                if (purposeText) {
+                    const words = purposeText.innerText.split(" ");
+                    purposeText.innerHTML = "";
+                    purposeText.style.opacity = 1; // Revela o container-pai agora que o CSS foi sobrescrito pelas spans
+
+                    const wordSpans = words.map(word => {
+                        const span = document.createElement("span");
+                        span.innerText = word; // Palavra pura, sem espaço dentro
+                        span.style.display = "inline-block";
+                        span.style.opacity = 0; // As palavras individuais nascem invisíveis
+                        purposeText.appendChild(span);
+                        purposeText.appendChild(document.createTextNode(" ")); // Adiciona o espaço real do HTML entre os spans
+                        return span;
+                    });
+
+                    // Força a animação a ocupar exatamente a janela de 0.2 até 1.0 da timeline
+                    // Para que o vídeo não trave pela metade do scroll!
+                    const staggerAmount = 0.6 / wordSpans.length;
+                    
+                    tlVideo.fromTo(wordSpans,
+                        { opacity: 0, filter: "blur(8px)", y: 20 },
+                        { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.2, stagger: staggerAmount, ease: "power1.out" },
+                        0.2 // Inicia aos 20% do scroll
+                    );
                 }
-            });
+
+                // O GSAP interpola a propriedade currentTime nativamente!
+                tlVideo.to(video, {
+                    currentTime: video.duration,
+                    ease: "none",
+                    duration: 1.0 // Duração 1.0 mapeia para 100% da distância do scroll
+                }, 0);
+            };
+
+            // Só podemos ler video.duration quando os metadados estiverem carregados
+            if (video.readyState >= 1) { // HAVE_METADATA ou superior
+                setupScrub();
+            } else {
+                video.addEventListener("loadedmetadata", setupScrub);
+            }
         });
     });
 

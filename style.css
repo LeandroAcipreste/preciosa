@@ -59,13 +59,13 @@ h2 {
   left: 0;
   width: 100%;
   height: 100vh;
-  background-color: #000;
+  background-color: #fff;
   z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
   opacity: 1;
-  transition: opacity 2s ease-in-out;
+  transition: opacity 1s ease-in-out;
   pointer-events: auto;
 }
 
@@ -131,18 +131,64 @@ h2 {
   z-index: 5;
 }
 
+.home-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-8vh); /* Desloca todo o bloco de texto para cima */
+}
+
 .home-title {
-  font-family: "Clash", "Inter", sans-serif;
-  font-size: clamp(40px, 6vw, 90px);
-  margin-bottom: 24px;
-  font-weight: 500;
+  font-family: "Great Vibes", cursive;
+  font-size: clamp(80px, 15vw, 240px); /* Fonte levemente maior no desktop */
+  margin-bottom: -0.25em; /* Puxa o subtítulo para BEM perto do título, removendo o vão livre */
+  font-weight: 400;
+  color: #ffa7b6;
+  line-height: 1.2;
+  padding: 0.2em 0.3em; /* Preenchimento em todos os lados impede qualquer corte (esquerda/direita/cima/baixo) */
+  position: relative;
+  z-index: 2;
 }
 
 .home-subtitle {
-  font-size: clamp(16px, 1.5vw, 24px);
-  max-width: 650px;
+  font-size: clamp(18px, 2vw, 30px); /* Aumentou o tamanho da fonte do subtítulo */
+  max-width: 800px;
   margin-bottom: 40px;
   line-height: 1.5;
+  color: #ffa7b6;
+  font-weight: 400;
+  letter-spacing: 4px; /* Espaçamento mais luxuoso */
+  margin-top: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.home-purpose-wrapper {
+  position: absolute;
+  top: auto;
+  bottom: 4%; /* Jogado bem mais para baixo para não ficar no meio da tela no celular */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  padding: 0 5vw;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.home-purpose-text {
+  font-family: "Clash", "Inter", sans-serif;
+  font-size: clamp(24px, 4.5vw, 64px); /* Tamanho adequado para fonte não-cursiva */
+  color: #ffffff;
+  font-weight: 600; /* Peso da Clash Display */
+  line-height: 1.2;
+  max-width: 1300px;
+  margin: 0 auto;
+  opacity: 0;
+  text-transform: uppercase; /* Para combinar com o estilo monumental da introdução (opcional, fica mais premium) */
+  
+  /* Sombra mais elegante e stroke fino */
+  -webkit-text-stroke: 0.5px rgba(255,255,255,0.2);
+  text-shadow: 2px 4px 15px rgba(0, 0, 0, 0.9);
 }
 
 .botoes {
@@ -151,10 +197,50 @@ h2 {
   justify-content: center;
 }
 
+.botaoPrimario,
+.botaoSecundario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  border-radius: 100px;
+  font-family: "Clash", "Inter", sans-serif;
+  font-size: clamp(14px, 1.2vw, 18px);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+}
+
+.botaoPrimario {
+  background-color: #ffa7b6;
+  color: #000;
+  box-shadow: 0 4px 24px rgba(255, 167, 182, 0.35);
+}
+
+.botaoPrimario:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 32px rgba(255, 167, 182, 0.55);
+}
+
+.botaoSecundario {
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+}
+
+.botaoSecundario:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+}
+
 /* Responsividade Global */
 @media (max-width: 768px) {
   .home-title {
-    font-size: clamp(32px, 10vw, 50px);
+    font-size: clamp(80px, 25vw, 130px); /* Muito maior no mobile, compensando os traços finos da fonte cursiva */
+    margin-bottom: -0.2em; /* Mantém o subtítulo coladinho na base */
   }
   
   .home-subtitle {
