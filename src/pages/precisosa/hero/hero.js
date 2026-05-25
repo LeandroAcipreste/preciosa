@@ -40,6 +40,23 @@ function splitTextChars(element) {
 
 export function initHero() {
     // ==========================================
+    // TRICK IOS: FORÇAR RENDERIZAÇÃO DO PRIMEIRO FRAME
+    // Em navegadores mobile (especialmente Safari), o vídeo só carrega o frame
+    // visualmente se dispararmos o .play() manual. Fazemos isso escondido no preloader!
+    // ==========================================
+    const bgVideo = document.getElementById("home-video");
+    if (bgVideo) {
+        bgVideo.load();
+        const p = bgVideo.play();
+        if (p !== undefined) {
+            p.then(() => {
+                bgVideo.pause();
+                bgVideo.currentTime = 0.01;
+            }).catch(() => {}); // Ignora se o autoplay for bloqueado
+        }
+    }
+
+    // ==========================================
     // THREE.JS SETUP
     // ==========================================
     const cena = new THREE.Scene();
