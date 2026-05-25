@@ -5,18 +5,36 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Função auxiliar: quebra texto em <span class="hero-char">
+// Função auxiliar: quebra texto em <span class="hero-char">, mantendo as palavras unidas
 function splitTextChars(element) {
     const text = element.innerText;
     element.innerHTML = '';
     const chars = [];
-    for (let char of text) {
-        const span = document.createElement('span');
-        span.className = 'hero-char';
-        span.innerText = char === ' ' ? '\u00A0' : char;
-        element.appendChild(span);
-        chars.push(span);
-    }
+    
+    // Divide por palavras para garantir a quebra de linha correta no mobile
+    const words = text.split(' ');
+    
+    words.forEach((word, wordIndex) => {
+        const wordSpan = document.createElement('span');
+        wordSpan.style.display = 'inline-block';
+        wordSpan.style.whiteSpace = 'nowrap'; // Impede quebra no meio da palavra
+        
+        for (let char of word) {
+            const charSpan = document.createElement('span');
+            charSpan.className = 'hero-char';
+            charSpan.innerText = char;
+            wordSpan.appendChild(charSpan);
+            chars.push(charSpan);
+        }
+        
+        element.appendChild(wordSpan);
+        
+        // Adiciona um espaço real no HTML para o navegador poder quebrar a linha entre as palavras
+        if (wordIndex < words.length - 1) {
+            element.appendChild(document.createTextNode(" "));
+        }
+    });
+    
     return { chars };
 }
 
@@ -265,8 +283,10 @@ export function initHero() {
                 }
 
                 // O GSAP interpola a propriedade currentTime nativamente!
+                // Usamos duration - 0.1 para evitar um bug do iOS/Navegadores Mobile onde
+                // bater exatamente no final do vídeo com loop faz ele voltar para o frame zero!
                 tlVideo.to(video, {
-                    currentTime: video.duration,
+                    currentTime: video.duration - 0.1,
                     ease: "none",
                     duration: 1.0 // Duração 1.0 mapeia para 100% da distância do scroll
                 }, 0);

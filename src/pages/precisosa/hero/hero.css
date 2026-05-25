@@ -38,10 +38,10 @@
     font-size: 8vw;
     text-align: center;
     color: #ffa7b6;
-    /* Adicionado para garantir visibilidade */
     pointer-events: none;
-        /* Evita que o texto bloqueie interação com o 3D se necessário */
-    }
+    line-height: 1.2; /* Garante que as linhas não fiquem uma em cima da outra */
+    width: 90%; /* Dá margem para a quebra de linha acontecer naturalmente */
+}
 
 .hero-char {
     display: inline-block;
