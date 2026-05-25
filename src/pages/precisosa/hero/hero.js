@@ -209,7 +209,7 @@ export function initHero() {
             webkitClipPath: "inset(-50% 0% -50% 0)",
             duration: 2.5,
             ease: "power2.inOut"
-        }, endIntroTime + 0.5); // Começa logo após a cortina terminar de subir
+        }, endIntroTime + 1.2); // Começa DEPOIS que a cortina branca subiu por completo
 
         // Revela o subtítulo em seguida
         masterTl.to(".home-subtitle", {
@@ -217,7 +217,7 @@ export function initHero() {
             y: 0,
             duration: 1.5,
             ease: "power2.out"
-        }, endIntroTime + 2.5); // Começa quando a escrita estiver terminando
+        }, endIntroTime + 2.8); // Começa no final da escrita
 
         // Avança o playhead interno para garantir que a timeline alcance o fim das animações
         const finalTime = endIntroTime + 4.0;
@@ -283,9 +283,11 @@ export function initHero() {
                 }
 
                 // O GSAP interpola a propriedade currentTime nativamente!
-                // Usamos duration - 0.1 para evitar um bug do iOS/Navegadores Mobile onde
-                // bater exatamente no final do vídeo com loop faz ele voltar para o frame zero!
-                tlVideo.to(video, {
+                // Usamos duration - 0.1 para evitar o loop bugado, E usamos fromTo 
+                // para GARANTIR que o GSAP jogue o vídeo para o segundo 0 no início!
+                tlVideo.fromTo(video, {
+                    currentTime: 0.01 // Zera o vídeo garantidamente no carregamento
+                }, {
                     currentTime: video.duration - 0.1,
                     ease: "none",
                     duration: 1.0 // Duração 1.0 mapeia para 100% da distância do scroll

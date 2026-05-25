@@ -87,6 +87,7 @@ h2 {
   z-index: 1;
   min-height: 100vh;
   min-height: 100dvh; /* Evita que a tela estique/distorça no celular quando a barra de endereço some */
+  background-color: #ffffff; /* Fundo branco para a transição transparente do vídeo */
   display: flex;
   flex-direction: column;
   justify-content: center;

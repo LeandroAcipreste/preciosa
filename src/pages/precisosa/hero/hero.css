@@ -68,8 +68,7 @@
 /* Responsividade Hero */
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 16vw;
-        /* Maior no mobile para dar leitura */
+        font-size: 8vw; /* Reduzido para garantir que ACOLHIMENTO caiba na tela */
         letter-spacing: 2px;
     }
 }
