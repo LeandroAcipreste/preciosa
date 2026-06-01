@@ -1,3 +1,4 @@
+/* Gradiente de fallback no container para preencher o meio eliminado */
 .hero-main {
     position: fixed;
     top: 0;
@@ -5,9 +6,34 @@
     width: 100%;
     height: 100vh;
     z-index: 10;
-    background-color: #fff;
+    overflow: hidden;
+    background: linear-gradient(180deg, #FCF8FA 0%, #F8EEF2 50%, #F5E8ED 100%);
     transform: translateY(0);
     transition: transform 1.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Paineis laterais do SVG — desktop: cobrem 50% cada, juntos cobrem tudo */
+.hero-bg-left,
+.hero-bg-right {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background-image: url('/assets/img/background_preciosa.svg');
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero-bg-left {
+    left: 0;
+    background-position: left center;
+}
+
+.hero-bg-right {
+    right: 0;
+    background-position: right center;
 }
 
 .hero-main.is-gone {
@@ -68,7 +94,21 @@
 /* Responsividade Hero */
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 8vw; /* Reduzido para garantir que ACOLHIMENTO caiba na tela */
+        font-size: 8vw;
         letter-spacing: 2px;
+    }
+
+    /* Mobile: paineis se sobrepõem e o meio do SVG é eliminado */
+    .hero-bg-left,
+    .hero-bg-right {
+        width: 65%;
+    }
+
+    .hero-bg-left {
+        left: -18%;
+    }
+
+    .hero-bg-right {
+        right: -18%;
     }
 }

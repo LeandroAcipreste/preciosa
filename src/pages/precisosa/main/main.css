@@ -1,0 +1,58 @@
+.main-preciosa {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    /* Gradiente de fallback para preencher o meio eliminado */
+    background: linear-gradient(180deg, #FCF8FA 0%, #F8EEF2 50%, #F5E8ED 100%);
+    z-index: 2;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Paineis laterais do SVG — desktop: cobrem 50% cada */
+.main-bg-left,
+.main-bg-right {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background-image: url('/assets/img/background_preciosa.svg');
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.main-bg-left {
+    left: 0;
+    background-position: left center;
+}
+
+.main-bg-right {
+    right: 0;
+    background-position: right center;
+}
+
+/* Qualquer conteúdo filho da main fica acima dos paineis de fundo */
+.main-preciosa > *:not(.main-bg-left):not(.main-bg-right) {
+    position: relative;
+    z-index: 1;
+}
+
+/* Mobile: paineis se sobrepõem e o meio do SVG é eliminado */
+@media (max-width: 768px) {
+    .main-bg-left,
+    .main-bg-right {
+        width: 65%;
+    }
+
+    .main-bg-left {
+        left: -18%;
+    }
+
+    .main-bg-right {
+        right: -18%;
+    }
+}

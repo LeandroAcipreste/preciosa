@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="centerGlow" cx="50%" cy="43%" r="70%">
+      <stop offset="0%" stop-color="#fffdfd"/>
+      <stop offset="38%" stop-color="#fff8fa"/>
+      <stop offset="72%" stop-color="#f9dce5"/>
+      <stop offset="100%" stop-color="#f4b4c6"/>
+    </radialGradient>
+
+    <linearGradient id="softRose" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <filter id="blurSoft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#centerGlow)"/>
+
+  <!-- blush corner depth -->
+  <circle cx="-80" cy="30" r="420" fill="#f5a9bd" opacity="0.23" filter="url(#blurSoft)"/>
+  <circle cx="1970" cy="70" r="430" fill="#f3a1b8" opacity="0.26" filter="url(#blurSoft)"/>
+  <circle cx="125" cy="1030" r="510" fill="#f5b3c7" opacity="0.20" filter="url(#blurSoft)"/>
+  <circle cx="1780" cy="980" r="520" fill="#f3a1ba" opacity="0.20" filter="url(#blurSoft)"/>
+
+  <!-- translucent silk waves -->
+  <path d="M-100 260 C 280 450, 590 190, 980 350 S 1550 535, 2050 230" fill="none" stroke="url(#softRose)" stroke-width="28" opacity="0.28"/>
+  <path d="M-140 840 C 260 690, 520 960, 860 780 S 1410 620, 2020 820" fill="none" stroke="url(#softRose)" stroke-width="34" opacity="0.36"/>
+  <path d="M-80 910 C 430 1000, 620 860, 1020 930 S 1510 1020, 2010 760" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.20"/>
+  <path d="M-40 345 C 285 410, 480 275, 760 345 S 1220 500, 1660 395" fill="none" stroke="#ffffff" stroke-width="8" opacity="0.16"/>
+
+  <!-- subtle vignette light -->
+  <ellipse cx="960" cy="488" rx="710" ry="400" fill="#ffffff" opacity="0.32" filter="url(#blurSoft)"/>
+
+  <!-- sparkle symbols -->
+  <g fill="#ffffff" stroke="#ffffff" opacity="0.75" filter="url(#glow)">
+    <g transform="translate(82 86)"><path d="M0 -28 L0 28 M-28 0 L28 0" stroke-width="2"/><path d="M-17 -17 L17 17 M17 -17 L-17 17" stroke-width="1"/></g>
+    <g transform="translate(248 110) scale(.75)"><path d="M0 -30 L0 30 M-30 0 L30 0" stroke-width="2"/><path d="M-18 -18 L18 18 M18 -18 L-18 18" stroke-width="1"/></g>
+    <g transform="translate(1715 215) scale(.85)"><path d="M0 -34 L0 34 M-34 0 L34 0" stroke-width="2"/><path d="M-20 -20 L20 20 M20 -20 L-20 20" stroke-width="1"/></g>
+    <g transform="translate(1848 44) scale(.55)"><path d="M0 -30 L0 30 M-30 0 L30 0" stroke-width="2"/><path d="M-18 -18 L18 18 M18 -18 L-18 18" stroke-width="1"/></g>
+    <g transform="translate(285 890) scale(.65)"><path d="M0 -30 L0 30 M-30 0 L30 0" stroke-width="2"/><path d="M-18 -18 L18 18 M18 -18 L-18 18" stroke-width="1"/></g>
+  </g>
+
+  <!-- tiny particles -->
+  <g fill="#ffffff" opacity="0.62">
+    <circle cx="122" cy="74" r="4"/><circle cx="166" cy="252" r="2"/><circle cx="40" cy="756" r="7"/>
+    <circle cx="318" cy="518" r="2"/><circle cx="520" cy="620" r="3"/><circle cx="690" cy="185" r="2"/>
+    <circle cx="1520" cy="120" r="2"/><circle cx="1638" cy="326" r="5"/><circle cx="1765" cy="73" r="3"/>
+    <circle cx="1815" cy="252" r="4"/><circle cx="1740" cy="715" r="3"/><circle cx="1888" cy="838" r="3"/>
+    <circle cx="108" cy="890" r="2"/><circle cx="252" cy="612" r="3"/><circle cx="1488" cy="860" r="3"/>
+  </g>
+</svg>

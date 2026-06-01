@@ -40,6 +40,16 @@ function splitTextChars(element) {
 
 export function initHero() {
     // ==========================================
+    // CRÍTICO: BLOQUEIA A RESTAURAÇÃO DE SCROLL DO BROWSER
+    // Sem isso, o browser lembra onde o usuário estava e pula a Hero inteira
+    // na próxima vez que a página carregar, indo direto para a main.
+    // ==========================================
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual'; // Desativa scroll restoration automático
+    }
+    window.scrollTo(0, 0); // Força posição 0 imediatamente, antes de qualquer animação
+
+    // ==========================================
     // TRICK IOS: FORÇAR RENDERIZAÇÃO DO PRIMEIRO FRAME
     // Em navegadores mobile (especialmente Safari), o vídeo só carrega o frame
     // visualmente se dispararmos o .play() manual. Fazemos isso escondido no preloader!
@@ -248,8 +258,10 @@ export function initHero() {
             const video = document.getElementById("home-video");
             if (!video) return;
 
-            // Pausa o vídeo para que o scroll assuma o controle 100%
+            // Pausa o vídeo e garante que o scroll está em 0 antes de criar o ScrollTrigger
             video.pause();
+            window.scrollTo(0, 0); // Segunda garantia: reseta posição antes do pin
+            ScrollTrigger.refresh(); // Força o GSAP a recalcular posições do zero
 
             const setupScrub = () => {
                 // Cria uma timeline atrelada ao ScrollTrigger
