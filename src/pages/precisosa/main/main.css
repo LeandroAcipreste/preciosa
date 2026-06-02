@@ -1,12 +1,13 @@
+/* ============================================
+   MAIN PRECIOSA — Container principal
+   ============================================ */
 .main-preciosa {
     position: relative;
     width: 100%;
     min-height: 100vh;
     overflow: hidden;
-    /* Gradiente de fallback para preencher o meio eliminado */
     background: linear-gradient(180deg, #FCF8FA 0%, #F8EEF2 50%, #F5E8ED 100%);
     z-index: 2;
-    padding: 60px 20px;
     display: flex;
     flex-direction: column;
 }
@@ -25,34 +26,374 @@
     z-index: 0;
 }
 
-.main-bg-left {
-    left: 0;
-    background-position: left center;
-}
+.main-bg-left  { left: 0;  background-position: left center; }
+.main-bg-right { right: 0; background-position: right center; }
 
-.main-bg-right {
-    right: 0;
-    background-position: right center;
-}
-
-/* Qualquer conteúdo filho da main fica acima dos paineis de fundo */
+/* Conteúdo filho fica acima dos paineis */
 .main-preciosa > *:not(.main-bg-left):not(.main-bg-right) {
     position: relative;
     z-index: 1;
 }
 
-/* Mobile: paineis se sobrepõem e o meio do SVG é eliminado */
+/* ============================================
+   SERVICES SECTION
+   ============================================ */
+.services-section {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 72px 40px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+/* ---- Header ---- */
+.services-header {
+    text-align: center;
+    margin-bottom: 56px;
+}
+
+.services-title {
+    font-family: "Great Vibes", cursive;
+    font-size: clamp(52px, 6vw, 96px);
+    font-weight: 400;
+    color: #c4607e;
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+.services-subtitle {
+    font-family: "Clash", "Inter", sans-serif;
+    font-size: clamp(11px, 1.1vw, 14px);
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: #c4607e;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.services-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.divider-line {
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e8a0b8, transparent);
+}
+
+.divider-gem {
+    font-size: 10px;
+    color: #d4708a;
+    opacity: 0.7;
+}
+
+.services-intro {
+    font-family: "Inter", sans-serif;
+    font-size: clamp(14px, 1.3vw, 16px);
+    color: #7a5060;
+    line-height: 1.8;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+.intro-highlight {
+    color: #c4607e;
+    font-weight: 500;
+}
+
+.intro-soft {
+    color: #c4607e;
+}
+
+/* ---- Gems Grid ---- */
+.gems-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0;
+    margin-bottom: 56px;
+}
+
+/* ---- Gem Card ---- */
+.gem-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 220px;
+    gap: 0;
+    text-align: center;
+}
+
+/* Icon acima da pedra */
+.gem-icon {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    opacity: 0.85;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.gem-card:hover .gem-icon {
+    opacity: 1;
+    transform: translateY(-4px);
+}
+
+/* Tamanho padrão para ícones PNG normais */
+.gem-icon-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+/* Base para ícones com máscara (aplicação de cor) */
+.gem-icon-mask {
+    width: 60px;
+    height: 60px;
+    background-color: #c4607e;
+}
+
+/* URLs específicas para cada máscara */
+.icon-saude {
+    -webkit-mask: url('/assets/img/icones/saude-feminina.png') no-repeat center / contain;
+    mask: url('/assets/img/icones/saude-feminina.png') no-repeat center / contain;
+}
+
+.icon-prevencao {
+    -webkit-mask: url('/assets/img/icones/prevencao-ginecologica.png') no-repeat center / contain;
+    mask: url('/assets/img/icones/prevencao-ginecologica.png') no-repeat center / contain;
+}
+
+/* Wrapper da pedra com glow — caixa uniforme para todas as pedras */
+.gem-glow-wrapper {
+    position: relative;
+    width: 160px;
+    height: 160px;   /* Quadrado fixo: garante que todas as pedras ocupam o mesmo espaço visual */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Círculo de glow rosado atrás da pedra */
+.gem-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 55%,
+        rgba(255, 182, 210, 0.55) 0%,
+        rgba(255, 192, 218, 0.35) 40%,
+        rgba(255, 220, 235, 0.15) 70%,
+        transparent 100%
+    );
+    filter: blur(12px);
+    transform: scale(1.05);
+    transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.gem-card:hover .gem-glow {
+    transform: scale(1.18);
+    filter: blur(16px);
+}
+
+/* Imagem da pedra — todas com o mesmo tamanho de caixa */
+.gem-image {
+    position: relative;
+    z-index: 1;
+    width: 100%;         /* Preenche toda a largura do wrapper */
+    height: 100%;        /* Preenche toda a altura do wrapper */
+    object-fit: contain; /* Cada pedra cabe dentro da caixa sem cortar nem distorcer */
+    mix-blend-mode: multiply; /* Remove fundo branco de imagens JPEG/PNG com fundo claro */
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+    filter: drop-shadow(0 8px 20px rgba(196, 96, 126, 0.25));
+}
+
+.gem-card:hover .gem-image {
+    transform: translateY(-6px) scale(1.05);
+    filter: drop-shadow(0 16px 32px rgba(196, 96, 126, 0.4));
+}
+
+/* Compensação para a pedra 4 (Estética) que possui muita margem transparente no arquivo original */
+.gem-flower {
+    width: 140%;
+    height: 140%;
+    max-width: none;
+}
+
+
+/* Título do card */
+.gem-title {
+    font-family: "Clash", "Inter", sans-serif;
+    font-size: clamp(10px, 0.9vw, 12px);
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: #c4607e;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+/* Descrição do card */
+.gem-desc {
+    font-family: "Inter", sans-serif;
+    font-size: clamp(12px, 1vw, 13px);
+    color: #9a7080;
+    line-height: 1.7;
+    max-width: 180px;
+    margin: 0 auto;
+}
+
+/* ---- Conectores entre pedras ---- */
+.gem-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    gap: 4px;
+    align-self: center;
+    margin-bottom: 70px; /* Alinha visualmente com a linha das pedras */
+}
+
+.connector-dot {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: #e8a0b8;
+    opacity: 0.7;
+}
+
+.connector-line {
+    display: block;
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, #e8a0b8, #f4c8d8);
+    opacity: 0.7;
+}
+
+.connector-sparkle {
+    font-size: 10px;
+    color: #e8a0b8;
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+
+/* ---- CTA inferior ---- */
+.services-cta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(232, 160, 184, 0.3);
+    border-radius: 60px;
+    padding: 16px 32px;
+    margin-top: 8px;
+}
+
+.cta-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f9ccd8, #f5a8be);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(196, 96, 126, 0.25);
+}
+
+.cta-main {
+    font-family: "Inter", sans-serif;
+    font-size: clamp(13px, 1.2vw, 15px);
+    font-weight: 600;
+    color: #c4607e;
+}
+
+.cta-sub {
+    font-family: "Inter", sans-serif;
+    font-size: clamp(12px, 1vw, 13px);
+    color: #9a7080;
+    margin-top: 2px;
+}
+
+/* ============================================
+   RESPONSIVIDADE MOBILE
+   ============================================ */
 @media (max-width: 768px) {
+
+    /* SVG: paineis se sobrepõem no mobile */
     .main-bg-left,
-    .main-bg-right {
-        width: 65%;
+    .main-bg-right { width: 65%; }
+    .main-bg-left  { left: -18%; }
+    .main-bg-right { right: -18%; }
+
+    .services-section {
+        padding: 48px 24px 60px;
     }
 
-    .main-bg-left {
-        left: -18%;
+    .services-header {
+        margin-bottom: 40px;
     }
 
-    .main-bg-right {
-        right: -18%;
+    /* Grid vira coluna no mobile */
+    .gems-grid {
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+    }
+
+    .gem-card {
+        max-width: 280px;
+        width: 100%;
+    }
+
+    .gem-glow-wrapper {
+        width: 130px;
+        height: 130px; /* Mesmo quadrado uniforme no mobile */
+    }
+
+    /* Conectores viram verticais no mobile */
+    .gem-connector {
+        flex-direction: column;
+        width: auto;
+        height: 48px;
+        margin-bottom: 0;
+        margin-left: 0;
+        gap: 4px;
+    }
+
+    .connector-line {
+        width: 1px;
+        height: 100%;
+        flex: 1;
+        background: linear-gradient(180deg, #e8a0b8, #f4c8d8);
+    }
+
+    /* CTA empilhado no mobile */
+    .services-cta {
+        flex-direction: column;
+        text-align: center;
+        border-radius: 20px;
+        padding: 20px 24px;
+    }
+}
+
+@media (max-width: 400px) {
+    .services-section {
+        padding: 36px 16px 48px;
     }
 }

@@ -261,7 +261,6 @@ export function initHero() {
             // Pausa o vídeo e garante que o scroll está em 0 antes de criar o ScrollTrigger
             video.pause();
             window.scrollTo(0, 0); // Segunda garantia: reseta posição antes do pin
-            ScrollTrigger.refresh(); // Força o GSAP a recalcular posições do zero
 
             const setupScrub = () => {
                 // Cria uma timeline atrelada ao ScrollTrigger
@@ -321,6 +320,11 @@ export function initHero() {
                     ease: "none",
                     duration: 1.0 // Duração 1.0 mapeia para 100% da distância do scroll
                 }, 0);
+                
+                // CRÍTICO: Recalcula todos os ScrollTriggers da página (incluindo os da main.js) 
+                // APÓS criar este pin que adiciona 2000px de espaçamento, garantindo que as 
+                // animações da segunda dobra não disparem na posição errada!
+                ScrollTrigger.refresh();
             };
 
             // Só podemos ler video.duration quando os metadados estiverem carregados

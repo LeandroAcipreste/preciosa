@@ -76,7 +76,7 @@ h2 {
 }
 
 .preloader-text {
-  color: #ffa7b6;
+  color: #c4607e;
   font-family: "Clash", "Inter", sans-serif;
   font-size: clamp(16px, 2.5vw, 32px);
   font-weight: 400;
@@ -147,7 +147,7 @@ h2 {
   font-size: clamp(80px, 15vw, 240px); /* Fonte levemente maior no desktop */
   margin-bottom: -0.25em; /* Puxa o subtítulo para BEM perto do título, removendo o vão livre */
   font-weight: 400;
-  color: #ffa7b6;
+  color: #c4607e;
   line-height: 1.2;
   padding: 0.2em 0.3em; /* Preenchimento em todos os lados impede qualquer corte (esquerda/direita/cima/baixo) */
   position: relative;
@@ -159,7 +159,7 @@ h2 {
   max-width: 800px;
   margin-bottom: 40px;
   line-height: 1.5;
-  color: #ffa7b6;
+  color: #c4607e;
   font-weight: 400;
   letter-spacing: 4px; /* Espaçamento mais luxuoso */
   margin-top: 0;

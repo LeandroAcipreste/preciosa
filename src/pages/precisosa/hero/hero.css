@@ -63,7 +63,7 @@
     position: absolute;
     font-size: 8vw;
     text-align: center;
-    color: #ffa7b6;
+    color: #c4607e;
     pointer-events: none;
     line-height: 1.2; /* Garante que as linhas não fiquem uma em cima da outra */
     width: 90%; /* Dá margem para a quebra de linha acontecer naturalmente */
