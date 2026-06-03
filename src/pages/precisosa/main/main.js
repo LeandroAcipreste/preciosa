@@ -11,68 +11,48 @@ export function initMain() {
     buildOrnamentalPath();
 
     // ============================================
-    // Animação de entrada do cabeçalho da seção
+    // Otimização: Adiciona classe CSS de animação
     // ============================================
-    gsap.from(".services-faixa, .services-subtitle, .services-intro", {
-        scrollTrigger: {
-            trigger: ".services-header",
-            start: "top 80%",
-            once: true
-        },
-        opacity: 0,
-        y: 24,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: "power2.out",
-        delay: 0.2
+    const fadeElements = document.querySelectorAll(".services-faixa, .services-subtitle, .services-intro, .gem-card, .services-cta");
+    fadeElements.forEach(el => el.classList.add("fade-up"));
+
+    // ============================================
+    // GSAP Executor: Dispara as animações CSS via ScrollTrigger
+    // ============================================
+    gsap.utils.toArray(fadeElements).forEach(el => {
+        ScrollTrigger.create({
+            trigger: el,
+            start: "top 85%", // Dispara quando o elemento entra na tela
+            // Substituímos onEnter e once:true por toggleClass! 
+            // Assim, se o ScrollTrigger.refresh() recalcular as posições por causa do vídeo fixo acima,
+            // ele remove a classe e readiciona na hora certa do scroll.
+            toggleClass: "is-visible"
+        });
     });
 
     // ============================================
-    // Animação de entrada das pedras (stagger)
+    // Caminho Ornamental: Revelação via Scrub (Scroll)
     // ============================================
-    gsap.from(".gem-card", {
+    const isMobile = window.innerWidth <= 768;
+    
+    // Set inicial no GSAP usando clip-path com porcentagens exatas para interpolar
+    gsap.set("#ornamental-path", { 
+        clipPath: isMobile ? "inset(0% 0% 100% 0%)" : "inset(0% 100% 0% 0%)",
+        webkitClipPath: isMobile ? "inset(0% 0% 100% 0%)" : "inset(0% 100% 0% 0%)",
+        opacity: 1 
+    });
+
+    // O scroll scrub revela o crop de acordo com a rolagem
+    gsap.to("#ornamental-path", {
+        clipPath: "inset(0% 0% 0% 0%)",
+        webkitClipPath: "inset(0% 0% 0% 0%)",
+        ease: "none",
         scrollTrigger: {
             trigger: ".gems-grid",
-            start: "top 80%",
-            once: true
-        },
-        opacity: 0,
-        y: 50,
-        duration: 0.9,
-        stagger: 0.15,
-        ease: "power3.out"
-    });
-
-    // ============================================
-    // Caminho Ornamental
-    // ============================================
-    gsap.from("#ornamental-path", {
-        scrollTrigger: {
-            trigger: ".gems-grid",
-            start: "top 75%",
-            once: true
-        },
-        opacity: 0,
-        scaleX: 0,
-        transformOrigin: "left center",
-        duration: 1.5,
-        ease: "power2.out",
-        delay: 0.4
-    });
-
-    // ============================================
-    // Animação de entrada do CTA
-    // ============================================
-    gsap.from(".services-cta", {
-        scrollTrigger: {
-            trigger: ".services-cta",
-            start: "top 90%",
-            once: true
-        },
-        opacity: 0,
-        y: 20,
-        duration: 0.8,
-        ease: "power2.out"
+            start: "top 65%", // Começa a revelar quando a grid atinge 65%
+            end: "bottom 85%", // Termina de revelar perto do fim da grid
+            scrub: 1 // Suavização premium do scrub
+        }
     });
 }
 
@@ -87,9 +67,15 @@ function buildOrnamentalPath() {
     const xlinkNS = "http://www.w3.org/1999/xlink";
     const GEM_SRC = "/assets/img/caminho das pedras/ChatGPT Image 2_06_2026, 06_32_01 (4).png";
 
+    const isMobile = window.innerWidth <= 768;
+
     // SVG container
     const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("viewBox", "0 0 1335 203");
+    if (isMobile) {
+        svg.setAttribute("viewBox", "0 0 203 1335");
+    } else {
+        svg.setAttribute("viewBox", "0 0 1335 203");
+    }
     svg.setAttribute("fill", "none");
     svg.setAttribute("overflow", "visible");
     container.appendChild(svg);
@@ -113,10 +99,17 @@ function buildOrnamentalPath() {
 
     // Helper: plota imagem centrada em (cx, cy) com tamanho s
     function placeGem(cx, cy, s, opacity) {
+        let finalX = cx;
+        let finalY = cy;
+        if (isMobile) {
+            finalX = cy;
+            finalY = cx;
+        }
+
         const img = document.createElementNS(svgNS, "image");
         img.setAttributeNS(xlinkNS, "href", GEM_SRC);
-        img.setAttribute("x",       String(cx - s / 2));
-        img.setAttribute("y",       String(cy - s / 2));
+        img.setAttribute("x",       String(finalX - s / 2));
+        img.setAttribute("y",       String(finalY - s / 2));
         img.setAttribute("width",   String(s));
         img.setAttribute("height",  String(s));
         img.setAttribute("opacity", String(opacity));
@@ -130,9 +123,26 @@ function buildOrnamentalPath() {
         const lp = guide.getPointAtLength(Math.min(largeDist, totalLen));
         placeGem(lp.x, lp.y, LARGE, 1);
 
-        // Sem próxima grande? Para.
+        // Sem próxima grande? Preenche o restante com pequenas e para.
         const nextLarge = largeDist + LARGE_STEP;
-        if (nextLarge > totalLen) break;
+        if (nextLarge > totalLen) {
+            const smallStart = largeDist + LARGE / 2 + SMALL / 2 + 2;
+            const smallEnd   = totalLen - SMALL / 2; // Vai até o fim do caminho
+            const available  = smallEnd - smallStart;
+
+            if (available > 0) {
+                const count = Math.max(1, Math.round(available / SMALL_STEP));
+                const step  = available / count;
+
+                for (let i = 0; i <= count; i++) {
+                    const dist = smallStart + i * step;
+                    if (dist > totalLen) break;
+                    const sp = guide.getPointAtLength(dist);
+                    placeGem(sp.x, sp.y, SMALL, 0.88);
+                }
+            }
+            break;
+        }
 
         // Região para pequenas: da borda da grande atual até a borda da próxima
         const smallStart = largeDist + LARGE / 2 + SMALL / 2 + 2;
@@ -182,8 +192,14 @@ function buildOrnamentalPath() {
         const dx = Math.cos(perpAng) * spread;
         const dy = Math.sin(perpAng) * spread;
 
-        const finalX = pt.x + dx;
-        const finalY = pt.y + dy;
+        let finalX = pt.x + dx;
+        let finalY = pt.y + dy;
+
+        if (isMobile) {
+            const tempX = finalX;
+            finalX = finalY;
+            finalY = tempX;
+        }
 
         // Tamanho variado: maioria pequena, algumas médias, raras grandes
         const r    = Math.random();

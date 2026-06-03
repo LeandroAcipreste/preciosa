@@ -58,9 +58,10 @@
 .services-faixa {
     display: block;
     margin: 0 auto 24px auto;
-    max-width: 80%;
+    width: clamp(200px, 45vw, 400px);
     height: auto;
     object-fit: contain;
+    opacity: 0.9;
 }
 
 .services-subtitle {
@@ -73,10 +74,9 @@
     margin-bottom: 16px;
 }
 
-.faixa-flip {
+.faixa-bottom {
     margin-top: 24px;
     margin-bottom: 0;
-    transform: rotate(180deg);
 }
 
 .services-intro {
@@ -335,15 +335,16 @@
         height: 130px; /* Mesmo quadrado uniforme no mobile */
     }
 
-    /* Oculta ou simplifica o caminho ornamental no mobile se preferir, 
-       ou ajusta para rolar. Por enquanto, permitimos que transborde. */
     #ornamental-path {
-        top: 50%;
-        min-width: 800px;
-        opacity: 0.5; /* Suaviza no mobile */
-        display: none; /* Como virou coluna, a linha horizontal não faz mais sentido. 
-                          Se quiser, pode-se criar um vetor vertical, mas por padrão 
-                          escondemos no mobile ou mostramos de outra forma. */
+        top: 20px; /* Começa logo abaixo da faixa */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 203px; /* Largura base do vetor invertido */
+        height: 1335px; /* Altura equivalente ao totalLen do desktop */
+        min-width: unset;
+        opacity: 0.9;
+        display: block;
+        z-index: 0;
     }
 
     /* CTA empilhado no mobile */
@@ -359,4 +360,33 @@
     .services-section {
         padding: 36px 16px 48px;
     }
+}
+
+/* ============================================
+   ANIMAÇÕES DE ENTRADA (FADE UP)
+   ============================================ */
+.fade-up {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1), transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: opacity, transform;
+}
+
+.fade-up.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Stagger para o cabeçalho (faixa, subtitle, intro, faixa) */
+.services-header .fade-up:nth-child(1) { transition-delay: 0.1s; }
+.services-header .fade-up:nth-child(2) { transition-delay: 0.2s; }
+.services-header .fade-up:nth-child(3) { transition-delay: 0.3s; }
+.services-header .fade-up:nth-child(4) { transition-delay: 0.4s; }
+
+/* Stagger para as pedras na grade (apenas desktop, no mobile entra por scroll natural) */
+@media (min-width: 769px) {
+    .gems-grid .gem-card:nth-child(2) { transition-delay: 0.0s; }
+    .gems-grid .gem-card:nth-child(3) { transition-delay: 0.2s; }
+    .gems-grid .gem-card:nth-child(4) { transition-delay: 0.4s; }
+    .gems-grid .gem-card:nth-child(5) { transition-delay: 0.6s; }
 }
