@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css" />
     <title>Precisoa</title>
 </head>
@@ -16,20 +16,23 @@
     <div id="preloader" class="preloader-overlay">
         <div class="preloader-text">Iniciando sua experiência...</div>
     </div>
-    <!-- Conteúdo principal que aparecerá atrás do diamante -->
+    <!-- HERO: Vídeo atrás + Máscara branca com texto vazado na frente (Blend Mode) -->
     <div class="home-content">
-        <!-- Vídeo de fundo que surge após a intro -->
-        <video id="home-video" class="home-video" src="/assets/img/hero_bg_scrub.mp4" muted playsinline
-            preload="auto"></video>
-        <div class="home-text-wrapper">
-            <h1 class="home-title">Preciosa</h1>
-            <p class="home-subtitle">Cuidado integral da mulher</p>
+        <!-- Vídeo de fundo: toca em loop automaticamente -->
+        <video id="home-video" class="home-video" src="/assets/img/nova-hero.mp4"
+            autoplay muted loop playsinline preload="auto"></video>
+            
+        <!-- Máscara de Blend-Mode: Tela branca com o texto PRECIOSA vazado -->
+        <div class="home-text-mask-container">
+            <h1 class="mask-brand-text">PRECIOSA</h1>
         </div>
 
-        <!-- Texto que se forma durante o scroll do vídeo -->
-        <div class="home-purpose-wrapper">
-            <h2 class="home-purpose-text">Nosso propósito é promover qualidade de vida, bem-estar e fortalecimento da
-                mulher</h2>
+        <!-- Indicador de Scroll Elegante -->
+        <div class="hero-scroll-indicator">
+            <span class="scroll-text">DESÇA PARA EXPLORAR</span>
+            <div class="scroll-mouse">
+                <div class="scroll-wheel"></div>
+            </div>
         </div>
     </div>
 

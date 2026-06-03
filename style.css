@@ -93,15 +93,17 @@ h2 {
   position: relative;
   z-index: 1;
   min-height: 100vh;
-  min-height: 100dvh; /* Evita que a tela estique/distorça no celular quando a barra de endereço some */
-  background-color: #ffffff; /* Fundo branco para a transição transparente do vídeo */
+  min-height: 100dvh;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
   padding: 4vw;
-  overflow: hidden;
+  /* CRÍTICO: isolation:auto permite que mix-blend-mode atravesse para o vídeo abaixo */
+  isolation: auto;
+  clip-path: inset(0);           /* Clip sem criar stacking context isolado */
 }
 
 .home-video {
@@ -114,12 +116,104 @@ h2 {
   height: 100dvh;
   object-fit: cover;
   z-index: 0;
-  opacity: 0; /* começa invisível */
-  transition: opacity 1s ease-in-out;
+  opacity: 1; /* sempre visível — sem scrub */
 }
 
 .home-video.is-visible {
   opacity: 1;
+}
+
+/* ============================================
+   HERO MASK — Efeito luxury cutout via Blend Mode
+   ============================================ */
+.home-text-mask-container {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2 !important;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.mask-brand-text {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(48px, 14vw, 220px);
+  color: #000000;
+  letter-spacing: 40px; /* Animado via GSAP */
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1;
+  opacity: 0; /* Animado via GSAP */
+  transform: scale(0.9); /* Animado via GSAP */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Indicador de Scroll Elegante */
+.hero-scroll-indicator {
+  position: absolute !important;
+  bottom: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+  opacity: 0; /* Animado via GSAP */
+}
+
+.scroll-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: #c4607e;
+  text-transform: uppercase;
+}
+
+.scroll-mouse {
+  width: 20px;
+  height: 32px;
+  border: 1.5px solid #c4607e;
+  border-radius: 12px;
+  position: relative;
+}
+
+.scroll-wheel {
+  width: 3px;
+  height: 6px;
+  background-color: #c4607e;
+  border-radius: 50%;
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: scrollWheelAnim 1.6s infinite ease-in-out;
+}
+
+@keyframes scrollWheelAnim {
+  0% {
+    top: 6px;
+    opacity: 1;
+  }
+  50% {
+    top: 14px;
+    opacity: 0.3;
+  }
+  100% {
+    top: 6px;
+    opacity: 1;
+  }
 }
 
 /* Garante que título e botões fiquem sobre o vídeo */
@@ -146,6 +240,8 @@ h2 {
   flex-direction: column;
   align-items: center;
   transform: translateY(-8vh); /* Desloca todo o bloco de texto para cima */
+  position: relative;
+  z-index: 2; /* Acima da máscara Union */
 }
 
 .home-title {
@@ -181,7 +277,7 @@ h2 {
   transform: translateX(-50%);
   width: 100%;
   padding: 0 5vw;
-  z-index: 2;
+  z-index: 2; /* Acima da máscara Union */
   pointer-events: none;
 }
 

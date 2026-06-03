@@ -49,20 +49,14 @@ export function initHero(onIntroComplete) {
     }
     window.scrollTo(0, 0); // Força posição 0 imediatamente, antes de qualquer animação
 
-    // ==========================================
-    // TRICK IOS: FORÇAR RENDERIZAÇÃO DO PRIMEIRO FRAME
-    // Em navegadores mobile (especialmente Safari), o vídeo só carrega o frame
-    // visualmente se dispararmos o .play() manual. Fazemos isso escondido no preloader!
-    // ==========================================
+    // O vídeo toca sozinho com autoplay/loop — sem scrub
     const bgVideo = document.getElementById("home-video");
     if (bgVideo) {
-        bgVideo.load();
+        bgVideo.loop = true;
+        bgVideo.muted = true;
         const p = bgVideo.play();
         if (p !== undefined) {
-            p.then(() => {
-                bgVideo.pause();
-                bgVideo.currentTime = 0.01;
-            }).catch(() => {}); // Ignora se o autoplay for bloqueado
+            p.catch(() => {}); // Ignora bloqueio de autoplay
         }
     }
 
@@ -228,117 +222,66 @@ export function initHero(onIntroComplete) {
             }
         }, endIntroTime - 1.0); // O vídeo aparece enquanto a cortina está subindo
 
-        // 7. ANIMAÇÃO DE ESCRITA DO TÍTULO FINAL E SURGIMENTO DO SUBTÍTULO
-        // Prepara os elementos no frame 0. Usamos -50% em cima e embaixo para o clip-path não cortar a letra P
-        masterTl.set(".home-title", { clipPath: "inset(-50% 100% -50% 0)", webkitClipPath: "inset(-50% 100% -50% 0)" }, 0);
-        masterTl.set(".home-subtitle", { opacity: 0, y: 30 }, 0);
+        // 7. ANIMAÇÃO DE ENTRADA TIPOGRÁFICA (Efeito Luxo)
+        // O texto inicia com espaçamento bem aberto e escala menor, e depois assenta na tela
+        const isMobileScreen = window.innerWidth < 768;
+        const startSpacing = isMobileScreen ? "20px" : "60px";
+        const endSpacing = isMobileScreen ? "8px" : "15px";
 
-        // Revela o título como se estivesse sendo escrito (da esquerda para a direita)
-        masterTl.to(".home-title", {
-            clipPath: "inset(-50% 0% -50% 0)",
-            webkitClipPath: "inset(-50% 0% -50% 0)",
-            duration: 2.5,
-            ease: "power2.inOut"
-        }, endIntroTime + 1.2); // Começa DEPOIS que a cortina branca subiu por completo
+        masterTl.set(".mask-brand-text", { 
+            opacity: 0, 
+            letterSpacing: startSpacing,
+            scale: 0.85,
+            transformOrigin: "50% 50%"
+        }, 0);
 
-        // Revela o subtítulo em seguida
-        masterTl.to(".home-subtitle", {
+        masterTl.to(".mask-brand-text", {
             opacity: 1,
-            y: 0,
+            letterSpacing: endSpacing,
+            scale: 1,
+            duration: 3.5,
+            ease: "power4.out"
+        }, endIntroTime + 0.8); // Inicia suavemente após a cortina branca subir
+
+        // Fade-in do indicador de scroll elegante
+        masterTl.to(".hero-scroll-indicator", {
+            opacity: 1,
             duration: 1.5,
             ease: "power2.out"
-        }, endIntroTime + 2.8); // Começa no final da escrita
+        }, endIntroTime + 2.2);
+
+        // Efeito de zoom e fade-out paralaxe no scroll do mouse (Buttery Smooth)
+        gsap.to(".home-text-mask-container", {
+            scrollTrigger: {
+                trigger: ".home-content",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            scale: 3.5,
+            opacity: 0,
+            transformOrigin: "50% 50%",
+            ease: "power1.inOut"
+        });
+
+        // Efeito de fade-out do scroll indicator
+        gsap.to(".hero-scroll-indicator", {
+            scrollTrigger: {
+                trigger: ".home-content",
+                start: "top top",
+                end: "30% top",
+                scrub: true
+            },
+            opacity: 0,
+            y: -50,
+            ease: "power1.in"
+        });
 
         // Avança o playhead interno para garantir que a timeline alcance o fim das animações
-        const finalTime = endIntroTime + 4.0;
+        const finalTime = endIntroTime + 4.5;
         masterTl.to({}, { duration: 0.1 }, finalTime);
 
-        // ==========================================
-        // 🖱️ SCROLL → VÍDEO SCRUBBING (Senior GSAP Approach)
-        // Usa o motor do GSAP para suavizar a interpolação do tempo (scrub)
-        // ==========================================
-        masterTl.add(() => {
-            const video = document.getElementById("home-video");
-            if (!video) return;
-
-            // Pausa o vídeo e garante que o scroll está em 0 antes de criar o ScrollTrigger
-            video.pause();
-            window.scrollTo(0, 0); // Segunda garantia: reseta posição antes do pin
-
-            const setupScrub = () => {
-                // Cria uma timeline atrelada ao ScrollTrigger
-                let tlVideo = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: ".home-content",
-                        start: "top top",
-                        end: "+=2000", // A tela fica travada (pinned) por 2000px de scroll
-                        pin: true,     // Prende a tela enquanto o scroll avança o vídeo
-                        scrub: 1.5,    // Suavização premium de 1.5s para evitar qualquer solavanco (jank)
-                        refreshPriority: 10 // CRÍTICO: Executa este cálculo antes de qualquer outro trigger abaixo
-                    }
-                });
-
-                // Anima o texto sumindo (fade out) e subindo logo no início do scroll (primeiros 20%)
-                tlVideo.to(".home-text-wrapper", {
-                    opacity: 0,
-                    y: -80,
-                    ease: "power2.inOut",
-                    duration: 0.2
-                }, 0);
-
-                // Faz a nova frase ir se formando, PALAVRA por PALAVRA, enquanto o cristal sobe
-                const purposeText = document.querySelector(".home-purpose-text");
-                if (purposeText) {
-                    const words = purposeText.innerText.split(" ");
-                    purposeText.innerHTML = "";
-                    purposeText.style.opacity = 1; // Revela o container-pai agora que o CSS foi sobrescrito pelas spans
-
-                    const wordSpans = words.map(word => {
-                        const span = document.createElement("span");
-                        span.innerText = word; // Palavra pura, sem espaço dentro
-                        span.style.display = "inline-block";
-                        span.style.opacity = 0; // As palavras individuais nascem invisíveis
-                        purposeText.appendChild(span);
-                        purposeText.appendChild(document.createTextNode(" ")); // Adiciona o espaço real do HTML entre os spans
-                        return span;
-                    });
-
-                    // Força a animação a ocupar exatamente a janela de 0.2 até 1.0 da timeline
-                    // Para que o vídeo não trave pela metade do scroll!
-                    const staggerAmount = 0.6 / wordSpans.length;
-                    
-                    tlVideo.fromTo(wordSpans,
-                        { opacity: 0, filter: "blur(8px)", y: 20 },
-                        { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.2, stagger: staggerAmount, ease: "power1.out" },
-                        0.2 // Inicia aos 20% do scroll
-                    );
-                }
-
-                // O GSAP interpola a propriedade currentTime nativamente!
-                // Usamos duration - 0.1 para evitar o loop bugado, E usamos fromTo 
-                // para GARANTIR que o GSAP jogue o vídeo para o segundo 0 no início!
-                tlVideo.fromTo(video, {
-                    currentTime: 0.01 // Zera o vídeo garantidamente no carregamento
-                }, {
-                    currentTime: video.duration - 0.1,
-                    ease: "none",
-                    duration: 1.0 // Duração 1.0 mapeia para 100% da distância do scroll
-                }, 0);
-                
-                // CRÍTICO: Recalcula todos os ScrollTriggers da página (incluindo os da main.js) 
-                // APÓS criar este pin que adiciona 2000px de espaçamento, garantindo que as 
-                // animações da segunda dobra não disparem na posição errada!
-                ScrollTrigger.refresh();
-            };
-
-            // Só podemos ler video.duration quando os metadados estiverem carregados
-            if (video.readyState >= 1) { // HAVE_METADATA ou superior
-                setupScrub();
-            } else {
-                video.addEventListener("loadedmetadata", setupScrub);
-            }
-        }, endIntroTime);
-    });
+    }); // Fecha Promise.all
 
     // ==========================================
     // 🔄 LOOP THREE.JS (rotação contínua do eixo Y)
