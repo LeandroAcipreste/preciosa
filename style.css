@@ -46,6 +46,12 @@ body {
   background-color: #000000;
 }
 
+body.intro-active {
+  overflow: hidden !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+}
+
 h2 {
   font-size: 3.8vw;
   font-family: "Clash", "Inter", Sans-Serif;

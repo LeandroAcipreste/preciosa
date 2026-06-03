@@ -4,55 +4,52 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export function initMain() {
-
-    // ============================================
-    // Cria o caminho de joias por trás das gemas
-    // ============================================
     buildOrnamentalPath();
 
-    // ============================================
-    // Otimização: Adiciona classe CSS de animação
-    // ============================================
     const fadeElements = document.querySelectorAll(".services-faixa, .services-subtitle, .services-intro, .gem-card, .services-cta");
     fadeElements.forEach(el => el.classList.add("fade-up"));
 
-    // ============================================
-    // GSAP Executor: Dispara as animações CSS via ScrollTrigger
-    // ============================================
+    // 1. CORREÇÃO DO TOGGLECLASS PARA MOBILE
+    // Usamos onEnter para adicionar a classe e evitamos que o resize do mobile remova a classe acidentalmente.
     gsap.utils.toArray(fadeElements).forEach(el => {
         ScrollTrigger.create({
             trigger: el,
-            start: "top 85%", // Dispara quando o elemento entra na tela
-            // Substituímos onEnter e once:true por toggleClass! 
-            // Assim, se o ScrollTrigger.refresh() recalcular as posições por causa do vídeo fixo acima,
-            // ele remove a classe e readiciona na hora certa do scroll.
-            toggleClass: "is-visible"
+            start: "top 85%",
+            onEnter: () => el.classList.add("is-visible"),
+            once: true // CRÍTICO: Garante que o recálculo do mobile não faça a div sumir
         });
     });
 
-    // ============================================
-    // Caminho Ornamental: Revelação via Scrub (Scroll)
-    // ============================================
     const isMobile = window.innerWidth <= 768;
-    
-    // Set inicial no GSAP usando clip-path com porcentagens exatas para interpolar
-    gsap.set("#ornamental-path", { 
+
+    gsap.set("#ornamental-path", {
         clipPath: isMobile ? "inset(0% 0% 100% 0%)" : "inset(0% 100% 0% 0%)",
         webkitClipPath: isMobile ? "inset(0% 0% 100% 0%)" : "inset(0% 100% 0% 0%)",
-        opacity: 1 
+        opacity: 1
     });
 
-    // O scroll scrub revela o crop de acordo com a rolagem
+    // 2. MELHORIA DO CÁLCULO DE ÁREA NO MOBILE
+    // No mobile a grade fica muito longa. Alteramos o 'end' para 'bottom center' 
+    // para a animação do vetor não parecer lenta ou morta no final.
     gsap.to("#ornamental-path", {
         clipPath: "inset(0% 0% 0% 0%)",
         webkitClipPath: "inset(0% 0% 0% 0%)",
         ease: "none",
         scrollTrigger: {
             trigger: ".gems-grid",
-            start: "top 65%", // Começa a revelar quando a grid atinge 65%
-            end: "bottom 85%", // Termina de revelar perto do fim da grid
-            scrub: 1 // Suavização premium do scrub
+            start: "top 65%",
+            end: isMobile ? "bottom center" : "bottom 85%",
+            scrub: 1
         }
+    });
+
+    // 3. A BALA DE PRATA PARA O MOBILE E LAYOUT SHIFTS
+    // Garante que os triggers sejam ordenados e recalculados na hora com base nas prioridades e fluxo
+    ScrollTrigger.sort();
+    ScrollTrigger.refresh();
+
+    window.addEventListener("load", () => {
+        ScrollTrigger.refresh();
     });
 }
 
@@ -63,7 +60,7 @@ function buildOrnamentalPath() {
     const container = document.getElementById('ornamental-path');
     if (!container) return;
 
-    const svgNS   = "http://www.w3.org/2000/svg";
+    const svgNS = "http://www.w3.org/2000/svg";
     const xlinkNS = "http://www.w3.org/1999/xlink";
     const GEM_SRC = "/assets/img/caminho das pedras/ChatGPT Image 2_06_2026, 06_32_01 (4).png";
 
@@ -92,8 +89,8 @@ function buildOrnamentalPath() {
     const totalLen = guide.getTotalLength();
 
     // ── Tamanhos ──────────────────────────────────────────────────────────────
-    const LARGE      = 36;   // tamanho da pedra grande (px no viewBox)
-    const SMALL      = 13;   // tamanho da pedra pequena
+    const LARGE = 36;   // tamanho da pedra grande (px no viewBox)
+    const SMALL = 13;   // tamanho da pedra pequena
     const SMALL_STEP = 15;   // distância centro-a-centro entre pedras pequenas
     const LARGE_STEP = 180;  // distância entre centros das pedras grandes
 
@@ -108,10 +105,10 @@ function buildOrnamentalPath() {
 
         const img = document.createElementNS(svgNS, "image");
         img.setAttributeNS(xlinkNS, "href", GEM_SRC);
-        img.setAttribute("x",       String(finalX - s / 2));
-        img.setAttribute("y",       String(finalY - s / 2));
-        img.setAttribute("width",   String(s));
-        img.setAttribute("height",  String(s));
+        img.setAttribute("x", String(finalX - s / 2));
+        img.setAttribute("y", String(finalY - s / 2));
+        img.setAttribute("width", String(s));
+        img.setAttribute("height", String(s));
         img.setAttribute("opacity", String(opacity));
         svg.appendChild(img);
     }
@@ -127,12 +124,12 @@ function buildOrnamentalPath() {
         const nextLarge = largeDist + LARGE_STEP;
         if (nextLarge > totalLen) {
             const smallStart = largeDist + LARGE / 2 + SMALL / 2 + 2;
-            const smallEnd   = totalLen - SMALL / 2; // Vai até o fim do caminho
-            const available  = smallEnd - smallStart;
+            const smallEnd = totalLen - SMALL / 2; // Vai até o fim do caminho
+            const available = smallEnd - smallStart;
 
             if (available > 0) {
                 const count = Math.max(1, Math.round(available / SMALL_STEP));
-                const step  = available / count;
+                const step = available / count;
 
                 for (let i = 0; i <= count; i++) {
                     const dist = smallStart + i * step;
@@ -146,14 +143,14 @@ function buildOrnamentalPath() {
 
         // Região para pequenas: da borda da grande atual até a borda da próxima
         const smallStart = largeDist + LARGE / 2 + SMALL / 2 + 2;
-        const smallEnd   = nextLarge - LARGE / 2 - SMALL / 2 - 2;
-        const available  = smallEnd - smallStart;
+        const smallEnd = nextLarge - LARGE / 2 - SMALL / 2 - 2;
+        const available = smallEnd - smallStart;
 
         if (available <= 0) continue;
 
         // Calcula quantas pedrinhas cabem para preencher TODO o espaço
         const count = Math.max(1, Math.round(available / SMALL_STEP));
-        const step  = available / count;
+        const step = available / count;
 
         for (let i = 0; i <= count; i++) {
             const dist = smallStart + i * step;
@@ -162,7 +159,7 @@ function buildOrnamentalPath() {
             placeGem(sp.x, sp.y, SMALL, 0.88);
         }
     }
-    
+
     // ── 2. ELEMENTOS DECORATIVOS ao redor da corrente ─────────────────────────
     const DECOR = [
         "/assets/img/caminho das pedras/ChatGPT Image 2_06_2026, 06_32_01 (1).png",
@@ -172,21 +169,21 @@ function buildOrnamentalPath() {
     ];
 
     // Espalha ~65 elementos ao longo do vetor, perpendiculares à curva
-    const DECOR_N    = 65;
-    const decorStep  = totalLen / DECOR_N;
+    const DECOR_N = 65;
+    const decorStep = totalLen / DECOR_N;
 
     for (let i = 0; i <= totalLen; i += decorStep) {
         const pt = guide.getPointAtLength(i);
 
         // Calcula o ângulo tangente para obter a direção perpendicular
-        const delta  = 2;
-        const p1     = guide.getPointAtLength(Math.max(0, i - delta));
-        const p2     = guide.getPointAtLength(Math.min(totalLen, i + delta));
-        const tang   = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        const delta = 2;
+        const p1 = guide.getPointAtLength(Math.max(0, i - delta));
+        const p2 = guide.getPointAtLength(Math.min(totalLen, i + delta));
+        const tang = Math.atan2(p2.y - p1.y, p2.x - p1.x);
         const perpAng = tang + Math.PI / 2; // 90° da tangente = perpendicular
 
         // Distância perpendicular: entre 28 e 70px (acima ou abaixo aleatório)
-        const side   = Math.random() > 0.5 ? 1 : -1;
+        const side = Math.random() > 0.5 ? 1 : -1;
         const spread = side * (Math.random() * 42 + 28);
 
         const dx = Math.cos(perpAng) * spread;
@@ -202,17 +199,17 @@ function buildOrnamentalPath() {
         }
 
         // Tamanho variado: maioria pequena, algumas médias, raras grandes
-        const r    = Math.random();
+        const r = Math.random();
         const size = r > 0.88 ? 32 : r > 0.55 ? 20 : 12;
 
         const file = DECOR[Math.floor(Math.random() * DECOR.length)];
 
         const img = document.createElementNS(svgNS, "image");
         img.setAttributeNS(xlinkNS, "href", file);
-        img.setAttribute("x",       String(finalX - size / 2));
-        img.setAttribute("y",       String(finalY - size / 2));
-        img.setAttribute("width",   String(size));
-        img.setAttribute("height",  String(size));
+        img.setAttribute("x", String(finalX - size / 2));
+        img.setAttribute("y", String(finalY - size / 2));
+        img.setAttribute("width", String(size));
+        img.setAttribute("height", String(size));
         img.setAttribute("opacity", String(Math.random() * 0.3 + 0.65));
         // Rotação aleatória para parecer natural
         img.setAttribute("transform", `rotate(${Math.random() * 360} ${finalX} ${finalY})`);

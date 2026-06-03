@@ -5,7 +5,7 @@
     position: relative;
     width: 100%;
     min-height: 100vh;
-    overflow: hidden;
+    overflow-x: clip;
     background: linear-gradient(180deg, #FCF8FA 0%, #F8EEF2 50%, #F5E8ED 100%);
     z-index: 2;
     display: flex;
@@ -26,11 +26,18 @@
     z-index: 0;
 }
 
-.main-bg-left  { left: 0;  background-position: left center; }
-.main-bg-right { right: 0; background-position: right center; }
+.main-bg-left {
+    left: 0;
+    background-position: left center;
+}
+
+.main-bg-right {
+    right: 0;
+    background-position: right center;
+}
 
 /* Conteúdo filho fica acima dos paineis */
-.main-preciosa > *:not(.main-bg-left):not(.main-bg-right) {
+.main-preciosa>*:not(.main-bg-left):not(.main-bg-right) {
     position: relative;
     z-index: 1;
 }
@@ -101,8 +108,10 @@
 .gems-grid {
     position: relative;
     display: flex;
-    align-items: flex-start; /* Garante que todos os cards fiquem alinhados no topo, travando as pedras na mesma altura */
-    justify-content: space-between; /* Space out the cards evenly to span the full width */
+    align-items: flex-start;
+    /* Garante que todos os cards fiquem alinhados no topo, travando as pedras na mesma altura */
+    justify-content: space-between;
+    /* Space out the cards evenly to span the full width */
     width: 100%;
     margin-bottom: 56px;
     z-index: 1;
@@ -165,7 +174,8 @@
 .gem-glow-wrapper {
     position: relative;
     width: 160px;
-    height: 160px;   /* Quadrado fixo: garante que todas as pedras ocupam o mesmo espaço visual */
+    height: 160px;
+    /* Quadrado fixo: garante que todas as pedras ocupam o mesmo espaço visual */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -178,11 +188,10 @@
     inset: 0;
     border-radius: 50%;
     background: radial-gradient(circle at 50% 55%,
-        rgba(255, 182, 210, 0.55) 0%,
-        rgba(255, 192, 218, 0.35) 40%,
-        rgba(255, 220, 235, 0.15) 70%,
-        transparent 100%
-    );
+            rgba(255, 182, 210, 0.55) 0%,
+            rgba(255, 192, 218, 0.35) 40%,
+            rgba(255, 220, 235, 0.15) 70%,
+            transparent 100%);
     filter: blur(12px);
     transform: scale(1.05);
     transition: transform 0.4s ease, filter 0.4s ease;
@@ -197,10 +206,14 @@
 .gem-image {
     position: relative;
     z-index: 1;
-    width: 100%;         /* Preenche toda a largura do wrapper */
-    height: 100%;        /* Preenche toda a altura do wrapper */
-    object-fit: contain; /* Cada pedra cabe dentro da caixa sem cortar nem distorcer */
-    mix-blend-mode: multiply; /* Remove fundo branco de imagens JPEG/PNG com fundo claro */
+    width: 100%;
+    /* Preenche toda a largura do wrapper */
+    height: 100%;
+    /* Preenche toda a altura do wrapper */
+    object-fit: contain;
+    /* Cada pedra cabe dentro da caixa sem cortar nem distorcer */
+    mix-blend-mode: multiply;
+    /* Remove fundo branco de imagens JPEG/PNG com fundo claro */
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
     filter: drop-shadow(0 8px 20px rgba(196, 96, 126, 0.25));
 }
@@ -243,14 +256,19 @@
 /* ---- Caminho Ornamental ---- */
 #ornamental-path {
     position: absolute;
-    top: 140px; /* Sobe o vetor para alinhar visualmente com o centro/metade superior das pedras */
+    top: 140px;
+    /* Sobe o vetor para alinhar visualmente com o centro/metade superior das pedras */
     left: 50%;
-    transform: translate(-50%, -50%); /* Centraliza o vetor em torno do eixo Y definido no top */
+    transform: translate(-50%, -50%);
+    /* Centraliza o vetor em torno do eixo Y definido no top */
     width: 100%;
-    min-width: 1280px; /* Mantém a proporção do Figma que tem 1335px */
+    min-width: 1280px;
+    /* Mantém a proporção do Figma que tem 1335px */
     height: auto;
-    z-index: 0; /* Fica atrás das pedras (que têm z-index: 1) */
-    pointer-events: none; /* Não interfere com hovers */
+    z-index: 0;
+    /* Fica atrás das pedras (que têm z-index: 1) */
+    pointer-events: none;
+    /* Não interfere com hovers */
 }
 
 #ornamental-path svg {
@@ -306,9 +324,17 @@
 
     /* SVG: paineis se sobrepõem no mobile */
     .main-bg-left,
-    .main-bg-right { width: 65%; }
-    .main-bg-left  { left: -18%; }
-    .main-bg-right { right: -18%; }
+    .main-bg-right {
+        width: 65%;
+    }
+
+    .main-bg-left {
+        left: -18%;
+    }
+
+    .main-bg-right {
+        right: -18%;
+    }
 
     .services-section {
         padding: 48px 24px 60px;
@@ -332,15 +358,19 @@
 
     .gem-glow-wrapper {
         width: 130px;
-        height: 130px; /* Mesmo quadrado uniforme no mobile */
+        height: 130px;
+        /* Mesmo quadrado uniforme no mobile */
     }
 
     #ornamental-path {
-        top: 20px; /* Começa logo abaixo da faixa */
+        top: 20px;
+        /* Começa logo abaixo da faixa */
         left: 50%;
         transform: translateX(-50%);
-        width: 203px; /* Largura base do vetor invertido */
-        height: 1335px; /* Altura equivalente ao totalLen do desktop */
+        width: 203px;
+        /* Largura base do vetor invertido */
+        height: 1335px;
+        /* Altura equivalente ao totalLen do desktop */
         min-width: unset;
         opacity: 0.9;
         display: block;
@@ -378,15 +408,37 @@
 }
 
 /* Stagger para o cabeçalho (faixa, subtitle, intro, faixa) */
-.services-header .fade-up:nth-child(1) { transition-delay: 0.1s; }
-.services-header .fade-up:nth-child(2) { transition-delay: 0.2s; }
-.services-header .fade-up:nth-child(3) { transition-delay: 0.3s; }
-.services-header .fade-up:nth-child(4) { transition-delay: 0.4s; }
+.services-header .fade-up:nth-child(1) {
+    transition-delay: 0.1s;
+}
+
+.services-header .fade-up:nth-child(2) {
+    transition-delay: 0.2s;
+}
+
+.services-header .fade-up:nth-child(3) {
+    transition-delay: 0.3s;
+}
+
+.services-header .fade-up:nth-child(4) {
+    transition-delay: 0.4s;
+}
 
 /* Stagger para as pedras na grade (apenas desktop, no mobile entra por scroll natural) */
 @media (min-width: 769px) {
-    .gems-grid .gem-card:nth-child(2) { transition-delay: 0.0s; }
-    .gems-grid .gem-card:nth-child(3) { transition-delay: 0.2s; }
-    .gems-grid .gem-card:nth-child(4) { transition-delay: 0.4s; }
-    .gems-grid .gem-card:nth-child(5) { transition-delay: 0.6s; }
+    .gems-grid .gem-card:nth-child(2) {
+        transition-delay: 0.0s;
+    }
+
+    .gems-grid .gem-card:nth-child(3) {
+        transition-delay: 0.2s;
+    }
+
+    .gems-grid .gem-card:nth-child(4) {
+        transition-delay: 0.4s;
+    }
+
+    .gems-grid .gem-card:nth-child(5) {
+        transition-delay: 0.6s;
+    }
 }

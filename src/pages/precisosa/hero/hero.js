@@ -38,7 +38,7 @@ function splitTextChars(element) {
     return { chars };
 }
 
-export function initHero() {
+export function initHero(onIntroComplete) {
     // ==========================================
     // CRÍTICO: BLOQUEIA A RESTAURAÇÃO DE SCROLL DO BROWSER
     // Sem isso, o browser lembra onde o usuário estava e pula a Hero inteira
@@ -214,6 +214,9 @@ export function initHero() {
         // 5. CORTINA SOBE
         masterTl.add(() => {
             document.querySelector(".hero-main")?.classList.add("is-gone");
+            if (typeof onIntroComplete === "function") {
+                onIntroComplete();
+            }
         }, endIntroTime);
 
         // 6. VÍDEO PRINCIPAL APARECE
@@ -270,7 +273,8 @@ export function initHero() {
                         start: "top top",
                         end: "+=2000", // A tela fica travada (pinned) por 2000px de scroll
                         pin: true,     // Prende a tela enquanto o scroll avança o vídeo
-                        scrub: 1.5     // Suavização premium de 1.5s para evitar qualquer solavanco (jank)
+                        scrub: 1.5,    // Suavização premium de 1.5s para evitar qualquer solavanco (jank)
+                        refreshPriority: 10 // CRÍTICO: Executa este cálculo antes de qualquer outro trigger abaixo
                     }
                 });
 
@@ -333,7 +337,7 @@ export function initHero() {
             } else {
                 video.addEventListener("loadedmetadata", setupScrub);
             }
-        });
+        }, endIntroTime);
     });
 
     // ==========================================
