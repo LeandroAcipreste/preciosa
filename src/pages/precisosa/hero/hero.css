@@ -67,21 +67,20 @@
     pointer-events: none;
     line-height: 1.2; /* Garante que as linhas não fiquem uma em cima da outra */
     width: 90%; /* Dá margem para a quebra de linha acontecer naturalmente */
+    z-index: 15; /* Garante que o texto fique sempre à frente do Canvas 3D e do diamante */
 }
 
 .hero-char {
     display: inline-block;
-    will-change: opacity, filter;
+    will-change: opacity, transform;
     opacity: 0;
-    filter: blur(20px);
-    -webkit-filter: blur(20px);
-    transition: opacity 1s ease, filter 1s ease;
+    transform: translateY(15px);
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .hero-char.is-visible {
     opacity: 1;
-    filter: blur(0px);
-    -webkit-filter: blur(0px);
+    transform: translateY(0);
 }
 
 .hero-animations {

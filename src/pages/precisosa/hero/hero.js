@@ -11,13 +11,11 @@ function splitTextChars(element) {
     element.innerHTML = '';
     const chars = [];
     
-    // Divide por palavras para garantir a quebra de linha correta no mobile
     const words = text.split(' ');
-    
     words.forEach((word, wordIndex) => {
         const wordSpan = document.createElement('span');
         wordSpan.style.display = 'inline-block';
-        wordSpan.style.whiteSpace = 'nowrap'; // Impede quebra no meio da palavra
+        wordSpan.style.whiteSpace = 'nowrap';
         
         for (let char of word) {
             const charSpan = document.createElement('span');
@@ -28,8 +26,6 @@ function splitTextChars(element) {
         }
         
         element.appendChild(wordSpan);
-        
-        // Adiciona um espaço real no HTML para o navegador poder quebrar a linha entre as palavras
         if (wordIndex < words.length - 1) {
             element.appendChild(document.createTextNode(" "));
         }
@@ -38,50 +34,148 @@ function splitTextChars(element) {
     return { chars };
 }
 
-export function initHero(onIntroComplete) {
-    // ==========================================
-    // CRÍTICO: BLOQUEIA A RESTAURAÇÃO DE SCROLL DO BROWSER
-    // Sem isso, o browser lembra onde o usuário estava e pula a Hero inteira
-    // na próxima vez que a página carregar, indo direto para a main.
-    // ==========================================
-    if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual'; // Desativa scroll restoration automático
-    }
-    window.scrollTo(0, 0); // Força posição 0 imediatamente, antes de qualquer animação
+// =========================================================================
+// CONTROLE DE PERFORMANCE DO VÍDEO: Loop Contínuo + Pause na Segunda Dobra
+// =========================================================================
+function setupVideoScrollControl(video) {
+    if (!video) return;
 
-    // O vídeo toca sozinho com autoplay/loop — sem scrub
-    const bgVideo = document.getElementById("home-video");
-    if (bgVideo) {
-        bgVideo.loop = true;
-        bgVideo.muted = true;
-        const p = bgVideo.play();
-        if (p !== undefined) {
-            p.catch(() => {}); // Ignora bloqueio de autoplay
+    video.loop = true;  // Loop nativo do navegador — sem delays, acelerado por hardware
+    video.muted = true;
+    video.play().catch(err => console.warn("Autoplay bloqueado temporariamente:", err));
+
+    // Pausa o vídeo quando o usuário entrar na segunda dobra para economizar CPU/GPU
+    ScrollTrigger.create({
+        trigger: ".main-preciosa",
+        start: "top bottom",
+        onEnter: () => {
+            video.pause();
+        },
+        onLeaveBack: () => {
+            video.play().catch(() => {});
         }
+    });
+}
+
+export function initHero(onIntroComplete) {
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
     }
+    window.scrollTo(0, 0);
+
+    const isMobileScreen = window.innerWidth < 768;
+
+    function initHeroScrollAnimations() {
+        gsap.to(".home-text-mask-container", {
+            scrollTrigger: {
+                trigger: ".home-content",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            opacity: 0,
+            scale: 1.5,
+            transformOrigin: "50% 50%",
+            ease: "power1.inOut"
+        });
+
+        gsap.to(".hero-scroll-indicator", {
+            scrollTrigger: {
+                trigger: ".home-content",
+                start: "top top",
+                end: "30% top",
+                scrub: true
+            },
+            opacity: 0,
+            y: -50,
+            ease: "power1.in"
+        });
+    }
+
+    // ==========================================
+    // MECANISMO DE FALLBACK
+    // ==========================================
+    let fallbackTriggered = false;
+    function triggerFallback() {
+        if (fallbackTriggered) return;
+        fallbackTriggered = true;
+
+        document.getElementById("preloader")?.classList.add("is-hidden");
+
+        const heroMain = document.querySelector(".hero-main");
+        if (heroMain) heroMain.classList.add("is-gone");
+
+        document.body.classList.remove("intro-active");
+
+        const video = document.getElementById("home-video");
+        if (video) {
+            if (!video.src) {
+                video.src = "/assets/img/nova-hero.mp4";
+                video.load();
+            }
+            setupVideoScrollControl(video);
+        }
+
+        const maskContainer = document.querySelector(".home-text-mask-container");
+        const maskText = document.querySelector(".mask-brand-text");
+        const scrollIndicator = document.querySelector(".hero-scroll-indicator");
+
+        if (maskContainer) {
+            gsap.set(maskContainer, { opacity: 0 });
+            gsap.to(maskContainer, { opacity: 1, duration: 2.0, ease: "power2.out", delay: 0.1 });
+        }
+
+        if (maskText) {
+            gsap.set(maskText, { opacity: 0, scale: 0.85, letterSpacing: isMobileScreen ? "10px" : "60px" });
+            gsap.to(maskText, {
+                opacity: 1, scale: 1,
+                letterSpacing: isMobileScreen ? "4px" : "15px",
+                duration: 2.5, ease: "power3.out", delay: 0.2
+            });
+        }
+
+        if (scrollIndicator) {
+            gsap.to(scrollIndicator, { opacity: 1, duration: 1.5, ease: "power2.out", delay: 1.0 });
+        }
+
+        setTimeout(() => initHeroScrollAnimations(), 2200);
+
+        if (typeof onIntroComplete === "function") onIntroComplete();
+    }
+
+    const loadTimeout = setTimeout(() => triggerFallback(), 8000);
 
     // ==========================================
     // THREE.JS SETUP
     // ==========================================
-    const cena = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 4;
+    let cena, camera, renderizador, div3d;
+    try {
+        cena = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 4;
 
-    const renderizador = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderizador.setSize(window.innerWidth, window.innerHeight);
-    renderizador.physicallyCorrectLights = true;
-    renderizador.outputColorSpace = THREE.SRGBColorSpace;
-    renderizador.toneMapping = THREE.ACESFilmicToneMapping;
-    renderizador.toneMappingExposure = 1.2;
-    renderizador.setPixelRatio(window.devicePixelRatio);
+        renderizador = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        if (!renderizador || !renderizador.getContext()) {
+            throw new Error("WebGL indisponível.");
+        }
+        renderizador.setSize(window.innerWidth, window.innerHeight);
+        renderizador.physicallyCorrectLights = true;
+        renderizador.outputColorSpace = THREE.SRGBColorSpace;
+        renderizador.toneMapping = THREE.ACESFilmicToneMapping;
+        renderizador.toneMappingExposure = 1.2;
+        renderizador.setPixelRatio(window.devicePixelRatio);
 
-    const div3d = document.querySelector(".hero-div3d");
-    if (!div3d) return;
-    renderizador.domElement.classList.add('hero-canvas');
-    div3d.appendChild(renderizador.domElement);
+        div3d = document.querySelector(".hero-div3d");
+        if (!div3d) { triggerFallback(); return; }
+        renderizador.domElement.classList.add('hero-canvas');
+        div3d.appendChild(renderizador.domElement);
+    } catch (error) {
+        triggerFallback();
+        return;
+    }
 
     // ==========================================
-    // ⏳ CARREGAMENTO ASSÍNCRONO (HDRI + GLTF)
+    // CARREGAMENTO ASSÍNCRONO (HDRI + GLTF)
     // ==========================================
     const loadHDRI = new Promise((resolve) => {
         const textureLoader = new THREE.TextureLoader();
@@ -92,31 +186,35 @@ export function initHero(onIntroComplete) {
             texture.dispose();
             pmrem.dispose();
             resolve();
-        });
+        }, undefined, () => resolve());
     });
 
     let objeto;
     const loadGLTF = new Promise((resolve) => {
-        new GLTFLoader().load("/assets/img/diamond-compressed.glb", (gltf) => resolve(gltf.scene));
+        new GLTFLoader().load("/assets/img/diamond-compressed.glb", (gltf) => {
+            resolve(gltf.scene);
+        }, undefined, () => resolve(null));
     });
 
     Promise.all([loadHDRI, loadGLTF]).then(([_, sceneObject]) => {
+        clearTimeout(loadTimeout);
 
-        // --- SETUP DO DIAMANTE RESPONSIVO ---
+        if (fallbackTriggered) return;
+        if (!sceneObject) { triggerFallback(); return; }
+
         const h2s = document.querySelectorAll(".hero-title");
         const splits = Array.from(h2s).map((h2) => splitTextChars(h2));
 
         const isMobile = window.innerWidth < 768;
-        const startZ = isMobile ? -20 : -12; // Afasta mais no mobile por conta da proporção da tela
+        const startZ = isMobile ? -20 : -12;
         const startY = isMobile ? 3 : 2;
-        const finalZ = isMobile ? 3.5 : 3.2;  // Avança MUITO mais no mobile para preencher toda a tela vertical
+        const finalZ = isMobile ? 3.5 : 3.2;
 
         objeto = sceneObject;
         objeto.position.z = startZ;
         objeto.position.y = startY;
         cena.add(objeto);
 
-        // Materiais: opacity 0 → animados via GSAP (Three.js, sem alternativa CSS)
         const materiais = [];
         objeto.traverse((child) => {
             if (child.isMesh && child.material) {
@@ -130,173 +228,131 @@ export function initHero(onIntroComplete) {
         });
 
         // ==========================================
-        // 🎬 MASTER TIMELINE
-        // Lógica perfeitamente organizada em uma única timeline sequencial
+        // MASTER TIMELINE
         // ==========================================
         const masterTl = gsap.timeline();
 
-        // 1. PRELOADER SOME ("Iniciando sua experiência...")
+        // 1. PRELOADER SOME + VÍDEO COMEÇA A RODAR DEBAIXO DA CORTINA
         masterTl.add(() => {
             document.getElementById("preloader")?.classList.add("is-hidden");
+
+            const video = document.getElementById("home-video");
+            if (video) {
+                video.loop = true;
+                video.muted = true;
+                video.play().catch(e => console.log("Aguardando interação:", e));
+            }
         });
-        
-        // Aguarda a transição CSS do preloader terminar (1s + 0.2s margem)
+
         masterTl.to({}, { duration: 1.2 });
 
-        // 2. DIAMANTE SURGE SOZINHO NO CENTRO
-        // Opacidade vai de 0 a 1 suavemente e mais rápido
+        // 2. DIAMANTE SURGE
         masterTl.to(materiais, {
             opacity: 1,
             duration: 1.2,
             ease: "power2.inOut"
         });
 
-        // Sem pausa longa, vai direto para as palavras
         masterTl.to({}, { duration: 0.1 });
 
-        // A partir daqui, calculamos o tempo absoluto na timeline
         let currentTime = masterTl.duration();
 
-        // 3. PALAVRAS SE FORMAM EM SEQUÊNCIA ("PRECIOSA" -> "CASA DE ACOLHIMENTO" -> "A MULHER")
+        // 3. TIPOGRAFIA INTRO
         splits.forEach((split, index) => {
             const chars = [...split.chars];
-            
-            // --- ENTRADA (FADE IN) ---
+
             const shuffledIn = gsap.utils.shuffle([...chars]);
-            const staggerIn = Math.min(0.08, 0.8 / chars.length); // Um pouco mais rápido
-            
+            const staggerIn = Math.min(0.08, 0.8 / chars.length);
             shuffledIn.forEach((char, i) => {
                 masterTl.to(char, {
                     duration: 0,
                     onComplete: () => char.classList.add('is-visible')
                 }, currentTime + (i * staggerIn));
             });
-            
-            // Avança o relógio interno: Stagger + 0.2s margem + 0.9s de tempo de leitura
+
             currentTime += (chars.length * staggerIn) + 1.1;
-            
-            // --- SAÍDA (FADE OUT) ---
+
             const shuffledOut = gsap.utils.shuffle([...chars]);
             const staggerOut = Math.min(0.05, 0.5 / chars.length);
-            
             shuffledOut.forEach((char, i) => {
                 masterTl.to(char, {
                     duration: 0,
                     onComplete: () => char.classList.remove('is-visible')
                 }, currentTime + (i * staggerOut));
             });
-            
-            // Avança o relógio: Stagger + 0.2s margem antes da próxima frase
+
             currentTime += (chars.length * staggerOut) + 0.2;
-            
-            if (index < splits.length - 1) {
-                currentTime += 0.1;
-            }
+            if (index < splits.length - 1) currentTime += 0.1;
         });
 
-        // 4. DIAMANTE DESCE/ZOOM
-        // Inicia o movimento cruzando com a saída da última palavra
-        const diamondMoveStart = currentTime - 0.5; 
-        
-        // Movimentos mais ágeis e explosivos
+        // 4. MOVIMENTO DO DIAMANTE
+        const diamondMoveStart = currentTime - 0.5;
+
         masterTl.to(objeto.position, { x: 0, y: 0, duration: 1.4, ease: "power2.out" }, diamondMoveStart);
         masterTl.to(objeto.rotation, { x: 1.5 * Math.PI, duration: 1.4, ease: "power2.out" }, diamondMoveStart);
         masterTl.to(objeto.position, { z: finalZ, duration: 0.8, ease: "power3.inOut" }, diamondMoveStart + 1.0);
 
-        const endIntroTime = diamondMoveStart + 1.8; // Movimento total bem mais curto
+        const endIntroTime = diamondMoveStart + 1.8;
 
-        // 5. CORTINA SOBE
+        // 5. CORTINA SOBE — vídeo já está rodando continuamente no fundo
         masterTl.add(() => {
             document.querySelector(".hero-main")?.classList.add("is-gone");
-            if (typeof onIntroComplete === "function") {
-                onIntroComplete();
-            }
+            if (typeof onIntroComplete === "function") onIntroComplete();
         }, endIntroTime);
 
-        // 6. VÍDEO PRINCIPAL APARECE
-        masterTl.add(() => {
-            const video = document.getElementById("home-video");
-            if (video) {
-                // Removemos o video.play() para que o vídeo só se mova no scroll!
-                video.classList.add("is-visible");
-            }
-        }, endIntroTime - 1.0); // O vídeo aparece enquanto a cortina está subindo
+        // 6. ANIMAÇÕES DA MÁSCARA PRINCIPAL
+        const startSpacing = isMobileScreen ? "10px" : "60px";
+        const endSpacing   = isMobileScreen ? "4px"  : "15px";
 
-        // 7. ANIMAÇÃO DE ENTRADA TIPOGRÁFICA (Efeito Luxo)
-        // O texto inicia com espaçamento bem aberto e escala menor, e depois assenta na tela
-        const isMobileScreen = window.innerWidth < 768;
-        const startSpacing = isMobileScreen ? "20px" : "60px";
-        const endSpacing = isMobileScreen ? "8px" : "15px";
-
-        masterTl.set(".mask-brand-text", { 
-            opacity: 0, 
+        masterTl.set(".home-text-mask-container", { opacity: 0 }, 0);
+        masterTl.set(".mask-brand-text", {
+            opacity: 0,
             letterSpacing: startSpacing,
             scale: 0.85,
             transformOrigin: "50% 50%"
         }, 0);
 
-        masterTl.to(".mask-brand-text", {
-            opacity: 1,
-            letterSpacing: endSpacing,
-            scale: 1,
-            duration: 3.5,
-            ease: "power4.out"
-        }, endIntroTime + 0.8); // Inicia suavemente após a cortina branca subir
+        masterTl.to(".home-text-mask-container", {
+            opacity: 1, duration: 2.0, ease: "power2.out"
+        }, endIntroTime + 0.2);
 
-        // Fade-in do indicador de scroll elegante
+        masterTl.to(".mask-brand-text", {
+            opacity: 1, letterSpacing: endSpacing, scale: 1,
+            duration: 3.5, ease: "power4.out"
+        }, endIntroTime + 0.8);
+
         masterTl.to(".hero-scroll-indicator", {
-            opacity: 1,
-            duration: 1.5,
-            ease: "power2.out"
+            opacity: 1, duration: 1.5, ease: "power2.out"
         }, endIntroTime + 2.2);
 
-        // Efeito de zoom e fade-out paralaxe no scroll do mouse (Buttery Smooth)
-        gsap.to(".home-text-mask-container", {
-            scrollTrigger: {
-                trigger: ".home-content",
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            },
-            scale: 3.5,
-            opacity: 0,
-            transformOrigin: "50% 50%",
-            ease: "power1.inOut"
-        });
-
-        // Efeito de fade-out do scroll indicator
-        gsap.to(".hero-scroll-indicator", {
-            scrollTrigger: {
-                trigger: ".home-content",
-                start: "top top",
-                end: "30% top",
-                scrub: true
-            },
-            opacity: 0,
-            y: -50,
-            ease: "power1.in"
-        });
-
-        // Avança o playhead interno para garantir que a timeline alcance o fim das animações
         const finalTime = endIntroTime + 4.5;
         masterTl.to({}, { duration: 0.1 }, finalTime);
 
-    }); // Fecha Promise.all
+        // 7. SCROLL ANIMATIONS + PAUSE INTELIGENTE DO VÍDEO NA SEGUNDA DOBRA
+        masterTl.add(() => {
+            initHeroScrollAnimations();
+            const video = document.getElementById("home-video");
+            setupVideoScrollControl(video);
+        }, finalTime + 0.1);
+    });
 
     // ==========================================
-    // 🔄 LOOP THREE.JS (rotação contínua do eixo Y)
+    // LOOP ROTATIVO THREE.JS
     // ==========================================
     function animar() {
-        if (objeto) objeto.rotation.y += 0.005;
+        if (objeto && renderizador && cena && camera) {
+            objeto.rotation.y += 0.005;
+            renderizador.render(cena, camera);
+        }
         requestAnimationFrame(animar);
-        renderizador.render(cena, camera);
     }
-
     animar();
 
     window.addEventListener("resize", () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderizador.setSize(window.innerWidth, window.innerHeight);
+        if (camera && renderizador) {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderizador.setSize(window.innerWidth, window.innerHeight);
+        }
     });
 }

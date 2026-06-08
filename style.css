@@ -1,7 +1,30 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import url('./src/pages/precisosa/hero/hero.css');
 @import url('./src/pages/precisosa/main/main.css');
+@import url('./src/pages/precisosa/services/services.css');
 
+/* ============================================
+   LENIS SMOOTH SCROLL SUPPORT
+   ============================================ */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis-scrolling iframe {
+  pointer-events: none;
+}
 * {
   margin: 0;
   padding: 0;
@@ -139,6 +162,12 @@ h2 {
   z-index: 2 !important;
   mix-blend-mode: screen;
   pointer-events: none;
+  opacity: 0; /* Começa transparente e é revelado via GSAP */
+  /* CORREÇÃO DO GLITCH DE BLEND MODE NO SCROLL MÓVEL (FORÇA LAYER GPU) */
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .mask-brand-text {
@@ -153,6 +182,7 @@ h2 {
   line-height: 1;
   opacity: 0; /* Animado via GSAP */
   transform: scale(0.9); /* Animado via GSAP */
+  white-space: nowrap !important; /* Evita quebra de linha no mobile */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -160,7 +190,7 @@ h2 {
 /* Indicador de Scroll Elegante */
 .hero-scroll-indicator {
   position: absolute !important;
-  bottom: 5vh;
+  bottom: 40px !important;
   left: 50%;
   transform: translateX(-50%);
   z-index: 3 !important;
@@ -213,6 +243,32 @@ h2 {
   100% {
     top: 6px;
     opacity: 1;
+  }
+}
+
+/* Seta de scroll móvel */
+.scroll-arrow {
+  display: none;
+}
+
+@keyframes bounceArrow {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .scroll-mouse {
+    display: none !important;
+  }
+  .scroll-arrow {
+    display: block !important;
+    animation: bounceArrow 1.5s infinite ease-in-out;
   }
 }
 
@@ -365,5 +421,10 @@ h2 {
   .botaoSecundario {
     width: 100%;
     justify-content: center;
+  }
+
+  .hero-scroll-indicator {
+    bottom: 25px !important;
+    transform: translateX(-50%) scale(0.85) !important; /* Reduz o tamanho e ajusta a posição para mobile */
   }
 }

@@ -6,45 +6,95 @@ gsap.registerPlugin(ScrollTrigger);
 export function initMain() {
     buildOrnamentalPath();
 
-    const fadeElements = document.querySelectorAll(".services-faixa, .services-subtitle, .services-intro, .gem-card, .services-cta");
-    fadeElements.forEach(el => el.classList.add("fade-up"));
-
-    // 1. CORREÇÃO DO TOGGLECLASS PARA MOBILE
-    // Usamos onEnter para adicionar a classe e evitamos que o resize do mobile remova a classe acidentalmente.
-    gsap.utils.toArray(fadeElements).forEach(el => {
-        ScrollTrigger.create({
-            trigger: el,
-            start: "top 85%",
-            onEnter: () => el.classList.add("is-visible"),
-            once: true // CRÍTICO: Garante que o recálculo do mobile não faça a div sumir
-        });
-    });
-
     const isMobile = window.innerWidth <= 768;
+
+    const cards = gsap.utils.toArray(".gem-card");
+    const cta = document.querySelector(".services-cta");
+
+    // Estado inicial invisível — GSAP é a única fonte de verdade para transform/opacity
+    gsap.set(".services-header > *", { opacity: 0, y: 20 });
+    gsap.set(cards, { opacity: 0, y: 25 });
+    if (cta) {
+        gsap.set(cta, { opacity: 0, y: 15 });
+    }
+
+    // 1. CABEÇALHO — entrada via toggleActions (sem scrub)
+    gsap.fromTo(".services-header > *",
+        { opacity: 0, y: 20 },
+        {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "sine.out",
+            stagger: 0.08,
+            scrollTrigger: {
+                trigger: ".services-header",
+                start: isMobile ? "top 90%" : "top 80%",
+                toggleActions: "play reverse play reverse"
+            }
+        }
+    );
 
     gsap.set("#ornamental-path", {
         clipPath: isMobile ? "inset(0% 0% 100% 0%)" : "inset(0% 100% 0% 0%)",
         webkitClipPath: isMobile ? "inset(0% 0% 100% 0%)" : "inset(0% 100% 0% 0%)",
-        opacity: 1
+        opacity: 1,
+        force3D: true
     });
 
-    // 2. MELHORIA DO CÁLCULO DE ÁREA NO MOBILE
-    // No mobile a grade fica muito longa. Alteramos o 'end' para 'bottom center' 
-    // para a animação do vetor não parecer lenta ou morta no final.
-    gsap.to("#ornamental-path", {
-        clipPath: "inset(0% 0% 0% 0%)",
-        webkitClipPath: "inset(0% 0% 0% 0%)",
-        ease: "none",
+    // TIMELINE SILK-SMOOTH
+    // end: "bottom 25%" amplia a janela de scroll — a animação progride devagar e flui como líquido
+    const gridTl = gsap.timeline({
         scrollTrigger: {
             trigger: ".gems-grid",
-            start: "top 65%",
-            end: isMobile ? "bottom center" : "bottom 85%",
-            scrub: 1
+            start: isMobile ? "top 85%" : "top 75%",
+            end:   isMobile ? "bottom 45%" : "bottom 25%",
+            scrub: 2.0,          // Inércia premium — o scroll "derrama" a animação
+            invalidateOnRefresh: true
         }
     });
 
-    // 3. A BALA DE PRATA PARA O MOBILE E LAYOUT SHIFTS
-    // Garante que os triggers sejam ordenados e recalculados na hora com base nas prioridades e fluxo
+    // Revelação do caminho de pedras em ritmo constante (ease:none = sincronizado pixel a pixel)
+    gridTl.to("#ornamental-path", {
+        clipPath: "inset(0% 0% 0% 0%)",
+        webkitClipPath: "inset(0% 0% 0% 0%)",
+        ease: "none",
+        duration: 1.40
+    }, 0);
+
+    // Cards surgem organicamente acompanhando o traço do caminho
+    // startTime em 0.28 = espaçamento generoso para cada card ter sua janela própria
+    cards.forEach((card, index) => {
+        const startTime = 0.12 + index * 0.28;
+
+        gridTl.fromTo(card,
+            { opacity: 0, y: 30 },
+            {
+                opacity: 1,
+                y: 0,
+                ease: "sine.out",
+                duration: 0.50,
+                force3D: true
+            },
+            startTime
+        );
+    });
+
+    // CTA surge logo após o último card
+    if (cta) {
+        gridTl.fromTo(cta,
+            { opacity: 0, y: 20 },
+            {
+                opacity: 1,
+                y: 0,
+                ease: "sine.out",
+                duration: 0.45,
+                force3D: true
+            },
+            1.15
+        );
+    }
+
     ScrollTrigger.sort();
     ScrollTrigger.refresh();
 
@@ -86,7 +136,15 @@ function buildOrnamentalPath() {
     guide.setAttribute("stroke", "none");
     svg.appendChild(guide);
 
-    const totalLen = guide.getTotalLength();
+    let totalLen = 1335; // Fallback para evitar travamentos offline/headless
+    try {
+        const pathLen = guide.getTotalLength();
+        if (pathLen > 0) {
+            totalLen = pathLen;
+        }
+    } catch (e) {
+        console.warn("Falha ao obter comprimento do path. Usando fallback.", e);
+    }
 
     // ── Tamanhos ──────────────────────────────────────────────────────────────
     const LARGE = 36;   // tamanho da pedra grande (px no viewBox)
@@ -170,7 +228,7 @@ function buildOrnamentalPath() {
 
     // Espalha ~65 elementos ao longo do vetor, perpendiculares à curva
     const DECOR_N = 65;
-    const decorStep = totalLen / DECOR_N;
+    const decorStep = Math.max(10, totalLen / DECOR_N); // Garante incremento de no mínimo 10px para evitar loops infinitos
 
     for (let i = 0; i <= totalLen; i += decorStep) {
         const pt = guide.getPointAtLength(i);

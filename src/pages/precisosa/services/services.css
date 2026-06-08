@@ -1,0 +1,231 @@
+/* ============================================
+   LUXURY SERVICES SECTION — Glassmorphism 2.0
+   ============================================ */
+.luxury-services-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 120px 40px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+/* Fundo com Paralaxe — Imagem de diamante (background.png) */
+.luxury-bg-parallax {
+    position: absolute;
+    top: -10%;
+    left: 0;
+    width: 100%;
+    height: 120%;
+    background-image: url('/assets/img/background.png');
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+    will-change: transform;
+    z-index: 0;
+}
+
+/* Overlay rosado para garantir legibilidade dos textos */
+.luxury-bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at center,
+        rgba(252, 248, 250, 0.20) 0%,
+        rgba(245, 232, 237, 0.50) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Container central */
+.luxury-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    z-index: 2;
+}
+
+/* ---- Header ---- */
+.luxury-header {
+    text-align: center;
+    margin-bottom: 64px;
+}
+
+.luxury-subtitle {
+    display: block;
+    font-family: "Clash", "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: #c4607e;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.luxury-main-title {
+    font-family: "Clash", "Inter", sans-serif;
+    font-size: clamp(32px, 3.5vw, 48px);
+    color: #4A2431;
+    margin: 0 0 20px;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.luxury-divider {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #c4607e, transparent);
+    margin: 0 auto;
+}
+
+/* ---- Grid ---- */
+.luxury-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    width: 100%;
+}
+
+/* ---- Card Glassmorphism 2.0 ---- */
+.luxury-card {
+    position: relative;
+    padding: 48px 32px;
+    border-radius: 28px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.45) 0%,
+        rgba(255, 255, 255, 0.12) 100%
+    );
+
+    /* O blur "derrete" as facetas do diamante em névoa rosa suave */
+    backdrop-filter: blur(25px) saturate(130%);
+    -webkit-backdrop-filter: blur(25px) saturate(130%);
+
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+        0 10px 40px rgba(196, 96, 126, 0.05),
+        inset 0 1px 1px rgba(255, 255, 255, 0.30);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+    cursor: default;
+
+    transition:
+        transform      0.6s cubic-bezier(0.25, 1, 0.5, 1),
+        border-color   0.6s ease,
+        box-shadow     0.6s ease;
+    will-change: transform, box-shadow;
+}
+
+/* Brilho interno que segue o mouse */
+.luxury-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(255, 255, 255, 0.40) 0%,
+        transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.luxury-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(255, 255, 255, 0.85);
+    box-shadow:
+        0 20px 50px rgba(196, 96, 126, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.luxury-card:hover::before {
+    opacity: 1;
+}
+
+/* ---- Elementos do Card ---- */
+.luxury-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.luxury-card:hover .luxury-icon-wrapper {
+    transform: scale(1.12) translateY(-2px);
+}
+
+.luxury-icon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Ícone via máscara de cor (mesma técnica da seção principal) */
+.luxury-icon-mask {
+    width: 56px;
+    height: 56px;
+    background-color: #c4607e;
+}
+
+.luxury-card-title {
+    position: relative;
+    z-index: 1;
+    font-family: "Clash", "Inter", sans-serif;
+    font-size: clamp(14px, 1.2vw, 18px);
+    font-weight: 600;
+    color: #4A2431;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+}
+
+.luxury-card-desc {
+    position: relative;
+    z-index: 1;
+    font-family: "Inter", sans-serif;
+    font-size: clamp(13px, 1vw, 14px);
+    color: #6B4E59;
+    line-height: 1.8;
+    margin: 0;
+}
+
+/* ============================================
+   RESPONSIVIDADE
+   ============================================ */
+@media (max-width: 1024px) {
+    .luxury-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .luxury-services-section {
+        padding: 80px 24px;
+    }
+
+    .luxury-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .luxury-card {
+        padding: 40px 24px;
+    }
+
+    .luxury-header {
+        margin-bottom: 48px;
+    }
+}

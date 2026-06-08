@@ -393,11 +393,11 @@
 }
 
 /* ============================================
-   ANIMAÇÕES DE ENTRADA (FADE UP)
+   ANIMAÇÕES DE ENTRADA (OTIMIZADAS PARA GSAP)
    ============================================ */
 .fade-up {
     opacity: 0;
-    transform: translateY(50px);
+    transform: translateY(40px);
     transition: opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1), transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
     will-change: opacity, transform;
 }
@@ -407,38 +407,21 @@
     transform: translateY(0);
 }
 
-/* Stagger para o cabeçalho (faixa, subtitle, intro, faixa) */
-.services-header .fade-up:nth-child(1) {
-    transition-delay: 0.1s;
+/* Stagger APENAS para o cabeçalho (que entra via toggleActions, não scrub) */
+.services-header .fade-up:nth-child(1) { transition-delay: 0.1s; }
+.services-header .fade-up:nth-child(2) { transition-delay: 0.2s; }
+.services-header .fade-up:nth-child(3) { transition-delay: 0.3s; }
+.services-header .fade-up:nth-child(4) { transition-delay: 0.4s; }
+
+/* REMOVIDO: stagger das pedras via CSS (:nth-child) — conflitava com o GSAP scrub */
+
+/* Aceleração por GPU para os elementos animados pelo GSAP */
+#ornamental-path {
+    will-change: clip-path, transform;
+    transform: translate(-50%, -50%) translateZ(0);
 }
 
-.services-header .fade-up:nth-child(2) {
-    transition-delay: 0.2s;
-}
-
-.services-header .fade-up:nth-child(3) {
-    transition-delay: 0.3s;
-}
-
-.services-header .fade-up:nth-child(4) {
-    transition-delay: 0.4s;
-}
-
-/* Stagger para as pedras na grade (apenas desktop, no mobile entra por scroll natural) */
-@media (min-width: 769px) {
-    .gems-grid .gem-card:nth-child(2) {
-        transition-delay: 0.0s;
-    }
-
-    .gems-grid .gem-card:nth-child(3) {
-        transition-delay: 0.2s;
-    }
-
-    .gems-grid .gem-card:nth-child(4) {
-        transition-delay: 0.4s;
-    }
-
-    .gems-grid .gem-card:nth-child(5) {
-        transition-delay: 0.6s;
-    }
+.gem-card {
+    will-change: transform, opacity;
+    transform: translateZ(0);
 }

@@ -19,7 +19,8 @@
     <!-- HERO: Vídeo atrás + Máscara branca com texto vazado na frente (Blend Mode) -->
     <div class="home-content">
         <!-- Vídeo de fundo: toca em loop automaticamente -->
-        <video id="home-video" class="home-video" src="/assets/img/nova-hero.mp4"
+        <video id="home-video" class="home-video"
+            src="/assets/img/nova-hero.mp4"
             autoplay muted loop playsinline preload="auto"></video>
             
         <!-- Máscara de Blend-Mode: Tela branca com o texto PRECIOSA vazado -->
@@ -32,6 +33,11 @@
             <span class="scroll-text">DESÇA PARA EXPLORAR</span>
             <div class="scroll-mouse">
                 <div class="scroll-wheel"></div>
+            </div>
+            <div class="scroll-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 10L12 15L17 10" stroke="#c4607e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
             </div>
         </div>
     </div>
@@ -148,6 +154,46 @@
             </div>
 
         </section>
+
+        <!-- LUXURY SERVICES SECTION (AWWWARDS STYLE) -->
+        <section class="luxury-services-section">
+            <div class="luxury-bg-parallax"></div>
+            <div class="luxury-bg-overlay"></div>
+
+            <div class="luxury-container">
+                <div class="luxury-header">
+                    <span class="luxury-subtitle">Tratamentos de Elite</span>
+                    <h2 class="luxury-main-title">Especialidades Preciosa</h2>
+                    <div class="luxury-divider"></div>
+                </div>
+
+                <div class="luxury-grid">
+                    <div class="luxury-card">
+                        <div class="luxury-icon-wrapper">
+                            <img src="/assets/img/icones/saude-feminina.png" alt="Ícone Saúde" class="luxury-icon-img">
+                        </div>
+                        <h3 class="luxury-card-title">Saúde Integral</h3>
+                        <p class="luxury-card-desc">Cuidado sistêmico e personalizado focado no bem-estar pleno da mulher moderna.</p>
+                    </div>
+
+                    <div class="luxury-card">
+                        <div class="luxury-icon-wrapper">
+                            <img src="/assets/img/icones/prevencao-ginecologica.png" alt="Ícone Prevenção" class="luxury-icon-img">
+                        </div>
+                        <h3 class="luxury-card-title">Longevidade</h3>
+                        <p class="luxury-card-desc">Protocolos preditivos e preventivos para guiar sua saúde em cada ciclo da vida.</p>
+                    </div>
+
+                    <div class="luxury-card">
+                        <div class="luxury-icon-wrapper">
+                            <img src="/assets/img/icones/saude-feminina.png" alt="Ícone Terapias" class="luxury-icon-img">
+                        </div>
+                        <h3 class="luxury-card-title">Alta Estética</h3>
+                        <p class="luxury-card-desc">Procedimentos refinados que realçam sua essência natural com precisão científica.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <script type="importmap">
@@ -156,7 +202,8 @@
           "three": "https://esm.sh/three@0.163.0",
           "three/addons/": "https://esm.sh/three@0.163.0/examples/jsm/",
           "gsap": "https://esm.sh/gsap@3.12.5",
-          "gsap/ScrollTrigger": "https://esm.sh/gsap@3.12.5/ScrollTrigger"
+          "gsap/ScrollTrigger": "https://esm.sh/gsap@3.12.5/ScrollTrigger",
+          "lenis": "https://esm.sh/lenis@1.1.5"
         }
       }
     </script>
