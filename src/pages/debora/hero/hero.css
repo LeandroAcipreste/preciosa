@@ -1,0 +1,68 @@
+/* ============================================
+   ESTILOS BÁSICOS PARA O HEADER E HERO (DEBORA)
+   ============================================ */
+.debora-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 40px;
+    z-index: 100;
+}
+
+.debora-nav .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #FFF; /* Branco para contrastar com o vídeo/overlay escuro */
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: opacity 0.3s ease;
+}
+
+.debora-nav .back-link:hover {
+    opacity: 0.7;
+}
+
+.debora-main {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #3D1E2A;
+}
+
+.hero-debora {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px; /* Margem para o vídeo respirar */
+    box-sizing: border-box;
+    overflow: hidden;
+    /* Fundo em mármore PNG estático */
+    background-image: url('../../../../assets_debora/img/backgroundPng.png');
+    background-size: cover;
+    background-position: center;
+}
+
+/* ============================================
+   VIDEO MAIN
+   ============================================ */
+.debora-hero-video-bg {
+    position: relative; 
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: calc(100vh - 80px); /* Proteção ABSOLUTA contra cortes em cima e em baixo */
+    z-index: 1;
+    border-radius: 16px; /* Borda curva para se comportar como uma "tela" */
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5); /* Sombra para o vídeo flutuar no mármore */
+}
+
+

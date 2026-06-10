@@ -1,0 +1,127 @@
+/* ============================================
+   DEBORA PRELOADER PREMIUM
+   ============================================ */
+.debora-preloader {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    background-image: url('../../../../assets_debora/img/backgroundPng.png');
+    background-size: cover;
+    background-position: center;
+    background-color: #3D1E2A; /* Cor de fallback (amora/vinho escuro) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.debora-preloader-text {
+    position: relative;
+    z-index: 2; /* Fica acima do canvas 3D e do background */
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(40px, 6vw, 80px);
+    color: #E2BC74; /* Tom dourado rico inspirado na imagem de referência */
+    font-weight: 400;
+    text-align: center;
+    letter-spacing: 2px;
+    display: flex;
+    gap: 15px; /* Espaçamento fluido entre as palavras */
+    margin: 0;
+    padding: 0;
+    /* Sombra dupla: uma para destaque no mármore e outra para leve brilho (glow) do dourado */
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(226, 188, 116, 0.15); 
+}
+
+.debora-preloader-text .word {
+    /* Preparado para animação de escrita à mão: cortado 100% da direita */
+    clip-path: inset(-20% 100% -20% -10%);
+    -webkit-clip-path: inset(-20% 100% -20% -10%);
+    display: inline-block;
+}
+
+/* ============================================
+   ESTILOS BÁSICOS PARA O HEADER E HERO (DEBORA)
+   ============================================ */
+.debora-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 40px;
+    z-index: 100;
+}
+
+.debora-nav .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #c4607e;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: opacity 0.3s ease;
+}
+
+.debora-nav .back-link:hover {
+    opacity: 0.7;
+}
+
+.debora-main {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #FCF8FA 0%, #F8EEF2 100%);
+}
+
+.hero-debora {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 40px;
+}
+
+.content-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Glassmorphism 2.0 Card */
+.glass-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.12) 100%);
+    backdrop-filter: blur(25px) saturate(130%);
+    -webkit-backdrop-filter: blur(25px) saturate(130%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 10px 40px rgba(196, 96, 126, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    border-radius: 28px;
+    padding: 60px 40px;
+    text-align: center;
+    opacity: 0; /* Preparado para animação de entrada no JS */
+    transform: translateY(30px);
+}
+
+.hero-title {
+    font-family: "Clash", "Inter", sans-serif;
+    font-size: clamp(32px, 4vw, 56px);
+    color: #4A2431;
+    margin-bottom: 20px;
+}
+
+.hero-desc {
+    font-family: "Inter", sans-serif;
+    font-size: clamp(14px, 1.5vw, 18px);
+    color: #6B4E59;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}

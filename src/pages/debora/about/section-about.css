@@ -1,0 +1,105 @@
+/* ============================================
+   SEÇÃO ABOUT: DÉBORA BISPO AMORIM
+   ============================================ */
+.about-debora {
+    position: relative;
+    width: 100%;
+    padding: 140px 40px;
+    background-color: #F8F3EE; /* Tom creme/champagne luxuoso para dar contraste com o mármore escuro */
+    color: #3D1E2A; /* Cor base: Vinho/Amora escuro */
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.about-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 80px;
+    align-items: center;
+}
+
+.about-content {
+    flex: 1;
+    min-width: 320px;
+    position: relative;
+    z-index: 2;
+}
+
+.about-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #DDA754; /* Dourado da marca */
+    display: block;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.about-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(24px, 3.5vw, 46px); /* Tamanho menor para manter o nome na mesma linha */
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 10px;
+    color: #26131b; /* Mesma cor do texto sobre o mármore da seção do livro */
+    white-space: nowrap; /* Força as palavras a não quebrarem de linha */
+}
+
+.about-role {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(28px, 3.5vw, 42px);
+    color: #C18566; /* Tom terracota escuro elegante */
+    font-weight: 400;
+    margin-bottom: 40px;
+}
+
+.about-text-body p {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #553E48; /* Cinza-vinho suave para leitura longa */
+    margin-bottom: 24px;
+}
+
+.about-image-wrapper {
+    flex: 1;
+    min-width: 320px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+/* Moldura onde futuramente entrará a foto real da Débora */
+.about-image-placeholder {
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 3 / 4;
+    background: linear-gradient(135deg, #EADDC6, #DBC8B6); /* Fundo mármore claro */
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 40px 80px rgba(61, 30, 42, 0.15); /* Sombra elegante refletindo a cor do fundo */
+    font-family: 'Cinzel', serif;
+    color: rgba(61, 30, 42, 0.6);
+    font-size: 20px;
+    letter-spacing: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Um leve brilho na diagonal da moldura para dar ar de luxo */
+.about-image-placeholder::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 100%);
+    pointer-events: none;
+}

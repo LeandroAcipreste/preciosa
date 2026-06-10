@@ -1,0 +1,206 @@
+.chapters-debora {
+    background-color: #FDFBF7; /* Um creme muito leve e iluminado para dar a sensação de cura/respiro */
+    padding: clamp(60px, 10vw, 120px) clamp(20px, 4vw, 60px);
+    position: relative;
+    overflow: hidden;
+}
+
+.chapters-header {
+    text-align: center;
+    margin-bottom: clamp(60px, 8vw, 100px);
+}
+
+.chapters-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(32px, 5vw, 56px);
+    color: #26131b;
+    margin-bottom: 20px;
+}
+
+.chapters-header p {
+    font-family: 'Inter', sans-serif;
+    color: #5A3A46;
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* O container principal da Timeline */
+.chapters-list {
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* A Linha Dourada Central */
+.chapters-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100%;
+    background: rgba(193, 133, 102, 0.2); /* Dourado/Cobre suave base */
+}
+
+/* A linha que preenche e "desenha" com o Scroll */
+.chapters-line-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    background: #E2BC74; /* Dourado premium */
+    box-shadow: 0 0 10px rgba(226, 188, 116, 0.8);
+}
+
+.chapter-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: clamp(60px, 8vw, 120px);
+    position: relative;
+    width: 100%;
+}
+
+/* Altera o lado dos capítulos pares para criar zig-zag */
+.chapter-item:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+/* Caixa de conteúdo de cada capítulo */
+.chapter-content {
+    width: 42%;
+    position: relative;
+    padding: clamp(20px, 3vw, 40px);
+    background: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(193, 133, 102, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chapter-content:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+}
+
+/* O Número Gigante atrás do texto */
+.chapter-number {
+    position: absolute;
+    top: -30px;
+    left: 10px;
+    font-family: 'Cinzel', serif;
+    font-size: clamp(60px, 8vw, 100px);
+    font-weight: 900;
+    color: rgba(226, 188, 116, 0.15); /* Dourado muito suave */
+    z-index: 0;
+    pointer-events: none;
+    line-height: 1;
+}
+
+.chapter-item:nth-child(even) .chapter-number {
+    left: auto;
+    right: 10px;
+}
+
+.chapter-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(20px, 2.5vw, 26px);
+    color: #26131b;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 1;
+    font-weight: 700;
+}
+
+.chapter-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #4A4A4A;
+    line-height: 1.7;
+    position: relative;
+    z-index: 1;
+}
+
+/* O Ponto brilhante na linha do tempo */
+.chapter-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    background: #FDFBF7;
+    border: 3px solid rgba(193, 133, 102, 0.4);
+    border-radius: 50%;
+    z-index: 2;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Quando o capítulo atinge o centro da tela, o ponto brilha */
+.chapter-item.is-active .chapter-dot {
+    background: #E2BC74;
+    border-color: #E2BC74;
+    box-shadow: 0 0 20px rgba(226, 188, 116, 0.8), 0 0 40px rgba(226, 188, 116, 0.4);
+    transform: translate(-50%, -50%) scale(1.3);
+}
+
+/* Rodapé Emocional */
+.chapters-footer {
+    text-align: center;
+    margin-top: clamp(80px, 10vw, 150px);
+    position: relative;
+    z-index: 5;
+}
+
+.chapters-footer p {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(16px, 2vw, 20px);
+    color: #26131b;
+    margin-bottom: 30px;
+    font-style: italic;
+    line-height: 1.8;
+}
+
+.chapters-sign-off {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #5A3A46;
+    margin-bottom: 10px;
+}
+
+.chapters-signature {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(48px, 6vw, 72px);
+    color: #E2BC74;
+    text-shadow: 1px 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Responsividade: Transforma a Timeline em formato de lista simples no Mobile */
+@media (max-width: 768px) {
+    .chapters-line {
+        left: 30px;
+    }
+    
+    .chapter-item {
+        flex-direction: column !important;
+        align-items: flex-end;
+    }
+    
+    .chapter-content {
+        width: calc(100% - 70px);
+    }
+    
+    .chapter-dot {
+        left: 30px;
+    }
+    
+    .chapter-item:nth-child(even) .chapter-number {
+        left: 10px;
+        right: auto;
+    }
+}
