@@ -204,3 +204,33 @@
         right: auto;
     }
 }
+
+/* ----------------------------------- */
+/* BOTÃO DO EBOOK (Fim dos Capítulos)  */
+/* ----------------------------------- */
+.ebook-btn-wrapper {
+    margin-top: 50px;
+}
+
+.ebook-btn {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #FDFBF7;
+    background-color: #26131b;
+    padding: 20px 50px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #26131b;
+    box-shadow: 0 10px 20px rgba(38, 19, 27, 0.2);
+}
+
+.ebook-btn:hover {
+    background-color: transparent;
+    color: #26131b;
+    box-shadow: none;
+    transform: translateY(-3px);
+}

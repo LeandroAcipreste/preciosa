@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="./src/pages/debora/about/section-about.css" />
     <link rel="stylesheet" href="./src/pages/debora/book/book.css" />
     <link rel="stylesheet" href="./src/pages/debora/chapters/chapters.css" />
+    <link rel="stylesheet" href="./src/pages/debora/event/event.css" />
 </head>
 
 <body class="global-body">
@@ -230,8 +231,43 @@
                 <p>Prepare-se para se emocionar, para refletir, para se inspirar.<br>Este livro é um convite para você se conectar consigo mesma, para se amar, para se libertar e voar.</p>
                 <div class="chapters-sign-off">Com carinho e afeto,</div>
                 <div class="chapters-signature">Débora Bispo Amorim</div>
+                
+                <div class="ebook-btn-wrapper">
+                    <!-- Link do Kwifi será inserido aqui futuramente -->
+                    <a href="#" class="ebook-btn">Adquira seu E-book</a>
+                </div>
             </div>
         </section>
+
+        <!-- 7. EVENT SECTION (Desperte sua Mulher Preciosa) -->
+        <section class="event-debora" id="event-debora">
+            <div class="event-container">
+                <div class="event-content">
+                    <span class="event-subtitle">Vivência Presencial</span>
+                    <h2 class="event-title">Desperte sua Mulher Preciosa</h2>
+                    <p class="event-desc">
+                        Um encontro exclusivo conduzido por Débora Amorim, desenhado para mulheres que buscam reconexão profunda com sua essência. 
+                        Durante esta vivência, você terá a oportunidade de mergulhar nas temáticas do livro em um ambiente seguro, luxuoso e acolhedor, trocando experiências e despertando o seu poder feminino.
+                    </p>
+                    <div class="event-info">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 21C16 17.5 20 13.5 20 10C20 5.58172 16.4183 2 12 2C7.58172 2 4 5.58172 4 10C4 13.5 8 17.5 12 21Z" stroke="#E2BC74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="#E2BC74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Rua Bartholomeu Gusmão 86 - Rio Vermelho</span>
+                    </div>
+                    <a href="#" class="event-btn">Adquira sua Vaga</a>
+                </div>
+                <div class="event-visual">
+                    <!-- Placeholder de luxo para a foto do evento -->
+                    <div class="event-image-wrapper">
+                         <img src="./assets_debora/img/backgroundPng.png" alt="Evento Preciosa">
+                         <div class="event-glow"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- 4. IMPORTAÇÕES NECESSÁRIAS (GSAP e Lenis) -->
@@ -252,6 +288,7 @@
         import { initDeboraAbout } from './src/pages/debora/about/section about.js';
         import { initDeboraBook } from './src/pages/debora/book/book.js';
         import { initDeboraChapters } from './src/pages/debora/chapters/chapters.js';
+        import { initDeboraEvent } from './src/pages/debora/event/event.js';
         import Lenis from 'lenis';
         import gsap from 'gsap';
         import ScrollTrigger from 'gsap/ScrollTrigger';
@@ -290,6 +327,9 @@
 
             // Inicia a animação interativa da Jornada (Capítulos)
             initDeboraChapters();
+
+            // Inicia a animação da seção do Evento Presencial
+            initDeboraEvent();
 
             // Inicia a animação de entrada Premium do Preloader
             initDeboraPreloader(() => {

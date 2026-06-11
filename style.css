@@ -100,8 +100,17 @@ h2 {
 }
 
 .preloader-overlay.is-hidden {
-  opacity: 0;
-  pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Bypass Instantâneo (Ativado via inline script para evitar flashes na navegação) */
+html.skip-preloader .preloader-overlay,
+html.skip-preloader .hero-main {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: none !important;
 }
 
 .preloader-text {
@@ -427,4 +436,513 @@ h2 {
     bottom: 25px !important;
     transform: translateX(-50%) scale(0.85) !important; /* Reduz o tamanho e ajusta a posição para mobile */
   }
+}
+
+/* ---------------------------------- */
+/* MEET DEBORA SECTION (Home Page)    */
+/* ---------------------------------- */
+.meet-debora-section {
+    position: relative;
+    padding: clamp(80px, 10vw, 150px) clamp(20px, 5vw, 80px);
+    background-color: #FDFBF7; /* Creme ultra claro para quebrar o dark do site principal e conectar com a página da Débora */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid rgba(193, 133, 102, 0.2);
+}
+
+.meet-debora-container {
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: clamp(40px, 8vw, 100px);
+}
+
+.meet-debora-content {
+    flex: 1;
+    z-index: 2;
+}
+
+.meet-debora-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #c4607e;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.meet-debora-title {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(60px, 8vw, 120px);
+    color: #26131b;
+    margin: 0 0 25px 0;
+    line-height: 1;
+    text-shadow: 1px 2px 4px rgba(0,0,0,0.05);
+}
+
+.meet-debora-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(16px, 1.2vw, 18px);
+    color: #5A3A46;
+    line-height: 1.8;
+    margin-bottom: 45px;
+    max-width: 500px;
+}
+
+.meet-debora-btn {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #FDFBF7;
+    background-color: #26131b;
+    padding: 20px 45px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #26131b;
+    box-shadow: 0 10px 20px rgba(38, 19, 27, 0.2);
+}
+
+.meet-debora-btn:hover {
+    background-color: transparent;
+    color: #26131b;
+    box-shadow: none;
+    transform: translateY(-3px);
+}
+
+.meet-debora-visual {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.meet-debora-photo-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 3/4;
+    border-radius: 200px 200px 0 0; /* Formato de arco clássico editorial */
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(38, 19, 27, 0.15);
+}
+
+.meet-debora-photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s ease;
+}
+
+.meet-debora-photo-wrapper:hover img {
+    transform: scale(1.05);
+}
+
+.meet-debora-badge {
+    position: absolute;
+    bottom: 20px;
+    left: -30px;
+    width: 130px;
+    height: 130px;
+    background: #E2BC74;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    color: #26131b;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 2px;
+    box-shadow: 0 15px 30px rgba(226, 188, 116, 0.4);
+    animation: rotateBadge 15s linear infinite;
+    z-index: 3;
+}
+
+@keyframes rotateBadge {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 900px) {
+    .meet-debora-container {
+        flex-direction: column-reverse; /* Foto acima no mobile */
+        text-align: center;
+    }
+    .meet-debora-desc {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .meet-debora-badge {
+        bottom: -20px;
+        left: auto;
+        right: -20px;
+    }
+}
+
+/* ---------------------------------- */
+/* CONHEÇA O ESPAÇO SECTION           */
+/* ---------------------------------- */
+.space-section {
+    padding: 0 clamp(20px, 5vw, 80px);
+    background-color: #fdf2f5; /* Fundo rosa bem suave para destacar o texto escuro */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 100vh;
+}
+
+.space-content {
+    width: 50%;
+    max-width: 600px;
+    text-align: left;
+    margin: 0;
+    z-index: 2;
+}
+
+.space-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #c4607e;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.space-title {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(60px, 8vw, 120px);
+    color: #4A2431; /* Cor vinho/plum como solicitado na imagem */
+    margin: 0 0 25px 0;
+    line-height: 1;
+}
+
+.space-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(16px, 1.2vw, 18px);
+    color: #c4607e; /* Rosa mais claro para o parágrafo */
+    line-height: 1.8;
+    margin: 0 auto;
+    font-weight: 500;
+}
+
+/* MARQUEE CSS (O Carrossel Ininito) */
+.space-gallery-container {
+    position: absolute;
+    right: 5%;
+    top: -10vh;
+    width: 40%;
+    max-width: 450px;
+    height: 120vh;
+    display: flex;
+    flex-direction: column;
+    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+}
+
+.space-gallery-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: max-content;
+}
+
+.space-gallery-track {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 3vw, 40px);
+    padding-bottom: clamp(20px, 3vw, 40px);
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+}
+
+/* Motores de Animação */
+.track-up {
+    animation: infiniteScrollUp 45s linear infinite;
+}
+
+@keyframes infiniteScrollUp {
+    0% { transform: translateY(0) translateZ(0); }
+    100% { transform: translateY(-100%) translateZ(0); }
+}
+
+/* Estilo das Fotos */
+.space-gallery-track img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2); /* Reduzindo a sombra levemente para melhor performance */
+    filter: brightness(0.95);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    -webkit-backface-visibility: hidden; /* Ajuda na fluidez em dispositivos Apple */
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* Efeito ao passar o mouse: Ganha brilho e aumenta de tamanho levemente */
+.space-gallery-track img:hover {
+    filter: brightness(1.1);
+    transform: scale(1.03);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+    z-index: 5;
+}
+
+@media (max-width: 900px) {
+    .space-section {
+        flex-direction: column;
+        padding: 80px 20px;
+        height: auto;
+    }
+    .space-content {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 60px;
+    }
+    .space-gallery-container {
+        position: relative;
+        right: auto;
+        top: auto;
+        width: 100%;
+        height: 60vh;
+        max-width: 100%;
+        pointer-events: none; /* Garante que o toque na galeria não intercepte a rolagem da página no mobile */
+    }
+}
+
+/* ---------------------------------- */
+/* PREMIUM FOOTER                     */
+/* ---------------------------------- */
+.premium-footer {
+    position: relative;
+    background-color: #050203;
+    background-image: 
+        linear-gradient(to bottom, rgba(5, 2, 3, 0.85), rgba(5, 2, 3, 0.96)),
+        url('/assets/img/background.png');
+    background-size: cover;
+    background-position: center;
+    color: #FDFBF7;
+    padding: 100px 5vw 40px;
+    overflow: hidden;
+    border-top: 1px solid rgba(196, 96, 126, 0.1);
+}
+
+.footer-glow {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: radial-gradient(circle, rgba(196,96,126,0.5) 0%, transparent 100%);
+    box-shadow: 0 0 40px 10px rgba(196,96,126,0.15);
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 60px;
+    margin-bottom: 80px;
+}
+
+.footer-brand {
+    max-width: 300px;
+}
+
+.footer-logo {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 700;
+    letter-spacing: 10px;
+    margin: 0 0 10px 0;
+    
+    /* Efeito de texto vazado (Mask) com o diamante */
+    background-image: url('/assets/img/background.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Cria um efeito paralaxe no texto */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(196, 96, 126, 0.3); /* Contorno sutil para destaque extra */
+}
+
+.footer-tagline {
+    font-family: 'Great Vibes', cursive;
+    font-size: 24px;
+    color: #c4607e;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.footer-address {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.address-title, .social-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #c4607e;
+    margin-bottom: 8px;
+}
+
+.footer-address p {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    line-height: 1.5;
+    transition: color 0.3s ease;
+}
+
+.footer-address p:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.footer-social {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.social-links-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.social-link-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+}
+
+.social-link-item:hover {
+    color: #ffffff;
+}
+
+.social-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.03);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.social-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #c4607e, #e28ca4);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+}
+
+.social-btn svg {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.social-link-item:hover .social-btn {
+    border-color: transparent;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(196, 96, 126, 0.3);
+}
+
+.social-link-item:hover .social-btn::before {
+    opacity: 1;
+}
+
+.social-link-item:hover .social-btn svg {
+    transform: scale(1.1);
+}
+
+.footer-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,0.1) 50%, 
+        rgba(255,255,255,0) 100%
+    );
+    margin-bottom: 40px;
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-bottom p {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0;
+}
+
+.footer-signature {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+    .footer-top {
+        flex-direction: column;
+        gap: 40px;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+    }
 }

@@ -93,6 +93,34 @@ export function initHero(onIntroComplete) {
     }
 
     // ==========================================
+    // PULAR PRELOADER SE JÁ ESTIVER NAVEGANDO
+    // ==========================================
+    // Se o usuário já carregou essa aba antes e só está voltando da página da Débora, pulamos o carregamento 3D inteiro.
+    if (sessionStorage.getItem('preciosaVisited')) {
+        document.getElementById("preloader")?.classList.add("is-hidden");
+        document.querySelector(".hero-main")?.classList.add("is-gone");
+        document.body.classList.remove("intro-active");
+
+        const video = document.getElementById("home-video");
+        if (video) {
+            video.play().catch(() => {});
+            setupVideoScrollControl(video);
+        }
+
+        const endSpacing = isMobileScreen ? "4px" : "15px";
+        gsap.set(".home-text-mask-container", { opacity: 1 });
+        gsap.set(".mask-brand-text", { opacity: 1, scale: 1, letterSpacing: endSpacing });
+        gsap.set(".hero-scroll-indicator", { opacity: 1 });
+
+        initHeroScrollAnimations();
+        if (typeof onIntroComplete === "function") onIntroComplete();
+        return; // Aborta todo o restante (download do modelo 3D, HDRI, etc) economizando banda
+    }
+
+    // Grava no cache da sessão que o site já foi acessado
+    sessionStorage.setItem('preciosaVisited', 'true');
+
+    // ==========================================
     // MECANISMO DE FALLBACK
     // ==========================================
     let fallbackTriggered = false;
