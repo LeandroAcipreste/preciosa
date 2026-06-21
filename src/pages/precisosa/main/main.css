@@ -49,11 +49,21 @@
     width: 100%;
     max-width: 1280px;
     margin: 0 auto;
-    padding: 72px 40px 80px;
+    padding: 72px 40px 80px; /* Restaurado o padding original */
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0;
+}
+
+/* Container interativo (Gemas + CTA) que será pinado no meio da tela */
+.services-interactive-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centraliza verticalmente quando pinado */
+    min-height: 100vh; /* Garante que a área pinada cubra a tela suavemente */
 }
 
 /* ---- Header ---- */
@@ -257,7 +267,7 @@
 #ornamental-path {
     position: absolute;
     top: 140px;
-    /* Sobe o vetor para alinhar visualmente com o centro/metade superior das pedras */
+    /* Sobe o vetor para alinhar visualmente com o centro das pedras (dentro do gems-grid) */
     left: 50%;
     transform: translate(-50%, -50%);
     /* Centraliza o vetor em torno do eixo Y definido no top */

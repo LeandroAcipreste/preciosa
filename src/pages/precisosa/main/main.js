@@ -43,45 +43,105 @@ export function initMain() {
         opacity: 1,
     });
 
-    // TIMELINE SCRUB — scrub menor no mobile para não travar
-    const gridTl = gsap.timeline({
-        scrollTrigger: {
-            trigger: ".gems-grid",
-            start: isMobile ? "top 90%" : "top 75%",
-            end:   isMobile ? "bottom 10%" : "bottom 25%",
-            scrub: isMobile ? 1.0 : 2.0,
-            invalidateOnRefresh: true,
+    if (isMobile) {
+        // ─── MOBILE: scrub simples sem pin ────────────────────────────────
+        const gridTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".gems-grid",
+                start: "top 90%",
+                end:   "bottom 10%",
+                scrub: 1.0,
+                invalidateOnRefresh: true,
+            }
+        });
+
+        gridTl.to("#ornamental-path", {
+            clipPath: "inset(0% 0% 0% 0%)",
+            webkitClipPath: "inset(0% 0% 0% 0%)",
+            ease: "none",
+            duration: 1.40
+        }, 0);
+
+        cards.forEach((card, index) => {
+            gridTl.fromTo(card,
+                { opacity: 0, y: 30 },
+                { opacity: 1, y: 0, ease: "sine.out", duration: 0.50 },
+                0.12 + index * 0.28
+            );
+        });
+
+        if (cta) {
+            gridTl.fromTo(cta,
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, ease: "sine.out", duration: 0.45 },
+                1.15
+            );
         }
-    });
 
-    // Revelação do caminho de pedras
-    gridTl.to("#ornamental-path", {
-        clipPath: "inset(0% 0% 0% 0%)",
-        webkitClipPath: "inset(0% 0% 0% 0%)",
-        ease: "none",
-        duration: 1.40
-    }, 0);
+    } else {
+        // ─── DESKTOP: section PINADA RESTAURADA COM FLUIDEZ PREMIUM ───────────
+        // Restauramos o pin porque o efeito de construir o caminho com o scroll é muito premium.
+        // O "travamento" anterior na saída do pin foi corrigido removendo o 'anticipatePin'
+        // e reduzindo o 'scrub' e o 'end' para uma transição amanteigada para a próxima seção.
+        const pinnedTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".services-interactive-area",
+                start: "top top",
+                end: "+=1100", // 1100px: tempo perfeito (nem rápido demais, nem longo demais que pareça travado)
+                pin: true,
+                pinSpacing: true,
+                scrub: 1.2, // Reduzido de 1.5 para 1.2: o caminho segue o scroll de forma mais colada e fluida
+                invalidateOnRefresh: true,
+            }
+        });
 
-    // Cards
-    cards.forEach((card, index) => {
-        gridTl.fromTo(card,
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, ease: "sine.out", duration: 0.50 },
-            0.12 + index * 0.28
-        );
-    });
+        // Caminho das pedras revela da esquerda para a direita (sincronizado com o scroll)
+        pinnedTl.to("#ornamental-path", {
+            clipPath: "inset(0% 0% 0% 0%)",
+            webkitClipPath: "inset(0% 0% 0% 0%)",
+            ease: "none",
+            duration: 1.0 // Usa quase toda a timeline
+        }, 0);
 
-    // CTA
-    if (cta) {
-        gridTl.fromTo(cta,
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, ease: "sine.out", duration: 0.45 },
-            1.15
-        );
+        // Cards entram com scale + y + opacity para sensação de "emergência" premium
+        const cardStartOffset = 0.05;
+        cards.forEach((card, index) => {
+            const startAt = cardStartOffset + index * 0.22;
+
+            pinnedTl.fromTo(card,
+                { opacity: 0, y: 50, scale: 0.88, transformOrigin: "center bottom" },
+                {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    ease: "back.out(1.4)",
+                    duration: 0.45,
+                },
+                startAt
+            );
+
+            // Brilho da gema pulsa uma vez após o card aparecer
+            const gemGlow = card.querySelector(".gem-glow");
+            if (gemGlow) {
+                pinnedTl.fromTo(gemGlow,
+                    { opacity: 0.3 },
+                    { opacity: 1, duration: 0.25, ease: "power2.out" },
+                    startAt + 0.25
+                );
+            }
+        });
+
+        // CTA aparece no final de forma majestosa
+        if (cta) {
+            pinnedTl.fromTo(cta,
+                { opacity: 0, y: 24, scale: 0.96 },
+                { opacity: 1, y: 0, scale: 1, ease: "power3.out", duration: 0.40 },
+                0.90
+            );
+        }
     }
 
     ScrollTrigger.sort();
-    // Único refresh — sem ouvinte de load duplicado
     ScrollTrigger.refresh();
 }
 

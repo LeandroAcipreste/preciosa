@@ -14,12 +14,12 @@ const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0
 
 function start() {
     lenis = new Lenis({
-        lerp: 0.08,
+        lerp: 0.035,             // Reduzido (era 0.045): scroll extremamente amanteigado e longo
         orientation: 'vertical',
         gestureOrientation: 'vertical',
         smoothWheel: true,
         smoothTouch: false,      // CRÍTICO: false evita conflito com scroll nativo touch
-        wheelMultiplier: 0.9,
+        wheelMultiplier: 0.55,   // Mais lento ainda, obrigando navegação contemplativa
         touchMultiplier: 1.0,
         infinite: false,
     });
