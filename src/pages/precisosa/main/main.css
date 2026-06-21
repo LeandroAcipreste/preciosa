@@ -359,22 +359,29 @@
     .gem-glow-wrapper {
         width: 130px;
         height: 130px;
-        /* Mesmo quadrado uniforme no mobile */
+    }
+
+    /* Desativa mix-blend-mode no mobile — força compositing layer extra em cada imagem */
+    .gem-image {
+        mix-blend-mode: normal;
     }
 
     #ornamental-path {
+        /* Posicionamento para coluna mobile (viewBox 203x1335) */
         top: 20px;
-        /* Começa logo abaixo da faixa */
         left: 50%;
         transform: translateX(-50%);
         width: 203px;
-        /* Largura base do vetor invertido */
         height: 1335px;
-        /* Altura equivalente ao totalLen do desktop */
         min-width: unset;
         opacity: 0.9;
         display: block;
         z-index: 0;
+    }
+
+    /* Desativa blur do glow no mobile (evita repaint por card) */
+    .gem-glow {
+        filter: none;
     }
 
     /* CTA empilhado no mobile */
@@ -393,13 +400,12 @@
 }
 
 /* ============================================
-   ANIMAÇÕES DE ENTRADA (OTIMIZADAS PARA GSAP)
+   ANIMAÇÕES DE ENTRADA (GERENCIADAS PELO GSAP)
    ============================================ */
 .fade-up {
     opacity: 0;
     transform: translateY(40px);
     transition: opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1), transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
-    will-change: opacity, transform;
 }
 
 .fade-up.is-visible {
@@ -407,21 +413,18 @@
     transform: translateY(0);
 }
 
-/* Stagger APENAS para o cabeçalho (que entra via toggleActions, não scrub) */
+/* Stagger APENAS para o cabeçalho */
 .services-header .fade-up:nth-child(1) { transition-delay: 0.1s; }
 .services-header .fade-up:nth-child(2) { transition-delay: 0.2s; }
 .services-header .fade-up:nth-child(3) { transition-delay: 0.3s; }
 .services-header .fade-up:nth-child(4) { transition-delay: 0.4s; }
 
-/* REMOVIDO: stagger das pedras via CSS (:nth-child) — conflitava com o GSAP scrub */
-
-/* Aceleração por GPU para os elementos animados pelo GSAP */
+/* GPU hint para o caminho ornamental (GSAP anima clip-path) */
 #ornamental-path {
-    will-change: clip-path, transform;
     transform: translate(-50%, -50%) translateZ(0);
 }
 
+/* GPU hint para os cards (GSAP anima opacity/y) */
 .gem-card {
-    will-change: transform, opacity;
     transform: translateZ(0);
 }

@@ -65,4 +65,25 @@
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5); /* Sombra para o vídeo flutuar no mármore */
 }
 
+/* ── MOBILE: vídeo de ponta a ponta ── */
+@media (max-width: 768px) {
+    .hero-debora {
+        padding: 0;          /* Remove margens — vídeo ocupa 100% da tela */
+        align-items: stretch;
+    }
 
+    .debora-header {
+        padding: 20px 24px;  /* Reduz um pouco o header no mobile */
+    }
+
+    .debora-hero-video-bg {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        max-width: none;
+        max-height: none;
+        object-fit: cover;   /* Preenche sem distorcer */
+        border-radius: 0;    /* Sem bordas arredondadas — ponta a ponta */
+        box-shadow: none;
+    }
+}

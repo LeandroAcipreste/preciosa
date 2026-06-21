@@ -1,0 +1,354 @@
+/* ============================================================
+   FOOTER DEBORA — "A última impressão é a que fica"
+   Paleta: Vinho escuro (#1A0C13) + Dourado (#E2BC74) + Creme (#FDFBF7)
+   ============================================================ */
+
+.debora-footer {
+    position: relative;
+    background-color: #0D0608;
+    overflow: hidden;
+    padding: 0;
+    color: #FDFBF7;
+}
+
+/* ── Faixa decorativa de separação no topo ── */
+.debora-footer-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(226, 188, 116, 0.1) 20%,
+        rgba(226, 188, 116, 0.6) 50%,
+        rgba(226, 188, 116, 0.1) 80%,
+        transparent 100%
+    );
+}
+
+/* ── Partículas douradas flutuantes (CSS puro, sem JS) ── */
+.debora-footer-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.debora-footer-particles span {
+    position: absolute;
+    display: block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #E2BC74;
+    opacity: 0;
+    animation: floatParticle var(--dur, 8s) var(--delay, 0s) ease-in-out infinite;
+    left: var(--x, 50%);
+    top: var(--y, 80%);
+}
+
+@keyframes floatParticle {
+    0%   { opacity: 0;    transform: translateY(0) scale(0.5); }
+    20%  { opacity: 0.7; }
+    80%  { opacity: 0.4; }
+    100% { opacity: 0;    transform: translateY(-120px) scale(1.2); }
+}
+
+/* ── Bloco da citação central ── */
+.debora-footer-quote {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 90px 40px 60px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.debora-footer-quote-mark {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(80px, 12vw, 160px);
+    color: #E2BC74;
+    opacity: 0.15;
+    line-height: 0.5;
+    display: block;
+    margin-bottom: 30px;
+    user-select: none;
+}
+
+.debora-footer-quote-text {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(28px, 4vw, 52px);
+    color: #FDFBF7;
+    line-height: 1.5;
+    margin: 0 0 20px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 30px rgba(226, 188, 116, 0.15);
+}
+
+.debora-footer-quote-author {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #E2BC74;
+    opacity: 0.8;
+}
+
+/* ── Linha ornamental dourada central ── */
+.debora-footer-ornament {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 0 40px;
+    margin: 0 auto 70px;
+    max-width: 700px;
+}
+
+.debora-footer-ornament-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(226, 188, 116, 0.5)
+    );
+}
+
+.debora-footer-ornament-line:last-child {
+    background: linear-gradient(90deg,
+        rgba(226, 188, 116, 0.5),
+        transparent
+    );
+}
+
+.debora-footer-diamond {
+    width: 10px;
+    height: 10px;
+    background: #E2BC74;
+    transform: rotate(45deg);
+    flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(226, 188, 116, 0.4);
+}
+
+/* ── Bloco principal (logo + links + contato) ── */
+.debora-footer-main {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 60px;
+    align-items: start;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+}
+
+/* ── Logo central ── */
+.debora-footer-logo-block {
+    grid-column: 2;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.debora-footer-logo-name {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(42px, 5vw, 64px);
+    color: #FDFBF7;
+    line-height: 1;
+    display: block;
+}
+
+.debora-footer-logo-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #E2BC74;
+    opacity: 0.7;
+}
+
+.debora-footer-logo-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(226, 188, 116, 0.4);
+    margin: 4px auto;
+}
+
+/* ── Coluna esquerda: contato ── */
+.debora-footer-contact {
+    grid-column: 1;
+    padding-top: 10px;
+}
+
+.debora-footer-col-title {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #E2BC74;
+    margin-bottom: 24px;
+    display: block;
+}
+
+.debora-footer-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: rgba(253, 251, 247, 0.6);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    transition: color 0.3s ease;
+}
+
+.debora-footer-contact-item:hover {
+    color: #FDFBF7;
+}
+
+.debora-footer-contact-item svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #E2BC74;
+}
+
+/* ── Coluna direita: redes sociais ── */
+.debora-footer-social {
+    grid-column: 3;
+    padding-top: 10px;
+    text-align: right;
+}
+
+.debora-footer-social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 0;
+    align-items: flex-end;
+}
+
+.debora-footer-social-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: rgba(253, 251, 247, 0.6);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.debora-footer-social-item:hover {
+    color: #FDFBF7;
+}
+
+.debora-footer-social-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(226, 188, 116, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(226, 188, 116, 0.04);
+    color: #E2BC74;
+    transition: all 0.4s ease;
+    flex-shrink: 0;
+}
+
+.debora-footer-social-item:hover .debora-footer-social-icon {
+    background: rgba(226, 188, 116, 0.12);
+    border-color: rgba(226, 188, 116, 0.5);
+    box-shadow: 0 0 20px rgba(226, 188, 116, 0.15);
+    transform: translateY(-2px);
+}
+
+/* ── Rodapé inferior ── */
+.debora-footer-bottom {
+    position: relative;
+    z-index: 2;
+    border-top: 1px solid rgba(253, 251, 247, 0.06);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.debora-footer-bottom p {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: rgba(253, 251, 247, 0.3);
+    margin: 0;
+}
+
+.debora-footer-back-link {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(226, 188, 116, 0.5);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.debora-footer-back-link:hover {
+    color: #E2BC74;
+}
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+    .debora-footer-quote {
+        padding: 70px 24px 50px;
+    }
+
+    .debora-footer-main {
+        grid-template-columns: 1fr;
+        gap: 48px;
+        padding: 0 24px 60px;
+        text-align: center;
+    }
+
+    .debora-footer-logo-block {
+        grid-column: 1;
+        order: -1; /* Logo primeiro no mobile */
+    }
+
+    .debora-footer-contact {
+        grid-column: 1;
+    }
+
+    .debora-footer-contact-item {
+        justify-content: center;
+    }
+
+    .debora-footer-social {
+        grid-column: 1;
+        text-align: center;
+    }
+
+    .debora-footer-social-links {
+        align-items: center;
+    }
+
+    .debora-footer-social-item {
+        flex-direction: row-reverse;
+    }
+
+    .debora-footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 24px;
+    }
+}

@@ -30,31 +30,31 @@ export function initMain() {
             scrollTrigger: {
                 trigger: ".services-header",
                 start: isMobile ? "top 90%" : "top 80%",
-                toggleActions: "play reverse play reverse"
+                toggleActions: "play none none reverse"
             }
         }
     );
 
+    // Mobile: revela de cima para baixo; Desktop: da esquerda para direita
+    const clipStart = isMobile ? "inset(0% 0% 100% 0%)" : "inset(0% 100% 0% 0%)";
     gsap.set("#ornamental-path", {
-        clipPath: isMobile ? "inset(0% 0% 100% 0%)" : "inset(0% 100% 0% 0%)",
-        webkitClipPath: isMobile ? "inset(0% 0% 100% 0%)" : "inset(0% 100% 0% 0%)",
+        clipPath: clipStart,
+        webkitClipPath: clipStart,
         opacity: 1,
-        force3D: true
     });
 
-    // TIMELINE SILK-SMOOTH
-    // end: "bottom 25%" amplia a janela de scroll — a animação progride devagar e flui como líquido
+    // TIMELINE SCRUB — scrub menor no mobile para não travar
     const gridTl = gsap.timeline({
         scrollTrigger: {
             trigger: ".gems-grid",
-            start: isMobile ? "top 85%" : "top 75%",
-            end:   isMobile ? "bottom 45%" : "bottom 25%",
-            scrub: 2.0,          // Inércia premium — o scroll "derrama" a animação
-            invalidateOnRefresh: true
+            start: isMobile ? "top 90%" : "top 75%",
+            end:   isMobile ? "bottom 10%" : "bottom 25%",
+            scrub: isMobile ? 1.0 : 2.0,
+            invalidateOnRefresh: true,
         }
     });
 
-    // Revelação do caminho de pedras em ritmo constante (ease:none = sincronizado pixel a pixel)
+    // Revelação do caminho de pedras
     gridTl.to("#ornamental-path", {
         clipPath: "inset(0% 0% 0% 0%)",
         webkitClipPath: "inset(0% 0% 0% 0%)",
@@ -62,45 +62,27 @@ export function initMain() {
         duration: 1.40
     }, 0);
 
-    // Cards surgem organicamente acompanhando o traço do caminho
-    // startTime em 0.28 = espaçamento generoso para cada card ter sua janela própria
+    // Cards
     cards.forEach((card, index) => {
-        const startTime = 0.12 + index * 0.28;
-
         gridTl.fromTo(card,
             { opacity: 0, y: 30 },
-            {
-                opacity: 1,
-                y: 0,
-                ease: "sine.out",
-                duration: 0.50,
-                force3D: true
-            },
-            startTime
+            { opacity: 1, y: 0, ease: "sine.out", duration: 0.50 },
+            0.12 + index * 0.28
         );
     });
 
-    // CTA surge logo após o último card
+    // CTA
     if (cta) {
         gridTl.fromTo(cta,
             { opacity: 0, y: 20 },
-            {
-                opacity: 1,
-                y: 0,
-                ease: "sine.out",
-                duration: 0.45,
-                force3D: true
-            },
+            { opacity: 1, y: 0, ease: "sine.out", duration: 0.45 },
             1.15
         );
     }
 
     ScrollTrigger.sort();
+    // Único refresh — sem ouvinte de load duplicado
     ScrollTrigger.refresh();
-
-    window.addEventListener("load", () => {
-        ScrollTrigger.refresh();
-    });
 }
 
 // ============================================

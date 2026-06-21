@@ -171,9 +171,8 @@ html.skip-preloader .hero-main {
   z-index: 2 !important;
   mix-blend-mode: screen;
   pointer-events: none;
-  opacity: 0; /* Começa transparente e é revelado via GSAP */
-  /* CORREÇÃO DO GLITCH DE BLEND MODE NO SCROLL MÓVEL (FORÇA LAYER GPU) */
-  will-change: transform, opacity;
+  opacity: 0;
+  /* GPU layer para evitar repaint no scroll mobile */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -527,16 +526,16 @@ html.skip-preloader .hero-main {
     position: relative;
     width: 100%;
     max-width: 400px;
-    aspect-ratio: 3/4;
-    border-radius: 200px 200px 0 0; /* Formato de arco clássico editorial */
+    border-radius: 200px 200px 12px 12px;
     overflow: hidden;
     box-shadow: 0 40px 80px rgba(38, 19, 27, 0.15);
 }
 
 .meet-debora-photo-wrapper img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    display: block;
+    object-fit: contain;
     transition: transform 1s ease;
 }
 
@@ -646,6 +645,7 @@ html.skip-preloader .hero-main {
     height: 120vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* CRÍTICO: sem isso os tracks animam mas o conteúdo não é cortado */
     mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
     -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
 }
@@ -662,8 +662,9 @@ html.skip-preloader .hero-main {
     gap: clamp(20px, 3vw, 40px);
     padding-bottom: clamp(20px, 3vw, 40px);
     will-change: transform;
-    -webkit-transform: translateZ(0);
     transform: translateZ(0);
+    /* Permite que o browser delege o scroll vertical ao nativo no touch */
+    touch-action: pan-y;
 }
 
 /* Motores de Animação */
@@ -682,21 +683,29 @@ html.skip-preloader .hero-main {
     height: 350px;
     object-fit: cover;
     border-radius: 16px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2); /* Reduzindo a sombra levemente para melhor performance */
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
     filter: brightness(0.95);
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: filter 0.6s ease, box-shadow 0.6s ease;
     cursor: pointer;
-    -webkit-backface-visibility: hidden; /* Ajuda na fluidez em dispositivos Apple */
+    /* backface-visibility ajuda na fluidez em Safari */
+    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    transform: translateZ(0);
+    /* Não colocar translateZ aqui — conflita com o transform do track */
 }
 
-/* Efeito ao passar o mouse: Ganha brilho e aumenta de tamanho levemente */
+/* Efeito ao passar o mouse: brilho e escala leve */
 .space-gallery-track img:hover {
     filter: brightness(1.1);
     transform: scale(1.03);
     box-shadow: 0 25px 50px rgba(0,0,0,0.6);
     z-index: 5;
+}
+
+/* Reduz velocidade para usuários que preferem menos movimento, mas não desliga */
+@media (prefers-reduced-motion: reduce) {
+    .track-up {
+        animation-duration: 90s;
+    }
 }
 
 @media (max-width: 900px) {
@@ -717,7 +726,8 @@ html.skip-preloader .hero-main {
         width: 100%;
         height: 60vh;
         max-width: 100%;
-        pointer-events: none; /* Garante que o toque na galeria não intercepte a rolagem da página no mobile */
+        overflow: hidden; /* Necessário para o clip da animação funcionar no mobile */
+        pointer-events: none;
     }
 }
 
@@ -776,15 +786,15 @@ html.skip-preloader .hero-main {
     letter-spacing: 10px;
     margin: 0 0 10px 0;
     
-    /* Efeito de texto vazado (Mask) com o diamante */
+    /* Efeito de texto com imagem de fundo */
     background-image: url('/assets/img/background.png');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed; /* Cria um efeito paralaxe no texto */
+    /* background-attachment: fixed removido — não funciona no iOS e causa repaints */
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    -webkit-text-stroke: 1px rgba(196, 96, 126, 0.3); /* Contorno sutil para destaque extra */
+    -webkit-text-stroke: 1px rgba(196, 96, 126, 0.3);
 }
 
 .footer-tagline {

@@ -9,46 +9,47 @@ gsap.registerPlugin(ScrollTrigger);
 
 let lenis;
 
+// Detecta se é touch device para desativar smooth touch (evita jank no mobile)
+const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
 function start() {
-    // Inicializa Lenis para scroll suave de alta performance (Buttery Smooth)
     lenis = new Lenis({
-        lerp: 0.06,              // Amortecimento fluido estilo luxo (0.05–0.08)
+        lerp: 0.08,
         orientation: 'vertical',
         gestureOrientation: 'vertical',
         smoothWheel: true,
-        smoothTouch: true,       // Suavidade em trackpads e telas touch
-        wheelMultiplier: 0.9,    // Consistência em mouses com rodas rápidas
+        smoothTouch: false,      // CRÍTICO: false evita conflito com scroll nativo touch
+        wheelMultiplier: 0.9,
+        touchMultiplier: 1.0,
+        infinite: false,
     });
 
-    // Vincula ScrollTrigger ao evento de scroll do Lenis
+    // Sincroniza ScrollTrigger ao Lenis via gsap.ticker (evita RAF duplo)
+    gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+    });
+    gsap.ticker.lagSmoothing(0);
+
     lenis.on('scroll', ScrollTrigger.update);
 
-    function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-
-    // Trava o scroll do Lenis durante a tela de carregamento/intro
+    // Trava o scroll durante a intro
     lenis.stop();
     document.body.classList.add("intro-active");
     window.scrollTo(0, 0);
 
     initHero(() => {
-        // Callback: executado quando o diamante sobe e a cortina abre
         document.body.classList.remove("intro-active");
         window.scrollTo(0, 0);
-        
-        // Habilita o scroll suave Lenis após o término da intro
         lenis.start();
-        
-        // Inicializa a segunda dobra agora, evitando disparos precoces
-        initMain();
-        initLuxuryServicesSection();
+
+        // Aguarda um frame para o layout estabilizar antes de criar ScrollTriggers
+        requestAnimationFrame(() => {
+            initMain();
+            initLuxuryServicesSection();
+        });
     });
 }
 
-// Executa imediatamente se o DOM já estiver pronto, caso contrário aguarda o evento
 if (document.readyState === "loading") {
     window.addEventListener("DOMContentLoaded", start);
 } else {
