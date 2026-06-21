@@ -949,6 +949,17 @@ html.skip-preloader .hero-main {
         flex-direction: column;
         gap: 40px;
     }
+
+    .footer-brand {
+        max-width: 100%;
+    }
+
+    /* Reduz letter-spacing para "PRECIOSA" não ser cortado no mobile */
+    .footer-logo {
+        font-size: clamp(24px, 8vw, 36px);
+        letter-spacing: 4px;
+        overflow: visible;
+    }
     
     .footer-bottom {
         flex-direction: column;

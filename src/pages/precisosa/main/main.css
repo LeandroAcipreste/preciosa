@@ -420,8 +420,29 @@
 .services-header .fade-up:nth-child(4) { transition-delay: 0.4s; }
 
 /* GPU hint para o caminho ornamental (GSAP anima clip-path) */
-#ornamental-path {
-    transform: translate(-50%, -50%) translateZ(0);
+/* Desktop: translate vertical para alinhar com o centro das pedras */
+@media (min-width: 769px) {
+    #ornamental-path {
+        transform: translate(-50%, -50%) translateZ(0);
+    }
+}
+
+/* Mobile: só centração horizontal — sem deslocamento vertical */
+@media (max-width: 768px) {
+    #ornamental-path {
+        transform: translateX(-50%) translateZ(0);
+    }
+
+    /* Shimmer dourado nas joias ao revelar o caminho (CSS puro) */
+    #ornamental-path svg image {
+        filter: drop-shadow(0 0 4px rgba(196, 96, 126, 0.35));
+        animation: gemShimmer 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes gemShimmer {
+        from { filter: drop-shadow(0 0 3px rgba(196, 96, 126, 0.2)); }
+        to   { filter: drop-shadow(0 0 8px rgba(226, 180, 120, 0.55)); }
+    }
 }
 
 /* GPU hint para os cards (GSAP anima opacity/y) */
