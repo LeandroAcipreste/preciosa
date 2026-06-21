@@ -23,14 +23,28 @@
 
 <body class="global-body">
     
-    <!-- 1. PRELOADER PREMIUM -->
+    <!-- 1. PRELOADER PREMIUM — fundo instantâneo, sem dependência de imagem -->
     <div id="debora-preloader" class="debora-preloader">
+        <!-- Joia dourada central (materializa primeiro via GSAP) -->
+        <div class="preloader-gem" aria-hidden="true"></div>
+
         <h1 class="debora-preloader-text">
             <span class="word">Débora</span>
             <span class="word">Bispo</span>
             <span class="word">Amorim</span>
         </h1>
+
+        <!-- Linha ornamental abaixo do nome -->
+        <div class="preloader-line" aria-hidden="true">
+            <div class="preloader-line-bar"></div>
+            <div class="preloader-line-dot"></div>
+            <div class="preloader-line-dot"></div>
+            <div class="preloader-line-dot"></div>
+            <div class="preloader-line-bar"></div>
+        </div>
     </div>
+
+
 
     <!-- 2. ESTRUTURA DE NAVEGAÇÃO INTEGRADA -->
     <header class="debora-header">

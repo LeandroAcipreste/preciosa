@@ -1,127 +1,147 @@
 /* ============================================
-   DEBORA PRELOADER PREMIUM
+   DEBORA PRELOADER — Édition Prestige
+   Fundo: gradiente CSS puro (carregamento instantâneo, sem dependência de imagem)
    ============================================ */
 .debora-preloader {
     position: fixed;
     inset: 0;
     width: 100%;
     height: 100vh;
-    background-image: url('../../../../assets_debora/img/backgroundPng.png');
-    background-size: cover;
-    background-position: center;
-    background-color: #3D1E2A; /* Cor de fallback (amora/vinho escuro) */
+    height: 100dvh;
+
+    /* Gradiente luxuoso: renderiza instantaneamente, sem network request */
+    background-color: #0D0608;
+    background-image:
+        radial-gradient(ellipse at 20% 20%, rgba(100, 35, 55, 0.75) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 80%, rgba(55, 15, 30, 0.85) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 30%, rgba(180, 75, 100, 0.12) 0%, transparent 45%);
+
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 28px;
     z-index: 9999;
     overflow: hidden;
 }
 
+/* Shimmer dourado que varre a tela lentamente */
+.debora-preloader::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background: linear-gradient(
+        105deg,
+        transparent        35%,
+        rgba(226,188,116,0.03) 44%,
+        rgba(226,188,116,0.07) 50%,
+        rgba(226,188,116,0.03) 56%,
+        transparent        65%
+    );
+    animation: preloaderSweep 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes preloaderSweep {
+    0%   { transform: translateX(-33%) translateY(-33%); }
+    100% { transform: translateX(33%)  translateY(33%);  }
+}
+
+/* Vinheta nas bordas — cria profundidade e foco no centro */
+.debora-preloader::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.65) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ── Joia central animada ── */
+.preloader-gem {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    z-index: 3;
+    opacity: 0; /* revelada pelo GSAP */
+}
+
+/* Losango dourado */
+.preloader-gem::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #f5d98a 0%, #E2BC74 40%, #c49a3c 100%);
+    transform: rotate(45deg);
+    border-radius: 3px;
+}
+
+/* Brilho pulsante ao redor da joia */
+.preloader-gem::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(226,188,116,0.35) 0%, transparent 70%);
+    animation: gemGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes gemGlow {
+    from { transform: scale(1);    opacity: 0.7; }
+    to   { transform: scale(1.4);  opacity: 1.0; }
+}
+
+/* ── Texto do nome ── */
 .debora-preloader-text {
     position: relative;
-    z-index: 2; /* Fica acima do canvas 3D e do background */
+    z-index: 3;
     font-family: 'Great Vibes', cursive;
-    font-size: clamp(40px, 6vw, 80px);
-    color: #E2BC74; /* Tom dourado rico inspirado na imagem de referência */
+    font-size: clamp(44px, 9vw, 88px);
+    color: #E2BC74;
     font-weight: 400;
     text-align: center;
     letter-spacing: 2px;
     display: flex;
-    gap: 15px; /* Espaçamento fluido entre as palavras */
+    gap: 16px;
     margin: 0;
     padding: 0;
-    /* Sombra dupla: uma para destaque no mármore e outra para leve brilho (glow) do dourado */
-    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(226, 188, 116, 0.15); 
+    text-shadow:
+        1px 2px 8px rgba(0,0,0,0.7),
+        0 0 30px rgba(226,188,116,0.2);
 }
 
 .debora-preloader-text .word {
-    /* Preparado para animação de escrita à mão: cortado 100% da direita */
     clip-path: inset(-20% 100% -20% -10%);
     -webkit-clip-path: inset(-20% 100% -20% -10%);
     display: inline-block;
 }
 
-/* ============================================
-   ESTILOS BÁSICOS PARA O HEADER E HERO (DEBORA)
-   ============================================ */
-.debora-header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 30px 40px;
-    z-index: 100;
-}
-
-.debora-nav .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-family: "Inter", sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    color: #c4607e;
-    text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    transition: opacity 0.3s ease;
-}
-
-.debora-nav .back-link:hover {
-    opacity: 0.7;
-}
-
-.debora-main {
+/* ── Linha ornamental abaixo do nome ── */
+.preloader-line {
     position: relative;
-    width: 100%;
-    min-height: 100vh;
-    background: linear-gradient(180deg, #FCF8FA 0%, #F8EEF2 100%);
-}
-
-.hero-debora {
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
+    z-index: 3;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 100px 40px;
+    gap: 12px;
+    opacity: 0; /* revelada pelo GSAP */
 }
 
-.content-wrapper {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+.preloader-line-bar {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(226,188,116,0.5));
 }
 
-/* Glassmorphism 2.0 Card */
-.glass-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.12) 100%);
-    backdrop-filter: blur(25px) saturate(130%);
-    -webkit-backdrop-filter: blur(25px) saturate(130%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 10px 40px rgba(196, 96, 126, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-    border-radius: 28px;
-    padding: 60px 40px;
-    text-align: center;
-    opacity: 0; /* Preparado para animação de entrada no JS */
-    transform: translateY(30px);
+.preloader-line-bar:last-child {
+    background: linear-gradient(90deg, rgba(226,188,116,0.5), transparent);
 }
 
-.hero-title {
-    font-family: "Clash", "Inter", sans-serif;
-    font-size: clamp(32px, 4vw, 56px);
-    color: #4A2431;
-    margin-bottom: 20px;
-}
-
-.hero-desc {
-    font-family: "Inter", sans-serif;
-    font-size: clamp(14px, 1.5vw, 18px);
-    color: #6B4E59;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
+.preloader-line-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(226,188,116,0.6);
 }

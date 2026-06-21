@@ -784,13 +784,15 @@ html.skip-preloader .hero-main {
     font-size: clamp(28px, 3vw, 40px);
     font-weight: 700;
     letter-spacing: 10px;
+    /* padding-top CRÍTICO: background-clip:text corta ascendentes sem ele */
+    padding: 8px 0 4px;
     margin: 0 0 10px 0;
+    line-height: 1;
     
     /* Efeito de texto com imagem de fundo */
     background-image: url('/assets/img/background.png');
     background-size: cover;
-    background-position: center;
-    /* background-attachment: fixed removido — não funciona no iOS e causa repaints */
+    background-position: center top;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -952,13 +954,60 @@ html.skip-preloader .hero-main {
 
     .footer-brand {
         max-width: 100%;
+        /* No mobile vira um bloco central premium */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 40px 0 20px;
+        position: relative;
     }
 
-    /* Reduz letter-spacing para "PRECIOSA" não ser cortado no mobile */
+    /* Diamond decorativo acima do logo no mobile */
+    .footer-brand::before {
+        content: '';
+        display: block;
+        width: 8px;
+        height: 8px;
+        background: #c4607e;
+        transform: rotate(45deg);
+        margin-bottom: 20px;
+        box-shadow: 0 0 16px rgba(196, 96, 126, 0.5);
+        flex-shrink: 0;
+    }
+
+    /* No mobile: abandona background-clip (inconsistente) e usa gradient puro */
     .footer-logo {
-        font-size: clamp(24px, 8vw, 36px);
-        letter-spacing: 4px;
-        overflow: visible;
+        font-size: clamp(36px, 14vw, 52px);
+        letter-spacing: 6px;
+        padding: 10px 4px 6px;
+        line-height: 1;
+        
+        /* Substitui background-clip por gradient confiável no mobile */
+        background-image: linear-gradient(
+            135deg,
+            #e8a0b4 0%,
+            #c4607e 30%,
+            #f5c6d6 55%,
+            #c4607e 75%,
+            #e8a0b4 100%
+        );
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        -webkit-text-stroke: 0px;
+        animation: shimmerLogo 4s linear infinite;
+    }
+
+    @keyframes shimmerLogo {
+        0%   { background-position: 0% center; }
+        100% { background-position: 200% center; }
+    }
+
+    .footer-tagline {
+        font-size: 20px;
+        letter-spacing: 0.5px;
     }
     
     .footer-bottom {
