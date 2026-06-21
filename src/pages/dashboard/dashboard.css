@@ -1,0 +1,435 @@
+/* ============================================
+   DASHBOARD PRIVADO - DÉBORA
+   ============================================ */
+
+/* Variáveis de Cores (Premium Dark/Gold) */
+:root {
+    --dash-bg: #11070A;
+    --dash-card: #1F0D15;
+    --dash-card-hover: #26111A;
+    --dash-border: rgba(226, 188, 116, 0.15);
+    --dash-gold: #E2BC74;
+    --dash-gold-glow: rgba(226, 188, 116, 0.4);
+    --dash-text: #F8EEF2;
+    --dash-text-muted: #9A7080;
+    --dash-accent: #c4607e;
+    --dash-green: #22c55e;
+}
+
+body.dashboard-body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--dash-bg);
+    color: var(--dash-text);
+    font-family: "Inter", sans-serif;
+    overflow-x: hidden;
+}
+
+/* ─── OVERLAY DE AUTENTICAÇÃO (Segurança Fake) ─── */
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #26111A 0%, #0D0608 100%);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-content {
+    text-align: center;
+    max-width: 400px;
+}
+
+.auth-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: rgba(226, 188, 116, 0.05);
+    border: 1px solid var(--dash-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 30px rgba(226, 188, 116, 0.1);
+    animation: authPulse 2s infinite;
+}
+
+@keyframes authPulse {
+    0% { box-shadow: 0 0 0 0 rgba(226, 188, 116, 0.2); }
+    70% { box-shadow: 0 0 0 20px rgba(226, 188, 116, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(226, 188, 116, 0); }
+}
+
+.auth-title {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--dash-gold);
+    margin: 0 0 8px;
+    letter-spacing: 2px;
+}
+
+.auth-desc {
+    color: var(--dash-text-muted);
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.auth-loader {
+    width: 100%;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.auth-progress {
+    width: 0%;
+    height: 100%;
+    background: var(--dash-gold);
+    box-shadow: 0 0 10px var(--dash-gold);
+}
+
+
+/* ─── LAYOUT PRINCIPAL ─── */
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.dash-sidebar {
+    width: 260px;
+    background: var(--dash-card);
+    border-right: 1px solid var(--dash-border);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 0;
+}
+
+.dash-brand {
+    padding: 0 30px 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 30px;
+}
+
+.dash-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    color: var(--dash-text);
+    letter-spacing: 4px;
+    margin: 0;
+}
+
+.dash-tag {
+    font-size: 11px;
+    color: var(--dash-gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.dash-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 16px;
+}
+
+.dash-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: var(--dash-text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.dash-link svg {
+    opacity: 0.6;
+}
+
+.dash-link:hover, .dash-link.active {
+    background: rgba(226, 188, 116, 0.08);
+    color: var(--dash-gold);
+}
+
+.dash-link:hover svg, .dash-link.active svg {
+    opacity: 1;
+}
+
+.return-site {
+    margin-top: auto;
+    color: var(--dash-accent);
+}
+
+/* Área Principal */
+.dash-main {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+}
+
+.dash-greeting {
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    margin: 0 0 8px 0;
+    color: var(--dash-text);
+}
+
+.dash-date {
+    margin: 0;
+    color: var(--dash-text-muted);
+    font-size: 14px;
+}
+
+.dash-profile img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--dash-gold);
+    object-fit: cover;
+}
+
+
+/* ─── GRID DE CARDS ─── */
+.dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.dash-card {
+    background: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.dash-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    border-color: rgba(226, 188, 116, 0.3);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--dash-text);
+}
+
+/* Badges e Status */
+.status-badge {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--dash-green);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.kiwify-tag {
+    background: rgba(67, 83, 255, 0.15); /* Cor brand do Kiwify aproximada */
+    color: #8b96ff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* KPI VIVÊNCIA */
+.kpi-group {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.kpi {
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-label {
+    font-size: 12px;
+    color: var(--dash-text-muted);
+    margin-bottom: 4px;
+}
+
+.kpi-value {
+    font-size: 36px;
+    font-family: 'Cinzel', serif;
+    color: var(--dash-gold);
+    line-height: 1;
+}
+
+.progress-container {
+    margin-bottom: 12px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 8px;
+    color: var(--dash-text-muted);
+}
+
+.progress-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--dash-accent), var(--dash-gold));
+    border-radius: 3px;
+    width: 0%; /* Animado pelo JS */
+    box-shadow: 0 0 10px var(--dash-gold-glow);
+}
+
+.card-footer-text {
+    font-size: 11px;
+    color: rgba(255,255,255,0.2);
+    margin: 0;
+    text-align: right;
+}
+
+/* KPI FINANCEIRO */
+.finance-value {
+    font-size: 42px;
+    font-family: 'Cinzel', serif;
+    color: var(--dash-text);
+    margin-bottom: 4px;
+}
+
+.finance-sub {
+    font-size: 13px;
+    color: var(--dash-green);
+    margin: 0 0 24px;
+}
+
+.finance-metrics {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 16px;
+}
+
+.fm-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.fm-item span {
+    font-size: 11px;
+    color: var(--dash-text-muted);
+    margin-bottom: 4px;
+}
+
+.fm-item strong {
+    font-size: 16px;
+    color: var(--dash-gold);
+}
+
+/* KPI GRÁFICO (CHART.JS) */
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chart-center-info {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none; /* Pra não bugar o hover do canvas */
+}
+
+.chart-center-info #total-books {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--dash-gold);
+    line-height: 1;
+}
+
+.chart-center-info small {
+    font-size: 10px;
+    color: var(--dash-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--dash-text-muted);
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.dot-sold { background-color: var(--dash-gold); box-shadow: 0 0 8px var(--dash-gold-glow); }
+.dot-stock { background-color: rgba(255,255,255,0.1); }
+
+/* RESPONSIVIDADE */
+@media (max-width: 900px) {
+    .dashboard-layout {
+        flex-direction: column;
+    }
+    
+    .dash-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--dash-border);
+        padding: 20px;
+    }
+    
+    .dash-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .dash-main {
+        padding: 24px;
+    }
+}
