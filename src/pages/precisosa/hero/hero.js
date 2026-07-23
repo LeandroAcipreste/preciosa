@@ -191,7 +191,9 @@ export function initHero(onIntroComplete) {
         renderizador.outputColorSpace = THREE.SRGBColorSpace;
         renderizador.toneMapping = THREE.ACESFilmicToneMapping;
         renderizador.toneMappingExposure = 1.2;
-        renderizador.setPixelRatio(window.devicePixelRatio);
+        // Clamp do pixel ratio: em telas 2x/3x renderizar em DPR cheio é brutal
+        // para a GPU e não agrega qualidade visível num diamante pequeno.
+        renderizador.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         div3d = document.querySelector(".hero-div3d");
         if (!div3d) { triggerFallback(); return; }
@@ -367,12 +369,25 @@ export function initHero(onIntroComplete) {
     // ==========================================
     // LOOP ROTATIVO THREE.JS
     // ==========================================
+    // Só renderiza enquanto o herói está visível. Ao entrar na segunda dobra,
+    // pausamos o render (a GPU fica livre para o scroll das dobras seguintes) e
+    // retomamos se o usuário voltar ao topo. Este era o principal gargalo que
+    // fazia a página "travar" ao rolar entre as seções.
+    let heroVisible = true;
+    ScrollTrigger.create({
+        trigger: ".main-preciosa",
+        start: "top bottom",
+        onEnter: () => { heroVisible = false; },
+        onLeaveBack: () => { heroVisible = true; },
+    });
+
     function animar() {
+        requestAnimationFrame(animar);
+        if (!heroVisible) return;              // Fora de tela: não gasta GPU
         if (objeto && renderizador && cena && camera) {
             objeto.rotation.y += 0.005;
             renderizador.render(cena, camera);
         }
-        requestAnimationFrame(animar);
     }
     animar();
 

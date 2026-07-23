@@ -10,15 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Great+Vibes&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     
-    <!-- Importação de Estilos Globais e Específicos -->
+    <!-- Importação de Estilos: globais/fontes + entrada única da página Débora -->
     <link rel="stylesheet" href="./style.css" />
-    <link rel="stylesheet" href="./src/pages/debora/preLoader/preLoader.css" />
-    <link rel="stylesheet" href="./src/pages/debora/hero/hero.css" />
-    <link rel="stylesheet" href="./src/pages/debora/about/section-about.css" />
-    <link rel="stylesheet" href="./src/pages/debora/book/book.css" />
-    <link rel="stylesheet" href="./src/pages/debora/chapters/chapters.css" />
-    <link rel="stylesheet" href="./src/pages/debora/event/event.css" />
-    <link rel="stylesheet" href="./src/pages/debora/footer/footer.css" />
+    <link rel="stylesheet" href="./src/pages/debora/debora.css" />
 </head>
 
 <body class="global-body">
@@ -410,7 +404,12 @@
 
     </footer>
 
-    <!-- 4. IMPORTAÇÕES NECESSÁRIAS (GSAP e Lenis) -->
+    <!--
+      ESTRATÉGIA DE MÓDULOS (unificada): import map + ESM via esm.sh.
+      As três páginas (index, debora, dashboard) usam este mesmo mecanismo.
+      Não há passo de build (site estático). Versões fixadas aqui devem bater
+      com as declaradas em package.json.
+    -->
     <script type="importmap">
       {
         "imports": {
@@ -425,40 +424,36 @@
     <script type="module">
         import { initDeboraPreloader } from './src/pages/debora/preLoader/preLoader.js';
         import { initDeboraHero } from './src/pages/debora/hero/hero.js';
-        import { initDeboraAbout } from './src/pages/debora/about/section about.js';
+        import { initDeboraAbout } from './src/pages/debora/about/section-about.js';
         import { initDeboraBook } from './src/pages/debora/book/book.js';
         import { initDeboraChapters } from './src/pages/debora/chapters/chapters.js';
         import { initDeboraEvent } from './src/pages/debora/event/event.js';
-        import Lenis from 'lenis';
-        import gsap from 'gsap';
-        import ScrollTrigger from 'gsap/ScrollTrigger';
-
-        gsap.registerPlugin(ScrollTrigger);
+        import { createSmoothScroll } from './src/core/smooth-scroll.js';
 
         // Desativa a memória de rolagem do navegador para que ele não tente restaurar a última posição visitada
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
         }
 
+        // Ao sair/recarregar, volta ao topo — evita que o bfcache do navegador
+        // reabra a página na última posição rolada.
+        window.addEventListener('pagehide', () => window.scrollTo(0, 0));
+
         document.addEventListener("DOMContentLoaded", () => {
             // Garante matematicamente que a página nasça cravada no pixel zero
             window.scrollTo(0, 0);
 
-            // Inicializa Lenis com configurações extremamente suaves e pesadas (Cinematic Scroll)
-            const lenis = new Lenis({
-                lerp: 0.035,
-                smoothWheel: true,
-                smoothTouch: false,      // CRÍTICO: evita conflito com scroll nativo touch
-                wheelMultiplier: 0.55,
-                touchMultiplier: 1.0,
-            });
+            // Cria Lenis + bridge com GSAP ScrollTrigger (lógica compartilhada).
+            const lenis = createSmoothScroll();
 
-            // Sincroniza o ScrollTrigger com o Lenis
-            // Loop de atualização do Lenis no GSAP
-            gsap.ticker.add((time) => {
-                lenis.raf(time * 1000)
+            // Zera também a posição interna do Lenis (window.scrollTo sozinho não basta
+            // com smooth scroll ativo). Reforça no 'load', quando imagens/vídeos podem
+            // deslocar o layout e o navegador tentar restaurar a rolagem antiga.
+            lenis.scrollTo(0, { immediate: true, force: true });
+            window.addEventListener('load', () => {
+                window.scrollTo(0, 0);
+                lenis.scrollTo(0, { immediate: true, force: true });
             });
-            gsap.ticker.lagSmoothing(0);
 
             // Inicia as animações da seção About (Scroll)
             initDeboraAbout();

@@ -10,9 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Great+Vibes&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Bibliotecas Externas via CDN (Segurança contra falha de compilação do Vite) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!--
+      ESTRATÉGIA DE MÓDULOS (unificada): import map + ESM via esm.sh.
+      As três páginas (index, debora, dashboard) carregam GSAP/ScrollTrigger/Lenis/Three
+      e Chart.js pelo mesmo mecanismo. Não há passo de build (site estático).
+      Versões fixadas aqui devem bater com as declaradas em package.json.
+    -->
 
     <!-- CSS -->
     <link rel="stylesheet" href="./style.css" />
@@ -165,6 +168,16 @@
             </div>
         </main>
     </div>
+
+    <!-- Bibliotecas via import map (mesma estratégia de index.html e debora.html) -->
+    <script type="importmap">
+      {
+        "imports": {
+          "gsap": "https://esm.sh/gsap@3.12.5",
+          "chart.js/auto": "https://esm.sh/chart.js@4.4.1/auto"
+        }
+      }
+    </script>
 
     <!-- Script principal -->
     <script type="module" src="./src/pages/dashboard/dashboard.js"></script>

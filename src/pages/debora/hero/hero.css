@@ -46,7 +46,7 @@
     box-sizing: border-box;
     overflow: hidden;
     /* Fundo em mármore PNG estático */
-    background-image: url('../../../../assets_debora/img/backgroundPng.png');
+    background-image: url('/assets_debora/img/backgroundPng.png');
     background-size: cover;
     background-position: center;
 }

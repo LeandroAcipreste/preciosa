@@ -443,15 +443,12 @@
         transform: translateX(-50%) translateZ(0);
     }
 
-    /* Shimmer dourado nas joias ao revelar o caminho (CSS puro) */
+    /* Brilho dourado estático nas joias.
+       (Antes havia uma animação 'gemShimmer' infinita de drop-shadow em CADA
+       imagem do caminho — dezenas de nós SVG repintando sem parar, o que
+       travava o scroll no mobile. Mantemos o glow, sem o repaint contínuo.) */
     #ornamental-path svg image {
         filter: drop-shadow(0 0 4px rgba(196, 96, 126, 0.35));
-        animation: gemShimmer 3s ease-in-out infinite alternate;
-    }
-
-    @keyframes gemShimmer {
-        from { filter: drop-shadow(0 0 3px rgba(196, 96, 126, 0.2)); }
-        to   { filter: drop-shadow(0 0 8px rgba(226, 180, 120, 0.55)); }
     }
 }
 

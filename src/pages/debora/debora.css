@@ -1,0 +1,14 @@
+/* ============================================================
+   DEBORA — ponto de entrada único de CSS da página
+   ------------------------------------------------------------
+   Padroniza o carregamento: em vez de 7 <link> soltos no HTML,
+   debora.html linka apenas style.css (globais/fontes) + este arquivo.
+   A ordem abaixo replica a ordem original dos <link>.
+   ============================================================ */
+@import url('./preLoader/preLoader.css');
+@import url('./hero/hero.css');
+@import url('./about/section-about.css');
+@import url('./book/book.css');
+@import url('./chapters/chapters.css');
+@import url('./event/event.css');
+@import url('./footer/footer.css');

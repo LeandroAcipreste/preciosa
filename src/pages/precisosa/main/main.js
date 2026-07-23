@@ -87,10 +87,10 @@ export function initMain() {
             scrollTrigger: {
                 trigger: ".services-interactive-area",
                 start: "top top",
-                end: "+=1100", // 1100px: tempo perfeito (nem rápido demais, nem longo demais que pareça travado)
+                end: "+=850", // Reduzido de 1100: menos rolagem presa = transição mais rápida entre dobras
                 pin: true,
                 pinSpacing: true,
-                scrub: 1.2, // Reduzido de 1.5 para 1.2: o caminho segue o scroll de forma mais colada e fluida
+                scrub: 0.8, // Reduzido de 1.2: a animação segue o scroll mais colada (menos "atraso")
                 invalidateOnRefresh: true,
             }
         });
@@ -154,7 +154,7 @@ function buildOrnamentalPath() {
 
     const svgNS = "http://www.w3.org/2000/svg";
     const xlinkNS = "http://www.w3.org/1999/xlink";
-    const GEM_SRC = "/assets/img/caminho das pedras/ChatGPT Image 2_06_2026, 06_32_01 (4).png";
+    const GEM_SRC = "/assets/img/caminho-das-pedras/gema-01.png";
 
     const isMobile = window.innerWidth <= 768;
 
@@ -262,10 +262,10 @@ function buildOrnamentalPath() {
 
     // ── 2. ELEMENTOS DECORATIVOS ao redor da corrente ─────────────────────────
     const DECOR = [
-        "/assets/img/caminho das pedras/ChatGPT Image 2_06_2026, 06_32_01 (1).png",
-        "/assets/img/caminho das pedras/ChatGPT Image 2_06_2026, 06_32_01 (2).png",
-        "/assets/img/caminho das pedras/ChatGPT Image 2_06_2026, 06_32_01 (3).png",
-        "/assets/img/caminho das pedras/ChatGPT Image 2_06_2026, 06_32_06 (9).png",
+        "/assets/img/caminho-das-pedras/decor-01.png",
+        "/assets/img/caminho-das-pedras/decor-02.png",
+        "/assets/img/caminho-das-pedras/decor-03.png",
+        "/assets/img/caminho-das-pedras/decor-04.png",
     ];
 
     // Espalha ~65 elementos ao longo do vetor, perpendiculares à curva

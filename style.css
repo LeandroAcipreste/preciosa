@@ -40,22 +40,22 @@ html.lenis, html.lenis body {
 
 @font-face {
   font-family: "Clash";
-  src: url('./designsystem/Site/assets/fonts/ClashDisplay-Bold.ttf');
+  src: url('/assets/fonts/ClashDisplay-Bold.ttf');
   font-weight: 700;
 }
 @font-face {
   font-family: "Clash";
-  src: url('./designsystem/Site/assets/fonts/ClashDisplay-Medium.ttf');
+  src: url('/assets/fonts/ClashDisplay-Medium.ttf');
   font-weight: 500;
 }
 @font-face {
   font-family: "Clash";
-  src: url('./designsystem/Site/assets/fonts/ClashDisplay-Regular.ttf');
+  src: url('/assets/fonts/ClashDisplay-Regular.ttf');
   font-weight: 400;
 }
 @font-face {
   font-family: "Clash";
-  src: url('./designsystem/Site/assets/fonts/ClashDisplay-Light.ttf');
+  src: url('/assets/fonts/ClashDisplay-Light.ttf');
   font-weight: 300;
 }
 
@@ -526,7 +526,7 @@ html.skip-preloader .hero-main {
     position: relative;
     width: 100%;
     max-width: 400px;
-    border-radius: 200px 200px 12px 12px;
+    border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 40px 80px rgba(38, 19, 27, 0.15);
 }

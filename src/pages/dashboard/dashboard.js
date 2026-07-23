@@ -1,5 +1,5 @@
-// GSAP agora é carregado via CDN no HTML para garantir que funcione
-// em qualquer ambiente sem depender do bundler imediatamente.
+import gsap from 'gsap';
+import Chart from 'chart.js/auto';
 
 function initDashboard() {
     
