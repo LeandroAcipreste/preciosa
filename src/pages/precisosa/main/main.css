@@ -105,6 +105,10 @@
     margin: 0 auto;
 }
 
+.services-intro + .services-intro {
+    margin-top: 14px;
+}
+
 .intro-highlight {
     color: #c4607e;
     font-weight: 500;
@@ -178,6 +182,18 @@
 .icon-prevencao {
     -webkit-mask: url('/assets/img/icones/prevencao-ginecologica.png') no-repeat center / contain;
     mask: url('/assets/img/icones/prevencao-ginecologica.png') no-repeat center / contain;
+}
+
+/* Ícones vetoriais (missão, visão, valores, público-alvo) */
+.gem-icon-svg {
+    width: 52px;
+    height: 52px;
+    color: #c4607e;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 /* Wrapper da pedra com glow — caixa uniforme para todas as pedras */
@@ -263,6 +279,12 @@
     margin: 0 auto;
 }
 
+/* Variante para listas (valores / público-alvo): mais respiro na largura */
+.gem-desc-wide {
+    max-width: 210px;
+    line-height: 1.9;
+}
+
 /* ---- Caminho Ornamental ---- */
 #ornamental-path {
     position: absolute;
@@ -313,7 +335,14 @@
     box-shadow: 0 4px 16px rgba(196, 96, 126, 0.25);
 }
 
-.cta-main {
+/* As duas linhas usam exatamente o mesmo estilo; a segunda fica centralizada
+   em relação à primeira */
+.cta-content {
+    text-align: center;
+}
+
+.cta-main,
+.cta-sub {
     font-family: "Inter", sans-serif;
     font-size: clamp(13px, 1.2vw, 15px);
     font-weight: 600;
@@ -321,9 +350,6 @@
 }
 
 .cta-sub {
-    font-family: "Inter", sans-serif;
-    font-size: clamp(12px, 1vw, 13px);
-    color: #9a7080;
     margin-top: 2px;
 }
 

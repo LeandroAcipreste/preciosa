@@ -36,7 +36,7 @@ export function initLuxuryServicesSection() {
             y: 0,
             ease: "sine.out",
             duration: 0.8
-        }, 0.2 + index * 0.20);
+        }, 0.2 + index * 0.12);
     });
 
     // Paralaxe do fundo apenas no desktop (muito pesado no mobile)
