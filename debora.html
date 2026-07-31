@@ -56,8 +56,20 @@
     <!-- 3. HERO SECTION E MAIN (PREPARADOS PARA ANIMAÇÃO) -->
     <main class="debora-main">
         <section class="hero-debora">
-            <!-- Vídeo de Fundo Puro e Limpo -->
-            <video src="./assets_debora/videos/video_debora.mp4" autoplay muted playsinline class="debora-hero-video-bg"></video>
+            <!-- Título no topo, sobre o mármore (legível) -->
+            <div class="hero-debora-overlay">
+                <span class="hero-debora-kicker">Saúde Íntima · Física · Mental</span>
+                <h1 class="hero-debora-name">Débora Bispo Amorim</h1>
+            </div>
+
+            <!-- ROLO DE FILME ANTIGO: as fotos passam na horizontal como um filme sendo desenrolado.
+                 Os quadros são injetados e clonados via JS (initDeboraHero) para o loop ser contínuo. -->
+            <div class="film-reel">
+                <div class="film-strip" id="film-strip" aria-label="Galeria de fotos de Débora Amorim"></div>
+                <!-- Camadas de textura vintage (apenas sobre a tira) -->
+                <div class="film-grain" aria-hidden="true"></div>
+                <div class="film-vignette" aria-hidden="true"></div>
+            </div>
         </section>
         
         <!-- 4. ABOUT SECTION -->
@@ -74,8 +86,9 @@
                 </div>
                 <div class="about-image-wrapper">
                     <div class="about-image-placeholder">
-                        <!-- Imagem futura da Débora -->
-                        <span>Foto Débora</span>
+                        <img src="./assets_debora/img/debora-retrato.jpg"
+                             alt="Débora Bispo Amorim, de jaleco branco, em seu consultório"
+                             class="about-image" width="960" height="1280" loading="lazy" decoding="async">
                     </div>
                 </div>
             </div>
@@ -98,6 +111,7 @@
                         <span class="word">Preciosas</span>
                     </h2>
                     <h3 class="book-subtitle">Preciosa força, perdão e sucesso</h3>
+                    <button class="journey-open-btn" id="journey-open" type="button">Conheça a Jornada</button>
                 </div>
             </div>
         </section>
@@ -252,12 +266,13 @@
         <section class="event-debora" id="event-debora">
             <div class="event-container">
                 <div class="event-content">
-                    <span class="event-subtitle">Vivência Presencial</span>
-                    <h2 class="event-title">Desperte sua Mulher Preciosa</h2>
-                    <p class="event-desc">
-                        Um encontro exclusivo conduzido por Débora Amorim, desenhado para mulheres que buscam reconexão profunda com sua essência. 
-                        Durante esta vivência, você terá a oportunidade de mergulhar nas temáticas do livro em um ambiente seguro, luxuoso e acolhedor, trocando experiências e despertando o seu poder feminino.
-                    </p>
+                    <span class="event-subtitle">Mentoria Presencial</span>
+                    <h2 class="event-title">Mentoria<br>&ldquo;Entre Nós&rdquo;</h2>
+                    <p class="event-tagline">Mães &amp; Filhas &ndash; Reconstruindo Laços, Fortalecendo o Amor</p>
+                    <div class="event-desc">
+                        <p>A Mentoria Entre Nós nasceu para fortalecer o relacionamento entre mães e filhas a partir dos 13 anos, promovendo diálogo, acolhimento, inteligência emocional e fortalecimento dos vínculos familiares.</p>
+                        <p>Durante seis encontros, mães e filhas terão a oportunidade de aprender a se comunicar com mais respeito, compreender as mudanças da adolescência, resolver conflitos e construir uma relação mais saudável e afetiva.</p>
+                    </div>
                     <div class="event-info">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 21C16 17.5 20 13.5 20 10C20 5.58172 16.4183 2 12 2C7.58172 2 4 5.58172 4 10C4 13.5 8 17.5 12 21Z" stroke="#E2BC74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -265,19 +280,169 @@
                         </svg>
                         <span>Rua Bartholomeu Gusmão 86 - Rio Vermelho</span>
                     </div>
-                    <a href="#" class="event-btn">Adquira sua Vaga</a>
                 </div>
                 <div class="event-visual">
-                    <!-- Placeholder de luxo para a foto do evento -->
-                    <div class="event-image-wrapper">
-                         <img src="./assets_debora/img/backgroundPng.png" alt="Evento Preciosa">
+                    <div class="event-image-wrapper" id="mentoria-portal-trigger" role="button" tabindex="0" aria-label="Conheça a experiência da Mentoria Entre Nós">
+                         <img src="./assets_debora/img/mentoria-entre-nos.jpg" alt="Mentoria Entre Nós — mãe e filha em abraço acolhedor">
                          <div class="event-glow"></div>
+                         <!-- Convite de entrada: é ele que abre a atmosfera, no clique -->
+                         <div class="portal-hint" aria-hidden="true">
+                             <span class="portal-hint-icon">
+                                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                     <path d="M12 2C7 2 3 7 3 12s4 10 9 10 9-5 9-10-4-10-9-10z" stroke="currentColor" stroke-width="1.4"/>
+                                     <path d="M12 6c-2.8 0-5 2.7-5 6s2.2 6 5 6 5-2.7 5-6-2.2-6-5-6z" stroke="currentColor" stroke-width="1.2" opacity="0.6"/>
+                                     <circle cx="12" cy="12" r="1.6" fill="currentColor"/>
+                                 </svg>
+                             </span>
+                             <span class="portal-hint-text">Conheça a experiência</span>
+                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
     </main>
+
+    <!-- ============================================================
+         PORTAL 3D — ATMOSFERA DA MENTORIA "ENTRE NÓS"
+         Abre ao passar o mouse (ou tocar) sobre a foto do evento.
+         Fundo: arte larga (mãe & filha). Conteúdo à esquerda, na área vinho.
+         ============================================================ -->
+    <div class="mentoria-portal" id="mentoria-portal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Mentoria Entre Nós — detalhes do curso">
+        <div class="mentoria-portal-bg"></div>
+        <div class="mentoria-portal-scrim"></div>
+
+        <button class="mentoria-portal-close" id="mentoria-portal-close" aria-label="Fechar experiência">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+
+        <div class="mentoria-portal-panel" data-lenis-prevent>
+            <div class="mp-inner">
+                <span class="mp-kicker">Mentoria Presencial</span>
+                <h2 class="mp-title">Mentoria<br>&ldquo;Entre Nós&rdquo;</h2>
+                <p class="mp-tagline">Mães &amp; Filhas &ndash; Reconstruindo Laços, Fortalecendo o Amor</p>
+
+                <div class="mp-grid">
+                    <div class="mp-block">
+                        <h3 class="mp-h">Público-alvo</h3>
+                        <p>Mães e filhas a partir de 13 anos.</p>
+                    </div>
+                    <div class="mp-block">
+                        <h3 class="mp-h">Vagas</h3>
+                        <p>20 duplas (40 participantes).</p>
+                    </div>
+                </div>
+
+                <div class="mp-block">
+                    <h3 class="mp-h">Formato</h3>
+                    <ul class="mp-list">
+                        <li>6 encontros presenciais</li>
+                        <li>2 horas por encontro</li>
+                        <li>Dinâmicas práticas</li>
+                        <li>Exercícios para realizar em casa</li>
+                        <li>Espaço de acolhimento e escuta</li>
+                    </ul>
+                </div>
+
+                <div class="mp-block">
+                    <h3 class="mp-h">Conteúdo</h3>
+                    <ul class="mp-list mp-list-2col">
+                        <li>Comunicação assertiva</li>
+                        <li>Adolescência e seus desafios</li>
+                        <li>Inteligência emocional</li>
+                        <li>Autoestima</li>
+                        <li>Limites e respeito</li>
+                        <li>Resolução de conflitos</li>
+                        <li>Perdão e reconexão</li>
+                        <li>Construção de novos hábitos familiares</li>
+                    </ul>
+                </div>
+
+                <div class="mp-block">
+                    <h3 class="mp-h">Incluso</h3>
+                    <ul class="mp-list mp-list-2col">
+                        <li>Apostila da mentoria</li>
+                        <li>Material de apoio</li>
+                        <li>Certificado</li>
+                        <li>Exercícios práticos</li>
+                        <li>Brinde de encerramento</li>
+                    </ul>
+                </div>
+
+                <div class="mp-invest">
+                    <span class="mp-invest-label">Investimento &middot; Valor Especial de Lançamento</span>
+                    <div class="mp-invest-price">R$ 397,00 <span>por dupla</span></div>
+                    <div class="mp-invest-parcel">ou 6&times; de R$ 66,17 sem juros</div>
+                </div>
+
+                <div class="mp-block">
+                    <h3 class="mp-h">Benefícios</h3>
+                    <ul class="mp-list mp-list-check">
+                        <li>Fortalecimento do vínculo entre mãe e filha</li>
+                        <li>Melhoria na comunicação</li>
+                        <li>Redução de conflitos familiares</li>
+                        <li>Desenvolvimento da autoestima e da inteligência emocional</li>
+                        <li>Ferramentas práticas para uma convivência mais saudável</li>
+                    </ul>
+                </div>
+
+                <div class="mp-block">
+                    <h3 class="mp-h">Diferenciais</h3>
+                    <ul class="mp-list">
+                        <li>Turma exclusiva para apenas 20 duplas</li>
+                        <li>Atendimento acolhedor e humanizado</li>
+                        <li>Metodologia vivencial</li>
+                        <li>Ambiente seguro para compartilhar experiências</li>
+                        <li>Certificado de participação</li>
+                    </ul>
+                </div>
+
+                <blockquote class="mp-quote">
+                    &ldquo;Uma mãe compreendida educa melhor. Uma filha ouvida floresce com mais segurança. Juntas, elas transformam a história da família.&rdquo;
+                </blockquote>
+
+                <a href="https://wa.me/5571992597073" target="_blank" rel="noopener noreferrer" class="mp-cta">Garanta sua vaga</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MODAL DA JORNADA — abre pelo botão "Conheça a Jornada".
+         Cards dos capítulos, trocando por scroll (PC) e toque (mobile).
+         ============================================================ -->
+    <div class="journey-portal" id="journey-portal" data-lenis-prevent aria-hidden="true" role="dialog" aria-modal="true" aria-label="A Jornada do livro Preciosas">
+        <video class="journey-portal-video" src="./assets_debora/videos/video_diamante.mp4" autoplay loop muted playsinline></video>
+        <div class="journey-portal-overlay"></div>
+
+        <button class="journey-close" id="journey-close" type="button" aria-label="Fechar a Jornada">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+
+        <div class="journey-stage">
+            <div class="journey-viewport" id="journey-viewport" data-lenis-prevent>
+                <div class="journey-track" id="journey-track"></div>
+            </div>
+
+            <div class="journey-nav">
+                <button class="journey-arrow" id="journey-prev" type="button" aria-label="Capítulo anterior">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="journey-progress"><span class="journey-progress-fill" id="journey-progress-fill"></span></div>
+                <span class="journey-counter" id="journey-counter">01</span>
+                <button class="journey-arrow" id="journey-next" type="button" aria-label="Próximo capítulo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- FOOTER DÉBORA — Édition Prestige -->
     <footer class="debora-footer">

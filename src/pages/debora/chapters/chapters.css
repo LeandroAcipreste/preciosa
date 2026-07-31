@@ -185,20 +185,20 @@
     .chapters-line {
         left: 30px;
     }
-    
+
     .chapter-item {
         flex-direction: column !important;
         align-items: flex-end;
     }
-    
+
     .chapter-content {
         width: calc(100% - 70px);
     }
-    
+
     .chapter-dot {
         left: 30px;
     }
-    
+
     .chapter-item:nth-child(even) .chapter-number {
         left: 10px;
         right: auto;
@@ -233,4 +233,287 @@
     color: #26131b;
     box-shadow: none;
     transform: translateY(-3px);
+}
+
+/* ============================================================
+   A seção de capítulos vira FONTE DE DADOS do modal (fica oculta;
+   o conteúdo aparece dentro do modal da Jornada, aberto pelo botão
+   que fica sobre o vídeo do livro).
+   ============================================================ */
+.chapters-debora {
+    display: none;
+}
+
+/* Botão "Conheça a Jornada" — sobre o vídeo do diamante */
+.journey-open-btn {
+    margin-top: clamp(24px, 4vh, 46px);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #14080c;
+    background-color: #E2BC74;
+    border: 1px solid #E2BC74;
+    padding: 18px 46px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 12px 34px rgba(226, 188, 116, 0.35);
+}
+
+.journey-open-btn:hover {
+    background-color: #FDFBF7;
+    border-color: #FDFBF7;
+    transform: translateY(-3px);
+}
+
+/* ============================================================
+   MODAL DA JORNADA
+   ============================================================ */
+/* NÃO usar display:none aqui: o <video> do portal precisa continuar sendo
+   renderizado pelo navegador, senão não pinta quadro nenhum ao abrir. */
+.journey-portal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: #140809;
+}
+
+/* Fechado, nenhum descendente pode capturar clique nem entrar na tabulação.
+   'pointer-events:none' no pai NÃO alcança um filho que redeclara
+   'pointer-events:auto' — era exatamente o .journey-slide.is-active ficando
+   invisível porém clicável em cima do botão "Conheça a Jornada" e impedindo a
+   reabertura. Estas regras têm especificidade maior e vencem. O atributo
+   'inert', posto pelo JS, cobre o mesmo buraco; isto aqui é a rede em CSS. */
+.journey-portal:not(.is-open) .journey-stage,
+.journey-portal:not(.is-open) .journey-slide,
+.journey-portal:not(.is-open) .journey-close {
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.journey-portal.is-open {
+    pointer-events: auto;
+    /* Camada própria de composição: o recorte animado da entrada (clip-path)
+       e o dolly do vídeo rodam sem repintar a página atrás. */
+    will-change: clip-path, opacity;
+}
+
+.journey-portal-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 15%;
+}
+
+.journey-portal-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(20, 8, 12, 0.55) 0%, rgba(16, 6, 10, 0.85) 70%, rgba(12, 4, 8, 0.95) 100%);
+}
+
+.journey-close {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    z-index: 6;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid rgba(226, 188, 116, 0.5);
+    background: rgba(20, 8, 12, 0.4);
+    color: #E2BC74;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    transition: all 0.35s ease;
+}
+
+.journey-close:hover { background: #E2BC74; color: #14080c; transform: rotate(90deg); }
+
+.journey-stage {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(60px, 8vh, 100px) clamp(24px, 5vw, 80px) clamp(28px, 5vh, 56px);
+    box-sizing: border-box;
+}
+
+.journey-head { text-align: center; margin-bottom: clamp(10px, 2vh, 24px); flex-shrink: 0; }
+
+.journey-title {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(44px, 6vw, 76px);
+    color: #FDFBF7;
+    line-height: 1;
+    text-shadow: 1px 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.journey-viewport {
+    position: relative;
+    width: 100%;
+    max-width: 780px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.journey-track { position: relative; width: 100%; height: 100%; }
+
+.journey-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.journey-slide.is-active { opacity: 1; visibility: visible; pointer-events: auto; }
+
+.journey-num {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(46px, 8vw, 92px);
+    font-weight: 900;
+    line-height: 1;
+    color: #E2BC74;
+    margin-bottom: 6px;
+}
+
+.journey-slide-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(23px, 3.2vw, 38px);
+    font-weight: 700;
+    color: #FDFBF7;
+    margin-bottom: 20px;
+    line-height: 1.15;
+}
+
+.journey-slide-text {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(15px, 1.4vw, 18px);
+    line-height: 1.85;
+    color: #EADDD6;
+    max-width: 620px;
+}
+
+.journey-slide-final .journey-final-quote {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-size: clamp(17px, 1.8vw, 22px);
+    line-height: 1.7;
+    color: #FDFBF7;
+    max-width: 640px;
+    margin-bottom: 26px;
+}
+
+.journey-signoff {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #E2BC74;
+    margin-bottom: 8px;
+}
+
+.journey-signature {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(44px, 6vw, 66px);
+    color: #E2BC74;
+    margin-bottom: 28px;
+}
+
+.journey-ebook {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #14080c;
+    background-color: #E2BC74;
+    padding: 18px 46px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(226, 188, 116, 0.3);
+}
+
+.journey-ebook:hover { background-color: #FDFBF7; transform: translateY(-3px); }
+
+.journey-nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 3vw, 30px);
+    margin-top: clamp(16px, 3vh, 30px);
+    flex-shrink: 0;
+}
+
+.journey-arrow {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1px solid rgba(226, 188, 116, 0.4);
+    background: rgba(20, 8, 12, 0.35);
+    color: #E2BC74;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+}
+
+.journey-arrow:hover:not(:disabled) { background: #E2BC74; color: #14080c; }
+.journey-arrow:disabled { opacity: 0.3; cursor: default; }
+
+.journey-progress {
+    width: clamp(120px, 22vw, 260px);
+    height: 2px;
+    background: rgba(226, 188, 116, 0.25);
+    position: relative;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.journey-progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0%;
+    background: #E2BC74;
+    box-shadow: 0 0 10px rgba(226, 188, 116, 0.8);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.journey-counter {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #E2BC74;
+    min-width: 74px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .journey-close { top: 18px; right: 18px; width: 46px; height: 46px; }
+    .journey-nav { gap: 14px; }
+    .journey-arrow { width: 46px; height: 46px; }
+    .journey-progress { width: clamp(80px, 30vw, 160px); }
 }

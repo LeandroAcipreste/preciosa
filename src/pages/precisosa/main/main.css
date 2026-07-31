@@ -109,6 +109,12 @@
     margin-top: 14px;
 }
 
+/* Palavras geradas por splitIntoWords(). Ficam inline para não alterar a
+   quebra de linha — só a opacidade é animada pelo scroll. */
+.intro-word {
+    display: inline;
+}
+
 .intro-highlight {
     color: #c4607e;
     font-weight: 500;
@@ -301,6 +307,11 @@
     /* Fica atrás das pedras (que têm z-index: 1) */
     pointer-events: none;
     /* Não interfere com hovers */
+
+    /* O clip-path deste bloco é animado no scrub e ele contém ~170 imagens SVG.
+       Promover a uma camada própria faz o navegador recortar uma textura já
+       rasterizada em vez de redesenhar todas as pedras a cada frame. */
+    will-change: clip-path;
 }
 
 #ornamental-path svg {

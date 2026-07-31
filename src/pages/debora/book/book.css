@@ -28,7 +28,7 @@
 }
 
 .book-intro-text p {
-    font-family: 'Cinzel', serif; 
+    font-family: 'Cinzel', serif;
     font-size: clamp(16px, 2vw, 24px);
     color: #26131b; /* Cor escura do mármore para destacar no fundo claro */
     text-transform: uppercase;
@@ -42,7 +42,7 @@
 .book-frame {
     position: absolute;
     /* Topo maior para caber o texto. Esquerda, Baixo e Direita com margens unificadas. */
-    inset: clamp(90px, 16vh, 150px) clamp(20px, 4vw, 60px) clamp(20px, 4vw, 60px) clamp(20px, 4vw, 60px); 
+    inset: clamp(90px, 16vh, 150px) clamp(20px, 4vw, 60px) clamp(20px, 4vw, 60px) clamp(20px, 4vw, 60px);
     border-radius: clamp(40px, 8vw, 100px); /* Arredonda TODAS as bordas matematicamente na div pai */
     overflow: hidden; /* CORTA qualquer vazamento do vídeo ou do overlay na raiz */
     transform: translateZ(0); /* Fix Safari */

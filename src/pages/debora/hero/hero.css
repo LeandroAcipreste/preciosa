@@ -17,15 +17,17 @@
     font-family: "Inter", sans-serif;
     font-size: 14px;
     font-weight: 500;
-    color: #FFF; /* Branco para contrastar com o vídeo/overlay escuro */
+    color: #B0824A; /* mesmo dourado escurecido do .hero-debora-kicker */
     text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 2px;
-    transition: opacity 0.3s ease;
+    transition: color 0.3s ease;
 }
 
+/* Sobre fundo claro, esmaecer no hover sumiria com o link: escurece o dourado
+   para ganhar destaque em vez de perder. */
 .debora-nav .back-link:hover {
-    opacity: 0.7;
+    color: #8E6837;
 }
 
 .debora-main {
@@ -39,51 +41,185 @@
     position: relative;
     width: 100%;
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px; /* Margem para o vídeo respirar */
+    gap: clamp(24px, 5vh, 56px);
     box-sizing: border-box;
     overflow: hidden;
-    /* Fundo em mármore PNG estático */
+    /* Fundo em mármore: a tira de filme repousa sobre o mármore */
     background-image: url('/assets_debora/img/backgroundPng.png');
     background-size: cover;
     background-position: center;
 }
 
 /* ============================================
-   VIDEO MAIN
+   ROLO DE FILME ANTIGO (FILM REEL)
    ============================================ */
-.debora-hero-video-bg {
-    position: relative; 
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: calc(100vh - 80px); /* Proteção ABSOLUTA contra cortes em cima e em baixo */
+.film-reel {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
     z-index: 1;
-    border-radius: 16px; /* Borda curva para se comportar como uma "tela" */
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5); /* Sombra para o vídeo flutuar no mármore */
+    /* Flicker sutil de projetor antigo */
+    animation: film-flicker 5s steps(1) infinite;
 }
 
-/* ── MOBILE: vídeo de ponta a ponta ── */
+.film-strip {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    /* Espaço em cima/embaixo para as perfurações do filme */
+    padding: 52px 16px;
+    background: #100d0c;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    will-change: transform;
+}
+
+/* Perfurações (sprocket holes) em cima e embaixo da tira */
+.film-strip::before,
+.film-strip::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 22px;
+    background-image: repeating-linear-gradient(
+        90deg,
+        #efe7d6 0 16px,
+        transparent 16px 42px
+    );
+    opacity: 0.9;
+    border-radius: 3px;
+}
+.film-strip::before { top: 16px; }
+.film-strip::after  { bottom: 16px; }
+
+.film-frame {
+    position: relative;
+    flex: 0 0 auto;
+    height: 52vh;
+    aspect-ratio: 2 / 3;
+    background: #000;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.85);
+}
+
+.film-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    /* Tratamento vintage: sépia, contraste e leve dessaturação */
+    filter: sepia(0.42) contrast(1.06) brightness(0.9) saturate(0.82);
+}
+
+/* Grão de filme animado sobre tudo */
+.film-grain {
+    position: absolute;
+    inset: -50%;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.08;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: film-grain-move 0.6s steps(3) infinite;
+}
+
+/* Vinheta escura nas bordas */
+.film-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.28) 100%);
+}
+
+/* Título no topo, sobre o mármore */
+.hero-debora-overlay {
+    position: relative;
+    z-index: 5;
+    padding: 40px 40px 0;
+    text-align: center;
+    pointer-events: none;
+}
+
+.hero-debora-kicker {
+    display: block;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #B0824A; /* dourado escurecido — legível no mármore claro */
+    margin-bottom: 14px;
+}
+
+.hero-debora-name {
+    font-family: "Cinzel", serif;
+    font-weight: 700;
+    font-size: clamp(2.2rem, 6vw, 5rem);
+    line-height: 1.05;
+    color: #3D1E2A; /* vinho profundo — contraste forte com o mármore */
+}
+
+@keyframes film-grain-move {
+    0%   { transform: translate(0, 0); }
+    33%  { transform: translate(-6%, 4%); }
+    66%  { transform: translate(4%, -5%); }
+    100% { transform: translate(-3%, 2%); }
+}
+
+@keyframes film-flicker {
+    0%, 100% { opacity: 1; }
+    48%      { opacity: 0.97; }
+    50%      { opacity: 0.93; }
+    52%      { opacity: 0.98; }
+    80%      { opacity: 0.95; }
+}
+
+/* ── MOBILE: quadros menores, mesma tira horizontal ── */
 @media (max-width: 768px) {
-    .hero-debora {
-        padding: 0;          /* Remove margens — vídeo ocupa 100% da tela */
-        align-items: stretch;
-    }
-
     .debora-header {
-        padding: 20px 24px;  /* Reduz um pouco o header no mobile */
+        padding: 20px 24px;
     }
 
-    .debora-hero-video-bg {
-        width: 100%;
-        height: 100vh;
-        height: 100dvh;
-        max-width: none;
-        max-height: none;
-        object-fit: cover;   /* Preenche sem distorcer */
-        border-radius: 0;    /* Sem bordas arredondadas — ponta a ponta */
-        box-shadow: none;
+    .film-strip {
+        gap: 10px;
+        padding: 38px 10px;
+    }
+    .film-strip::before,
+    .film-strip::after {
+        height: 16px;
+        background-image: repeating-linear-gradient(
+            90deg,
+            #efe7d6 0 11px,
+            transparent 11px 30px
+        );
+    }
+    .film-strip::before { top: 12px; }
+    .film-strip::after  { bottom: 12px; }
+
+    .film-frame {
+        height: 42vh;
+    }
+
+    .hero-debora-overlay {
+        padding: 72px 24px 0;
+    }
+    .hero-debora-kicker {
+        font-size: 11px;
+        letter-spacing: 3px;
+    }
+}
+
+/* Respeita quem prefere menos movimento */
+@media (prefers-reduced-motion: reduce) {
+    .film-reel,
+    .film-grain {
+        animation: none;
     }
 }

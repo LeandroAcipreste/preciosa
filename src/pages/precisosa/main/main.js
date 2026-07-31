@@ -11,15 +11,19 @@ export function initMain() {
     const cards = gsap.utils.toArray(".gem-card");
     const cta = document.querySelector(".services-cta");
 
+    // Faixas e subtítulo entram normalmente; os parágrafos têm animação própria
+    // palavra a palavra (revealIntroWords), por isso ficam de fora daqui.
+    const headerBits = gsap.utils.toArray(".services-header > :not(.services-intro)");
+
     // Estado inicial invisível — GSAP é a única fonte de verdade para transform/opacity
-    gsap.set(".services-header > *", { opacity: 0, y: 20 });
+    gsap.set(headerBits, { opacity: 0, y: 20 });
     gsap.set(cards, { opacity: 0, y: 25 });
     if (cta) {
         gsap.set(cta, { opacity: 0, y: 15 });
     }
 
     // 1. CABEÇALHO — entrada via toggleActions (sem scrub)
-    gsap.fromTo(".services-header > *",
+    gsap.fromTo(headerBits,
         { opacity: 0, y: 20 },
         {
             opacity: 1,
@@ -34,6 +38,9 @@ export function initMain() {
             }
         }
     );
+
+    // 1b. TEXTO DE ABERTURA — palavras acendem e apagam conforme a rolagem
+    revealIntroWords(isMobile);
 
     // Mobile: revela de cima para baixo; Desktop: da esquerda para direita
     const clipStart = isMobile ? "inset(0% 0% 100% 0%)" : "inset(0% 100% 0% 0%)";
@@ -143,6 +150,88 @@ export function initMain() {
 
     ScrollTrigger.sort();
     ScrollTrigger.refresh();
+}
+
+// ============================================
+// TEXTO DE ABERTURA — REVELAÇÃO PALAVRA A PALAVRA
+// --------------------------------------------
+// Cada palavra começa apagada, acende conforme a página desce e volta a
+// apagar quando o bloco sai de cena. Como está no scrub, rolar para cima
+// desfaz o efeito na mesma proporção.
+// ============================================
+function revealIntroWords(isMobile) {
+    const paragraphs = document.querySelectorAll(".services-intro");
+    if (!paragraphs.length) return;
+
+    const words = [];
+    paragraphs.forEach(p => words.push(...splitIntoWords(p)));
+    if (!words.length) return;
+
+    const DIM = 0.14;
+    gsap.set(words, { opacity: DIM });
+
+    // Cada palavra ocupa uma fatia igual da timeline; a soma dá ~1.4 de duração
+    const each = 1 / words.length;
+
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: ".services-header",
+            start: isMobile ? "top 88%" : "top 78%",
+            end: isMobile ? "bottom 12%" : "bottom 15%",
+            scrub: 0.6,
+            invalidateOnRefresh: true,
+        }
+    });
+
+    tl.to(words, {
+        opacity: 1,
+        ease: "none",
+        duration: 0.4,
+        stagger: { each }
+    }, 0);
+
+    tl.to(words, {
+        opacity: DIM,
+        ease: "none",
+        duration: 0.4,
+        stagger: { each }
+    }, 1.7);
+}
+
+// Envolve cada palavra num <span>, preservando os elementos internos
+// (os destaques .intro-highlight / .intro-soft continuam intactos).
+function splitIntoWords(root) {
+    const words = [];
+
+    const walk = (node) => {
+        // Cópia da lista: vamos substituir nós durante o percurso
+        Array.from(node.childNodes).forEach(child => {
+            if (child.nodeType === Node.TEXT_NODE) {
+                const parts = child.textContent.split(/(\s+)/);
+                const frag = document.createDocumentFragment();
+
+                parts.forEach(part => {
+                    if (!part) return;
+                    if (/^\s+$/.test(part)) {
+                        frag.appendChild(document.createTextNode(" "));
+                        return;
+                    }
+                    const span = document.createElement("span");
+                    span.className = "intro-word";
+                    span.textContent = part;
+                    frag.appendChild(span);
+                    words.push(span);
+                });
+
+                node.replaceChild(frag, child);
+            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                walk(child);
+            }
+        });
+    };
+
+    walk(root);
+    return words;
 }
 
 // ============================================

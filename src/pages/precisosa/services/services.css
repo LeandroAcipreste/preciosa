@@ -103,29 +103,29 @@
 /* ---- Card Glassmorphism 2.0 ---- */
 .luxury-card {
     position: relative;
-    padding: 36px 28px;
+    padding: 36px 32px;
     border-radius: 28px;
+    /* Vidro leitoso: opaco o bastante para o texto não competir com as facetas
+       do diamante ao fundo, mas ainda deixando a cor do fundo transparecer. */
     background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.45) 0%,
-        rgba(255, 255, 255, 0.12) 100%
+        rgba(255, 253, 254, 0.92) 0%,
+        rgba(255, 246, 250, 0.84) 100%
     );
 
-    /* O blur "derrete" as facetas do diamante em névoa rosa suave */
-    backdrop-filter: blur(25px) saturate(130%);
-    -webkit-backdrop-filter: blur(25px) saturate(130%);
+    /* Sem backdrop-filter: com o fundo já quase opaco ele não mudava nada
+       visualmente e obrigava o navegador a reprocessar o blur dos 8 cards a
+       cada frame do parallax — era a principal fonte de travamento no scroll. */
 
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.9);
     box-shadow:
-        0 10px 40px rgba(196, 96, 126, 0.05),
-        inset 0 1px 1px rgba(255, 255, 255, 0.30);
+        0 12px 40px rgba(196, 96, 126, 0.12),
+        inset 0 1px 1px rgba(255, 255, 255, 0.6);
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    /* Cards da mesma linha esticam para a mesma altura; centralizar o conteúdo
-       distribui a sobra igualmente em cima e embaixo, sem buraco no rodapé. */
+    justify-content: flex-start;
     text-align: center;
     overflow: hidden;
     cursor: default;
@@ -134,7 +134,9 @@
         transform      0.6s cubic-bezier(0.25, 1, 0.5, 1),
         border-color   0.6s ease,
         box-shadow     0.6s ease;
-    will-change: transform, box-shadow;
+    /* will-change só de transform: incluir box-shadow promovia 8 camadas
+       permanentes na GPU sem ganho nenhum */
+    will-change: transform;
 }
 
 /* Brilho interno que segue o mouse */
@@ -155,10 +157,10 @@
 
 .luxury-card:hover {
     transform: translateY(-10px);
-    border-color: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 1);
     box-shadow:
-        0 20px 50px rgba(196, 96, 126, 0.15),
-        0 4px 12px rgba(0, 0, 0, 0.02);
+        0 24px 56px rgba(196, 96, 126, 0.22),
+        0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .luxury-card:hover::before {
@@ -225,7 +227,9 @@
     margin: 0;
 }
 
-/* ---- Lista de tópicos em chips ---- */
+/* ---- Lista de tópicos ----
+   Uma linha por tópico, alinhada à esquerda e com marcador em losango. Chips
+   soltos quebravam em linhas de larguras irregulares e deixavam o card bagunçado. */
 .luxury-tags {
     position: relative;
     z-index: 1;
@@ -233,28 +237,49 @@
     margin: 0;
     padding: 0;
     width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 9px 32px;
+    text-align: left;
 }
 
 .luxury-tags li {
+    position: relative;
     font-family: "Inter", sans-serif;
-    font-size: clamp(12px, 0.95vw, 13px);
+    font-size: clamp(12.5px, 0.95vw, 13.5px);
     color: #6B4E59;
-    line-height: 1.4;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.45);
-    border: 1px solid rgba(196, 96, 126, 0.18);
-    transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+    line-height: 1.5;
+    padding-left: 20px;
+    transition: color 0.4s ease;
+}
+
+/* Marcador em losango (mesma linguagem das pedras da seção anterior) */
+.luxury-tags li::before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0.62em;
+    width: 5px;
+    height: 5px;
+    background: #d98aa4;
+    border-radius: 1px;
+    transform: rotate(45deg);
+    transition: background 0.4s ease;
 }
 
 .luxury-card:hover .luxury-tags li {
-    background: rgba(255, 255, 255, 0.7);
-    border-color: rgba(196, 96, 126, 0.35);
     color: #4A2431;
+}
+
+.luxury-card:hover .luxury-tags li::before {
+    background: #c4607e;
+}
+
+/* Cards mais largos distribuem os tópicos em 2 colunas */
+.card-span-3 .luxury-tags,
+.card-span-4 .luxury-tags,
+.luxury-card-wide .luxury-tags {
+    grid-template-columns: repeat(2, 1fr);
 }
 
 /* ---- Projetos Sociais: nome + descrição ---- */
@@ -330,6 +355,13 @@
     .card-span-4,
     .luxury-card-wide { grid-column: span 1; }
 
+    /* Sem espaço para 2 colunas de tópicos no celular */
+    .card-span-3 .luxury-tags,
+    .card-span-4 .luxury-tags,
+    .luxury-card-wide .luxury-tags {
+        grid-template-columns: 1fr;
+    }
+
     .luxury-projects {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -337,11 +369,9 @@
 
     .luxury-card {
         padding: 32px 24px;
-        /* Reduz drasticamente o blur no mobile — principal causa de jank no Safari iOS */
-        backdrop-filter: blur(8px) saturate(110%);
-        -webkit-backdrop-filter: blur(8px) saturate(110%);
         /* Remove hover transform em touch (não existe hover real no touch) */
         transition: none;
+        will-change: auto;
     }
 
     .luxury-card:hover {

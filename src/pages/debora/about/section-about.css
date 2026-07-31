@@ -73,26 +73,30 @@
     position: relative;
 }
 
-/* Moldura onde futuramente entrará a foto real da Débora */
+/* Moldura da foto da Débora */
 .about-image-placeholder {
     width: 100%;
     max-width: 480px;
     aspect-ratio: 3 / 4;
-    background: linear-gradient(135deg, #EADDC6, #DBC8B6); /* Fundo mármore claro */
+    background: linear-gradient(135deg, #EADDC6, #DBC8B6); /* fundo enquanto a foto carrega */
     border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     box-shadow: 0 40px 80px rgba(61, 30, 42, 0.15); /* Sombra elegante refletindo a cor do fundo */
-    font-family: 'Cinzel', serif;
-    color: rgba(61, 30, 42, 0.6);
-    font-size: 20px;
-    letter-spacing: 2px;
     overflow: hidden;
     position: relative;
 }
 
-/* Um leve brilho na diagonal da moldura para dar ar de luxo */
+/* A foto já vem recortada em 3/4, o mesmo da moldura: o 'cover' aqui é só
+   garantia caso a proporção da moldura mude em algum breakpoint. */
+.about-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Um leve brilho na diagonal da moldura para dar ar de luxo. Bem mais sutil
+   agora que há uma foto embaixo: a 0.8 original lavava o rosto da Débora. */
 .about-image-placeholder::after {
     content: '';
     position: absolute;
@@ -100,6 +104,6 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(to bottom right, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 100%);
     pointer-events: none;
 }
