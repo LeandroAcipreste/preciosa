@@ -113,6 +113,51 @@ html.skip-preloader .hero-main {
     transition: none !important;
 }
 
+/* ============================================================
+   REDE DE SEGURANÇA DO PRELOADER
+   Ativada pelo watchdog do <head> quando os módulos ES não chegam
+   (mobile com internet lenta/instável). Revela o site em CSS puro,
+   sem depender de GSAP — que é justamente o que pode não ter carregado.
+
+   NOTA: sem !important nas propriedades que o GSAP anima. Estilo inline
+   vence regra de folha de estilo, então se o módulo chegar depois ele
+   reassume a animação normalmente. Só o que ninguém anima leva !important.
+   ============================================================ */
+html.preloader-bypass .preloader-overlay {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+html.preloader-bypass .hero-main {
+    display: none !important;
+}
+
+/* Destrava a rolagem mesmo se o main.js tiver alcançado a trava da intro */
+html.preloader-bypass body.intro-active {
+    overflow: auto !important;
+    height: auto !important;
+}
+
+html.preloader-bypass .home-text-mask-container {
+    opacity: 1;
+}
+
+html.preloader-bypass .mask-brand-text {
+    opacity: 1;
+    letter-spacing: 15px;
+}
+
+html.preloader-bypass .hero-scroll-indicator {
+    opacity: 1;
+}
+
+@media (max-width: 767px) {
+    html.preloader-bypass .mask-brand-text {
+        letter-spacing: 4px;
+    }
+}
+
 .preloader-text {
   color: #c4607e;
   font-family: "Clash", "Inter", sans-serif;

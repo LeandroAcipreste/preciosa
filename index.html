@@ -13,17 +13,50 @@
     
     <script>
         // ANTI-GLITCH & PRELOADER LOGIC
-        // Executado ANTES do corpo renderizar para evitar flashes visuais
-        const navEntry = performance.getEntriesByType("navigation")[0];
-        const isReload = navEntry && navEntry.type === "reload";
-        
-        if (isReload) {
-            // Se o usuário recarregou a página (F5), ele quer ver a intro novamente
-            sessionStorage.removeItem('preciosaVisited');
-        } else if (sessionStorage.getItem('preciosaVisited')) {
-            // Se está apenas navegando (ex: voltando da página Débora), escondemos o preloader instantaneamente
-            document.documentElement.classList.add('skip-preloader');
-        }
+        // Executado ANTES do corpo renderizar para evitar flashes visuais.
+        //
+        // IMPORTANTE: este bloco é inline e SEM imports de propósito. Ele é a
+        // única parte da lógica do preloader que sempre roda, mesmo que os
+        // módulos ES (three/gsap/lenis, vindos da CDN esm.sh) nunca cheguem —
+        // cenário real no mobile com internet lenta ou instável.
+        (function () {
+            var navEntry = performance.getEntriesByType("navigation")[0];
+            var isReload = navEntry && navEntry.type === "reload";
+
+            if (isReload) {
+                // Se o usuário recarregou a página (F5), ele quer ver a intro novamente
+                sessionStorage.removeItem('preciosaVisited');
+            } else if (sessionStorage.getItem('preciosaVisited')) {
+                // Se está apenas navegando (ex: voltando da página Débora), escondemos o preloader instantaneamente
+                document.documentElement.classList.add('skip-preloader');
+                return;
+            }
+
+            // ── MODO LEVE ────────────────────────────────────────────────
+            // Só para conexão REALMENTE inviável ou "economia de dados" ligada.
+            // '3g' ficou de fora de propósito: o Chrome rotula assim muita rede
+            // móvel decente, e cortar o cristal nesses casos mataria a intro
+            // para grande parte dos visitantes. O que pesava era o mapa de
+            // ambiente de 5 MB; agora o 3D inteiro são ~170 KB e passa em 3G.
+            var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            var eff = (conn && conn.effectiveType) || '';
+            var light = !!(conn && (conn.saveData || eff === 'slow-2g' || eff === '2g'));
+            window.__preciosaLightMode = light;
+
+            // ── REDE DE SEGURANÇA ────────────────────────────────────────
+            // O fallback antigo (8s) vivia DENTRO de initHero. Se o módulo não
+            // carregasse, ele nunca era armado e o preloader — opaco e em
+            // z-index 9999 — ficava para sempre na frente da página. Este
+            // temporizador não depende de nada: revela o site na marra.
+            window.__preciosaSafeMode = false;
+            window.__preciosaRelease = function () {
+                if (window.__preciosaSafeMode) return;
+                window.__preciosaSafeMode = true;
+                document.documentElement.classList.add('preloader-bypass');
+            };
+            // Cancelado por initHero assim que a aplicação assume o controle.
+            window.__preciosaWatchdog = setTimeout(window.__preciosaRelease, light ? 5000 : 9000);
+        })();
     </script>
 </head>
 
@@ -35,8 +68,12 @@
     <!-- HERO: Vídeo atrás + Máscara branca com texto vazado na frente (Blend Mode) -->
     <div class="home-content">
         <!-- Vídeo de fundo: toca em loop automaticamente -->
+        <!-- preload="metadata": com "auto" o navegador baixava os 3,6 MB do
+             vídeo em paralelo com os assets da intro, disputando a banda no
+             celular. O vídeo só aparece depois da intro, então buscar sob
+             demanda não atrasa nada visível. -->
         <video id="home-video" class="home-video" src="/assets/img/nova-hero.mp4" autoplay muted loop playsinline
-            preload="auto"></video>
+            preload="metadata"></video>
 
         <!-- Máscara de Blend-Mode: Tela branca com o texto PRECIOSA vazado -->
         <div class="home-text-mask-container">

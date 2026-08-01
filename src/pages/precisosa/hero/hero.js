@@ -93,6 +93,75 @@ export function initHero(onIntroComplete) {
     }
 
     // ==========================================
+    // MECANISMO DE FALLBACK
+    // ==========================================
+    // Definido ANTES de qualquer decisão: os caminhos de "conexão fraca" e de
+    // "watchdog já disparou" também precisam dele.
+    let fallbackTriggered = false;
+
+    // `instant`: a página já foi revelada pela rede de segurança em CSS, então
+    // reanimar do zero causaria um piscar. Nesse caso só fixa o estado final.
+    function triggerFallback(instant) {
+        if (fallbackTriggered) return;
+        fallbackTriggered = true;
+
+        document.getElementById("preloader")?.classList.add("is-hidden");
+
+        const heroMain = document.querySelector(".hero-main");
+        if (heroMain) heroMain.classList.add("is-gone");
+
+        document.body.classList.remove("intro-active");
+
+        const video = document.getElementById("home-video");
+        if (video) {
+            if (!video.src) {
+                video.src = "/assets/img/nova-hero.mp4";
+                video.load();
+            }
+            setupVideoScrollControl(video);
+        }
+
+        const maskContainer = document.querySelector(".home-text-mask-container");
+        const maskText = document.querySelector(".mask-brand-text");
+        const scrollIndicator = document.querySelector(".hero-scroll-indicator");
+        const endSpacing = isMobileScreen ? "4px" : "15px";
+
+        if (maskContainer) {
+            if (instant) {
+                gsap.set(maskContainer, { opacity: 1 });
+            } else {
+                gsap.set(maskContainer, { opacity: 0 });
+                gsap.to(maskContainer, { opacity: 1, duration: 2.0, ease: "power2.out", delay: 0.1 });
+            }
+        }
+
+        if (maskText) {
+            if (instant) {
+                gsap.set(maskText, { opacity: 1, scale: 1, letterSpacing: endSpacing });
+            } else {
+                gsap.set(maskText, { opacity: 0, scale: 0.85, letterSpacing: isMobileScreen ? "10px" : "60px" });
+                gsap.to(maskText, {
+                    opacity: 1, scale: 1, letterSpacing: endSpacing,
+                    duration: 2.5, ease: "power3.out", delay: 0.2
+                });
+            }
+        }
+
+        if (scrollIndicator) {
+            if (instant) gsap.set(scrollIndicator, { opacity: 1 });
+            else gsap.to(scrollIndicator, { opacity: 1, duration: 1.5, ease: "power2.out", delay: 1.0 });
+        }
+
+        setTimeout(() => initHeroScrollAnimations(), instant ? 0 : 2200);
+
+        if (typeof onIntroComplete === "function") onIntroComplete();
+    }
+
+    // A aplicação assumiu: o watchdog do <head> não precisa mais agir. A partir
+    // daqui quem protege é o loadTimeout desta função.
+    clearTimeout(window.__preciosaWatchdog);
+
+    // ==========================================
     // PULAR PRELOADER SE JÁ ESTIVER NAVEGANDO
     // ==========================================
     // Se o usuário já carregou essa aba antes e só está voltando da página da Débora, pulamos o carregamento 3D inteiro.
@@ -121,57 +190,24 @@ export function initHero(onIntroComplete) {
     sessionStorage.setItem('preciosaVisited', 'true');
 
     // ==========================================
-    // MECANISMO DE FALLBACK
+    // CAMINHOS SEM 3D
     // ==========================================
-    let fallbackTriggered = false;
-    function triggerFallback() {
-        if (fallbackTriggered) return;
-        fallbackTriggered = true;
-
-        document.getElementById("preloader")?.classList.add("is-hidden");
-
-        const heroMain = document.querySelector(".hero-main");
-        if (heroMain) heroMain.classList.add("is-gone");
-
-        document.body.classList.remove("intro-active");
-
-        const video = document.getElementById("home-video");
-        if (video) {
-            if (!video.src) {
-                video.src = "/assets/img/nova-hero.mp4";
-                video.load();
-            }
-            setupVideoScrollControl(video);
-        }
-
-        const maskContainer = document.querySelector(".home-text-mask-container");
-        const maskText = document.querySelector(".mask-brand-text");
-        const scrollIndicator = document.querySelector(".hero-scroll-indicator");
-
-        if (maskContainer) {
-            gsap.set(maskContainer, { opacity: 0 });
-            gsap.to(maskContainer, { opacity: 1, duration: 2.0, ease: "power2.out", delay: 0.1 });
-        }
-
-        if (maskText) {
-            gsap.set(maskText, { opacity: 0, scale: 0.85, letterSpacing: isMobileScreen ? "10px" : "60px" });
-            gsap.to(maskText, {
-                opacity: 1, scale: 1,
-                letterSpacing: isMobileScreen ? "4px" : "15px",
-                duration: 2.5, ease: "power3.out", delay: 0.2
-            });
-        }
-
-        if (scrollIndicator) {
-            gsap.to(scrollIndicator, { opacity: 1, duration: 1.5, ease: "power2.out", delay: 1.0 });
-        }
-
-        setTimeout(() => initHeroScrollAnimations(), 2200);
-
-        if (typeof onIntroComplete === "function") onIntroComplete();
+    // 1) O watchdog já revelou a página: o módulo chegou tarde demais e não há
+    //    mais intro a tocar — só ligar o que a página precisa para funcionar.
+    if (window.__preciosaSafeMode) {
+        triggerFallback(true);
+        return;
     }
 
-    const loadTimeout = setTimeout(() => triggerFallback(), 8000);
+    // 2) Conexão fraca / economia de dados: baixar mapa de ambiente + modelo 3D
+    //    é o que fazia o preloader se arrastar no celular. Entra com a intro
+    //    leve, que não custa nenhum download extra.
+    if (window.__preciosaLightMode) {
+        triggerFallback(false);
+        return;
+    }
+
+    const loadTimeout = setTimeout(() => triggerFallback(false), 8000);
 
     // ==========================================
     // THREE.JS SETUP
@@ -209,7 +245,10 @@ export function initHero(onIntroComplete) {
     // ==========================================
     const loadHDRI = new Promise((resolve) => {
         const textureLoader = new THREE.TextureLoader();
-        textureLoader.load("/assets/img/hdri.png", (texture) => {
+        // hdri.jpg (136 KB) no lugar do hdri.png (5 MB). É um mapa de ambiente
+        // usado só para o reflexo do diamante — JPEG não deixa artefato visível
+        // aí, e o PNG sozinho era metade do peso da página.
+        textureLoader.load("/assets/img/hdri.jpg", (texture) => {
             texture.mapping = THREE.EquirectangularReflectionMapping;
             const pmrem = new THREE.PMREMGenerator(renderizador);
             cena.environment = pmrem.fromEquirectangular(texture).texture;
