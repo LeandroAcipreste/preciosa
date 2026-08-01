@@ -182,14 +182,15 @@
             }
 
             // ── MODO LEVE ────────────────────────────────────────────────
-            // Só para conexão REALMENTE inviável ou "economia de dados" ligada.
-            // '3g' ficou de fora de propósito: o Chrome rotula assim muita rede
-            // móvel decente, e cortar o cristal nesses casos mataria a intro
-            // para grande parte dos visitantes. O que pesava era o mapa de
-            // ambiente de 5 MB; agora o 3D inteiro são ~170 KB e passa em 3G.
+            // APENAS para conexão realmente inviável (2G real). O `saveData`
+            // saiu do gatilho: muito celular no Brasil roda com "Economizador
+            // de dados" LIGADO no Chrome, e com ele aqui o cristal era cortado
+            // SEMPRE nesses aparelhos — "tudo funciona, só o diamante não
+            // aparece", enquanto no DevTools (saveData=false) funcionava.
+            // O 3D inteiro pesa ~170 KB; não justifica matar a marca do site.
             var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
             var eff = (conn && conn.effectiveType) || '';
-            var light = !!(conn && (conn.saveData || eff === 'slow-2g' || eff === '2g'));
+            var light = !!(conn && (eff === 'slow-2g' || eff === '2g'));
             window.__preciosaLightMode = light;
 
             // ── REDE DE SEGURANÇA ────────────────────────────────────────
