@@ -10,7 +10,50 @@
         rel="stylesheet">
     <link rel="stylesheet" href="./style.css" />
     <title>Preciosa</title>
-    
+
+    <!-- ============================================================
+         IMPORT MAP — precisa vir ANTES de qualquer modulepreload.
+         Os preloads abaixo resolvem a árvore de dependências, e para isso
+         especificadores como "gsap" e "lenis" já têm de estar mapeados.
+
+         Aponta para /vendor/, servido pelo MESMO domínio. Antes vinha da CDN
+         externa esm.sh: medido em celular emulado, no 3G o cristal 3D não
+         chegava a aparecer (os módulos demoravam mais que o watchdog de 9s).
+         Os arquivos são bundles ESM minificados das MESMAS versões que
+         estavam fixadas aqui. Sem passo de build. Ver vendor/README.md.
+         ============================================================ -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/vendor/three.js",
+          "three/addons/loaders/GLTFLoader.js": "/vendor/GLTFLoader.js",
+          "gsap": "/vendor/gsap.js",
+          "gsap/ScrollTrigger": "/vendor/ScrollTrigger.js",
+          "lenis": "/vendor/lenis.js"
+        }
+      }
+    </script>
+
+    <!-- ============================================================
+         CARGA EM PARALELO DA INTRO 3D
+         Sem isto o navegador só descobre /vendor/three.js depois de baixar
+         index.html -> main.js -> hero.js: quatro idas e voltas em sequência.
+         Em 3G (latência ~300ms) é mais de um segundo perdido só esperando,
+         antes do primeiro byte do three. Declarando aqui, tudo começa junto.
+         Medido: é o que decide se o cristal aparece ou não no celular.
+         ============================================================ -->
+    <link rel="modulepreload" href="/main.js">
+    <link rel="modulepreload" href="/vendor/three.js">
+    <link rel="modulepreload" href="/vendor/gsap.js">
+    <link rel="modulepreload" href="/vendor/ScrollTrigger.js">
+    <link rel="modulepreload" href="/vendor/lenis.js">
+    <link rel="modulepreload" href="/vendor/GLTFLoader.js">
+    <link rel="modulepreload" href="/src/pages/precisosa/hero/hero.js">
+    <link rel="modulepreload" href="/src/core/smooth-scroll.js">
+    <!-- Assets que a intro 3D precisa antes de poder começar -->
+    <link rel="preload" as="image" href="/assets/img/hdri.jpg">
+    <link rel="preload" as="fetch" href="/assets/img/diamond-compressed.glb" crossorigin>
+
     <script>
         // ANTI-GLITCH & PRELOADER LOGIC
         // Executado ANTES do corpo renderizar para evitar flashes visuais.
@@ -563,23 +606,9 @@
     </footer>
 
     <!--
-      ESTRATÉGIA DE MÓDULOS (unificada): import map + ESM via esm.sh.
-      As três páginas (index, debora, dashboard) usam este mesmo mecanismo.
-      Não há passo de build (site estático). Versões fixadas aqui devem bater
-      com as declaradas em package.json.
+      O import map desta página fica no <head>, junto dos modulepreload.
     -->
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://esm.sh/three@0.163.0",
-          "three/addons/": "https://esm.sh/three@0.163.0/examples/jsm/",
-          "gsap": "https://esm.sh/gsap@3.12.5",
-          "gsap/ScrollTrigger": "https://esm.sh/gsap@3.12.5/ScrollTrigger",
-          "lenis": "https://esm.sh/lenis@1.1.5"
-        }
-      }
-    </script>
-    <script type="module" src="./main.js"></script>
+    <script type="module" src="/main.js"></script>
 </body>
 
 </html>
