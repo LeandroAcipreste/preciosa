@@ -38,6 +38,18 @@ export function createSmoothScroll(options = {}) {
     // Registra o plugin uma única vez por página.
     if (!pluginRegistered) {
         gsap.registerPlugin(ScrollTrigger);
+
+        ScrollTrigger.config({
+            // No celular, esconder/mostrar a barra de endereço dispara um
+            // 'resize', e cada resize faz o ScrollTrigger recalcular TODOS os
+            // gatilhos — relayout da página inteira no meio da rolagem. É a
+            // recomendação da própria documentação do GSAP para mobile.
+            ignoreMobileResize: true,
+            // Em rolagem muito rápida, não dispara os callbacks mais de uma vez
+            // por tick. Menos trabalho redundante justamente no pior momento.
+            limitCallbacks: true,
+        });
+
         pluginRegistered = true;
     }
 

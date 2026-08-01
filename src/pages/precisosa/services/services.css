@@ -13,14 +13,18 @@
     z-index: 5;
 }
 
-/* Fundo com Paralaxe — Imagem de diamante (background.png) */
+/* Fundo com Paralaxe — Imagem de diamante.
+   Era background.png com 1838 KB. O canal alpha do arquivo estava 100% opaco
+   (inútil) e só obrigava o formato a ser PNG: em JPEG o mesmo pixel dá 124 KB.
+   Decodificar aquele PNG custava ~90 ms de thread principal, e como esta
+   camada se move no parallax, era a maior fonte de travamento da rolagem. */
 .luxury-bg-parallax {
     position: absolute;
     top: -10%;
     left: 0;
     width: 100%;
     height: 120%;
-    background-image: url('/assets/img/background.png');
+    background-image: url('/assets/img/background.jpg');
     background-size: cover;
     background-position: center;
     pointer-events: none;
