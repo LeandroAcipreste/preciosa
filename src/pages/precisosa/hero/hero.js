@@ -218,24 +218,46 @@ export function initHero(onIntroComplete) {
         camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 4;
 
-        renderizador = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderizador = new THREE.WebGLRenderer({
+            // No iPhone o antialias multiplica o custo de memória do buffer, e
+            // o iOS derruba o contexto WebGL sob pressão de memória — com dois
+            // vídeos decodificando na mesma página, isso é real. Num diamante
+            // pequeno em tela de alta densidade a diferença não se vê.
+            antialias: !isMobileScreen,
+            alpha: true,
+            powerPreference: 'default',
+        });
         if (!renderizador || !renderizador.getContext()) {
             throw new Error("WebGL indisponível.");
         }
         renderizador.setSize(window.innerWidth, window.innerHeight);
-        renderizador.physicallyCorrectLights = true;
         renderizador.outputColorSpace = THREE.SRGBColorSpace;
         renderizador.toneMapping = THREE.ACESFilmicToneMapping;
         renderizador.toneMappingExposure = 1.2;
         // Clamp do pixel ratio: em telas 2x/3x renderizar em DPR cheio é brutal
         // para a GPU e não agrega qualidade visível num diamante pequeno.
-        renderizador.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        // No mobile o teto cai para 1.5 — o iPhone chega a DPR 3.
+        renderizador.setPixelRatio(Math.min(window.devicePixelRatio, isMobileScreen ? 1.5 : 2));
 
         div3d = document.querySelector(".hero-div3d");
         if (!div3d) { triggerFallback(); return; }
         renderizador.domElement.classList.add('hero-canvas');
         div3d.appendChild(renderizador.domElement);
+
+        // O iOS pode derrubar o contexto a qualquer momento. Sem tratar, a
+        // tela fica num canvas morto e a intro nunca termina.
+        renderizador.domElement.addEventListener('webglcontextlost', (e) => {
+            e.preventDefault();
+            if (window.__diag) window.__diag.erros.push('WebGL: contexto perdido');
+            triggerFallback(false);
+        });
+
+        if (window.__diag) window.__diag.renderer = 'ok';
     } catch (error) {
+        // Antes este catch engolia o erro em silêncio — era por isso que uma
+        // falha no iPhone ficava invisível.
+        console.error('Intro 3D indisponível:', error);
+        if (window.__diag) window.__diag.erros.push('renderer: ' + error.message);
         triggerFallback();
         return;
     }
@@ -249,20 +271,37 @@ export function initHero(onIntroComplete) {
         // usado só para o reflexo do diamante — JPEG não deixa artefato visível
         // aí, e o PNG sozinho era metade do peso da página.
         textureLoader.load("/assets/img/hdri.jpg", (texture) => {
-            texture.mapping = THREE.EquirectangularReflectionMapping;
-            const pmrem = new THREE.PMREMGenerator(renderizador);
-            cena.environment = pmrem.fromEquirectangular(texture).texture;
-            texture.dispose();
-            pmrem.dispose();
+            try {
+                texture.mapping = THREE.EquirectangularReflectionMapping;
+                const pmrem = new THREE.PMREMGenerator(renderizador);
+                cena.environment = pmrem.fromEquirectangular(texture).texture;
+                texture.dispose();
+                pmrem.dispose();
+                if (window.__diag) window.__diag.hdri = 'ok';
+            } catch (err) {
+                // PMREM usa render target de half-float. Em WebGL1 sem a
+                // extensão (aparelhos antigos) isso lança. O diamante fica sem
+                // reflexo do ambiente, mas a intro continua — melhor que nada.
+                console.warn('Mapa de ambiente indisponível:', err);
+                if (window.__diag) window.__diag.hdri = 'falhou: ' + err.message;
+            }
             resolve();
-        }, undefined, () => resolve());
+        }, undefined, () => {
+            if (window.__diag) window.__diag.hdri = 'nao carregou';
+            resolve();
+        });
     });
 
     let objeto;
     const loadGLTF = new Promise((resolve) => {
         new GLTFLoader().load("/assets/img/diamond-compressed.glb", (gltf) => {
+            if (window.__diag) window.__diag.glb = 'ok';
             resolve(gltf.scene);
-        }, undefined, () => resolve(null));
+        }, undefined, (err) => {
+            if (window.__diag) window.__diag.glb = 'falhou';
+            console.warn('Modelo 3D não carregou:', err);
+            resolve(null);
+        });
     });
 
     Promise.all([loadHDRI, loadGLTF]).then(([_, sceneObject]) => {

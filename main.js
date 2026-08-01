@@ -7,6 +7,9 @@ import { pauseWhenOffscreen } from './src/core/pause-offscreen.js';
 let lenis;
 
 function start() {
+    // Marca para o diagnóstico (?diag=1): prova que os módulos resolveram.
+    if (window.__diag) window.__diag.mainJs = Date.now() - window.__diag.inicio;
+
     // Cria Lenis + bridge com GSAP ScrollTrigger (lógica compartilhada).
     lenis = createSmoothScroll();
 

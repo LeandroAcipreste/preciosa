@@ -35,6 +35,89 @@
     </script>
 
     <!-- ============================================================
+         DIAGNÓSTICO — script CLÁSSICO de propósito.
+         Não é módulo e não importa nada: precisa funcionar justamente nos
+         casos em que os módulos falham (import map sem suporte, erro de
+         rede, WebGL indisponível). Sem isto, uma falha no iPhone é invisível
+         — o catch do hero.js engolia o erro em silêncio.
+
+         Para ver no celular, abra a home com  ?diag=1  no fim do endereço.
+         ============================================================ -->
+    <script>
+        (function () {
+            var d = window.__diag = {
+                inicio: Date.now(),
+                ua: navigator.userAgent,
+                importmap: !!(window.HTMLScriptElement && HTMLScriptElement.supports
+                    && HTMLScriptElement.supports('importmap')),
+                modulepreload: !!(window.HTMLLinkElement && HTMLLinkElement.prototype
+                    && 'relList' in HTMLLinkElement.prototype
+                    && document.createElement('link').relList.supports('modulepreload')),
+                erros: [],
+            };
+
+            // WebGL: qual versão o aparelho realmente entrega
+            try {
+                var cv = document.createElement('canvas');
+                var g2 = cv.getContext('webgl2');
+                var g1 = g2 || cv.getContext('webgl') || cv.getContext('experimental-webgl');
+                d.webgl = g2 ? 'webgl2' : (g1 ? 'webgl1' : 'NENHUM');
+                if (g1) {
+                    var info = g1.getExtension('WEBGL_debug_renderer_info');
+                    d.gpu = info ? g1.getParameter(info.UNMASKED_RENDERER_WEBGL) : '(oculto)';
+                    d.maxTex = g1.getParameter(g1.MAX_TEXTURE_SIZE);
+                    d.halfFloat = !!(g2 || g1.getExtension('OES_texture_half_float'));
+                }
+            } catch (e) { d.webgl = 'ERRO: ' + e.message; }
+
+            window.addEventListener('error', function (e) {
+                d.erros.push((e.message || 'erro') + ' @ ' +
+                    String(e.filename || '').split('/').pop() + ':' + (e.lineno || '?'));
+            }, true);
+            window.addEventListener('unhandledrejection', function (e) {
+                d.erros.push('promise: ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
+            });
+
+            if (!/[?&]diag=1/.test(location.search)) return;
+
+            function mostrar() {
+                var el = document.createElement('div');
+                el.setAttribute('style', 'position:fixed;inset:0;z-index:2147483647;' +
+                    'background:#111;color:#0f0;font:12px/1.5 monospace;padding:16px;' +
+                    'overflow:auto;-webkit-overflow-scrolling:touch;white-space:pre-wrap;word-break:break-word');
+                var linhas = [
+                    'DIAGNÓSTICO PRECIOSA   (toque para fechar)',
+                    '─────────────────────────────',
+                    'import map      : ' + (d.importmap ? 'SIM' : 'NÃO  <-- quebra tudo'),
+                    'modulepreload   : ' + (d.modulepreload ? 'SIM' : 'não (só perde velocidade)'),
+                    'WebGL           : ' + d.webgl,
+                    'GPU             : ' + (d.gpu || '-'),
+                    'textura máx     : ' + (d.maxTex || '-'),
+                    'half float      : ' + (d.halfFloat ? 'sim' : 'NÃO  <-- PMREM falha'),
+                    '─────────────────────────────',
+                    'main.js rodou   : ' + (d.mainJs ? 'SIM (' + d.mainJs + 'ms)' : 'NÃO'),
+                    'initHero rodou  : ' + (d.initHero ? 'SIM (' + d.initHero + 'ms)' : 'NÃO'),
+                    'renderer criado : ' + (d.renderer || 'NÃO'),
+                    'HDRI            : ' + (d.hdri || 'não terminou'),
+                    'modelo .glb     : ' + (d.glb || 'não terminou'),
+                    'canvas na tela  : ' + (document.querySelector('.hero-canvas') ? 'SIM' : 'NÃO'),
+                    'modo leve       : ' + !!window.__preciosaLightMode,
+                    'watchdog agiu   : ' + !!window.__preciosaSafeMode,
+                    '─────────────────────────────',
+                    'ERROS (' + d.erros.length + '):',
+                ].concat(d.erros.length ? d.erros : ['  nenhum']).concat([
+                    '─────────────────────────────', d.ua,
+                ]);
+                el.textContent = linhas.join('\n');
+                el.onclick = function () { el.remove(); };
+                document.body.appendChild(el);
+            }
+            // 14s: tempo de sobra para a intro tentar carregar em rede móvel
+            window.addEventListener('load', function () { setTimeout(mostrar, 14000); });
+        })();
+    </script>
+
+    <!-- ============================================================
          CARGA EM PARALELO DA INTRO 3D
          Sem isto o navegador só descobre /vendor/three.js depois de baixar
          index.html -> main.js -> hero.js: quatro idas e voltas em sequência.
@@ -70,9 +153,28 @@
                 // Se o usuário recarregou a página (F5), ele quer ver a intro novamente
                 sessionStorage.removeItem('preciosaVisited');
             } else if (sessionStorage.getItem('preciosaVisited')) {
-                // Se está apenas navegando (ex: voltando da página Débora), escondemos o preloader instantaneamente
-                document.documentElement.classList.add('skip-preloader');
-                return;
+                // Pular a intro só faz sentido quando a navegação veio de DENTRO
+                // do site — voltar da página da Débora não deve repetir 15s de
+                // abertura. Era essa a intenção original.
+                //
+                // Antes bastava a flag existir. Mas o sessionStorage vive
+                // enquanto a ABA viver, e no celular abas ficam abertas por
+                // semanas: depois da primeira visita, abrir o link de novo
+                // nunca mais mostrava o cristal. Reproduzido em teste — era a
+                // causa de "no iPhone/Android a intro não aparece".
+                var interno = false;
+                try {
+                    interno = !!document.referrer &&
+                        new URL(document.referrer).origin === location.origin;
+                } catch (e) { interno = false; }
+
+                if (interno) {
+                    document.documentElement.classList.add('skip-preloader');
+                    return;
+                }
+                // Chegada nova (link do WhatsApp, endereço digitado, atalho na
+                // tela inicial): é uma visita, e visita vê a intro.
+                sessionStorage.removeItem('preciosaVisited');
             }
 
             // ── MODO LEVE ────────────────────────────────────────────────

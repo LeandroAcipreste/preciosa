@@ -4,7 +4,9 @@
 .about-debora {
     position: relative;
     width: 100%;
-    padding: 140px 40px;
+    /* Respiro proporcional à tela. Com 140px/40px fixos, num aparelho de
+       320px sobravam 240px de área útil — menos do que os filhos exigiam. */
+    padding: clamp(72px, 12vw, 140px) clamp(20px, 5vw, 40px);
     background-color: #F8F3EE; /* Tom creme/champagne luxuoso para dar contraste com o mármore escuro */
     color: #3D1E2A; /* Cor base: Vinho/Amora escuro */
     display: flex;
@@ -17,13 +19,18 @@
     max-width: 1200px;
     display: flex;
     flex-wrap: wrap;
-    gap: 80px;
+    gap: clamp(36px, 6vw, 80px);
     align-items: center;
 }
 
 .about-content {
-    flex: 1;
-    min-width: 320px;
+    /* flex-basis (o 3o valor) é quem decide quando a coluna quebra para
+       baixo — não min-width. E min-width:0 é obrigatório: o padrão do
+       flexbox é min-width:auto, que IMPEDE o item de encolher abaixo do
+       tamanho do seu conteúdo. Era isso, somado ao overflow:hidden da
+       seção, que cortava o texto em telas estreitas em vez de adaptá-lo. */
+    flex: 1 1 320px;
+    min-width: 0;
     position: relative;
     z-index: 2;
 }
@@ -41,33 +48,48 @@
 
 .about-title {
     font-family: 'Cinzel', serif;
-    font-size: clamp(24px, 3.5vw, 46px); /* Tamanho menor para manter o nome na mesma linha */
+    /* O 5.2vw do meio mantém o nome numa linha só em telas médias sem
+       precisar proibir a quebra. */
+    font-size: clamp(21px, 5.2vw, 46px);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.15;
     margin-bottom: 10px;
     color: #26131b; /* Mesma cor do texto sobre o mármore da seção do livro */
-    white-space: nowrap; /* Força as palavras a não quebrarem de linha */
+    text-wrap: balance; /* se quebrar, quebra equilibrado, não com uma órfã */
 }
+
+/* NOTA: aqui havia 'white-space: nowrap' para manter o nome numa linha só.
+   Mas nowrap não faz o texto caber — ele PROÍBE a quebra e deixa o excesso
+   vazar, e o overflow:hidden da seção cortava o nome na borda. Sem ele o
+   comportamento é melhor nos dois lados: continua numa linha sempre que
+   couber (é o que acontece no desktop) e quebra em duas quando não couber,
+   em vez de ficar cortado. Vale principalmente na faixa de 768–1024px, onde
+   o layout é de duas colunas e cada coluna fica estreita. */
 
 .about-role {
     font-family: 'Great Vibes', cursive;
-    font-size: clamp(28px, 3.5vw, 42px);
+    font-size: clamp(26px, 5vw, 42px);
     color: #C18566; /* Tom terracota escuro elegante */
     font-weight: 400;
-    margin-bottom: 40px;
+    margin-bottom: clamp(24px, 4vw, 40px);
+    /* Great Vibes é cursiva e larga; sem isto uma palavra longa pode
+       estourar a caixa num aparelho estreito. */
+    overflow-wrap: break-word;
 }
 
 .about-text-body p {
     font-family: 'Inter', sans-serif;
-    font-size: 16px;
+    font-size: clamp(15px, 1.2vw, 16px);
     line-height: 1.8;
     color: #553E48; /* Cinza-vinho suave para leitura longa */
     margin-bottom: 24px;
 }
 
 .about-image-wrapper {
-    flex: 1;
-    min-width: 320px;
+    /* Mesma correção do .about-content: a base define quando quebra,
+       o min-width:0 é o que permite encolher. */
+    flex: 1 1 300px;
+    min-width: 0;
     display: flex;
     justify-content: center;
     position: relative;
