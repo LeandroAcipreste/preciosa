@@ -265,6 +265,11 @@ export function initHero(onIntroComplete) {
     // ==========================================
     // CARREGAMENTO ASSÍNCRONO (HDRI + GLTF)
     // ==========================================
+    // Marca se o mapa de ambiente realmente entrou na cena. Sem ele, materiais
+    // de vidro/metal renderizam INVISÍVEIS — era o "só o diamante não aparece"
+    // no celular (GPUs móveis sem half-float fazem o PMREM falhar).
+    let envCarregado = false;
+
     const loadHDRI = new Promise((resolve) => {
         const textureLoader = new THREE.TextureLoader();
         // hdri.jpg (136 KB) no lugar do hdri.png (5 MB). É um mapa de ambiente
@@ -277,6 +282,7 @@ export function initHero(onIntroComplete) {
                 cena.environment = pmrem.fromEquirectangular(texture).texture;
                 texture.dispose();
                 pmrem.dispose();
+                envCarregado = true;
                 if (window.__diag) window.__diag.hdri = 'ok';
             } catch (err) {
                 // PMREM usa render target de half-float. Em WebGL1 sem a
@@ -322,6 +328,40 @@ export function initHero(onIntroComplete) {
         objeto.position.z = startZ;
         objeto.position.y = startY;
         cena.add(objeto);
+
+        // ==========================================
+        // FALLBACK DE VISIBILIDADE DO DIAMANTE
+        // ==========================================
+        // Sem o mapa de ambiente (PMREM falhou ou o hdri.jpg não chegou),
+        // o material original de vidro/metal não tem o que refletir e fica
+        // invisível. Aqui o diamante troca para um material que funciona com
+        // LUZES comuns — menos suntuoso, porém SEMPRE visível.
+        if (!envCarregado) {
+            if (window.__diag) window.__diag.erros.push('env ausente: usando material de contingência');
+
+            const luzPrincipal = new THREE.DirectionalLight(0xffffff, 2.6);
+            luzPrincipal.position.set(2, 4, 5);
+            cena.add(luzPrincipal);
+
+            const luzPreenchimento = new THREE.DirectionalLight(0xffe9c9, 1.3);
+            luzPreenchimento.position.set(-3, -1, 2);
+            cena.add(luzPreenchimento);
+
+            cena.add(new THREE.AmbientLight(0xffffff, 0.65));
+
+            objeto.traverse((child) => {
+                if (child.isMesh) {
+                    child.material = new THREE.MeshPhysicalMaterial({
+                        color: 0xf6f0ff,          // branco-cristal com leve tom frio
+                        metalness: 0.15,
+                        roughness: 0.08,
+                        clearcoat: 1.0,
+                        clearcoatRoughness: 0.06,
+                        flatShading: true,        // realça as facetas sem depender de reflexo
+                    });
+                }
+            });
+        }
 
         const materiais = [];
         objeto.traverse((child) => {
