@@ -66,7 +66,14 @@
                     var info = g1.getExtension('WEBGL_debug_renderer_info');
                     d.gpu = info ? g1.getParameter(info.UNMASKED_RENDERER_WEBGL) : '(oculto)';
                     d.maxTex = g1.getParameter(g1.MAX_TEXTURE_SIZE);
+                    // Ter half-float NÃO basta: o PMREM precisa FILTRAR essa
+                    // textura linearmente. Sem OES_texture_float_linear o mapa
+                    // de ambiente carrega sem erro e mesmo assim nao e
+                    // amostravel — foi o que enganou o diagnostico anterior,
+                    // que dizia "half float: sim" com o diamante invisivel.
                     d.halfFloat = !!(g2 || g1.getExtension('OES_texture_half_float'));
+                    d.floatLinear = !!(g1.getExtension('OES_texture_float_linear') ||
+                        g1.getExtension('OES_texture_half_float_linear'));
                 }
             } catch (e) { d.webgl = 'ERRO: ' + e.message; }
 
@@ -94,6 +101,7 @@
                     'GPU             : ' + (d.gpu || '-'),
                     'textura máx     : ' + (d.maxTex || '-'),
                     'half float      : ' + (d.halfFloat ? 'sim' : 'NÃO  <-- PMREM falha'),
+                    'filtro float    : ' + (d.floatLinear ? 'sim' : 'NÃO  <-- env nao amostravel'),
                     '─────────────────────────────',
                     'main.js rodou   : ' + (d.mainJs ? 'SIM (' + d.mainJs + 'ms)' : 'NÃO'),
                     'initHero rodou  : ' + (d.initHero ? 'SIM (' + d.initHero + 'ms)' : 'NÃO'),
@@ -113,6 +121,7 @@
                     'enquadramento   : ' + (d.enquadramento || '-'),
                     'diamante        : ' + (d.diamante || '-'),
                     'gate de GPU     : ' + (d.gateGpu || 'nunca desligou (bom)'),
+                    'materiais       : ' + (d.materiais || '-'),
                     'modo leve       : ' + !!window.__preciosaLightMode,
                     'watchdog agiu   : ' + !!window.__preciosaSafeMode,
                     '─────────────────────────────',

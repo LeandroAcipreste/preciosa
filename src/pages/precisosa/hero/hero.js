@@ -374,6 +374,32 @@ export function initHero(onIntroComplete) {
         }
 
         // ==========================================
+        // LUZ SEMPRE PRESENTE
+        // ==========================================
+        // O material do .glb é MeshStandardMaterial com metalness=1 e
+        // roughness=1: metal puro e totalmente rugoso NÃO tem componente
+        // difusa — ele não desenha cor própria, só reflete o mapa de ambiente,
+        // e na rugosidade 1 amostra o mip MAIS BORRADO do PMREM.
+        //
+        // O PMREM usa textura half-float, e a FILTRAGEM LINEAR de half-float
+        // (OES_texture_float_linear) não existe em várias GPUs da Apple. Ali o
+        // env carrega sem erro mas não é amostrável: material sem difusa + env
+        // inútil = diamante invisível e console limpo. Era o caso do iPhone.
+        //
+        // Com luzes na cena o diamante existe por conta própria, com env ou
+        // sem. Intensidade baixa para não alterar o visual onde o reflexo já
+        // funciona (Chrome, Android, desktop).
+        cena.add(new THREE.HemisphereLight(0xffffff, 0xffd9e6, envCarregado ? 0.35 : 1.1));
+
+        const luzChave = new THREE.DirectionalLight(0xffffff, envCarregado ? 0.6 : 2.2);
+        luzChave.position.set(2, 4, 5);
+        cena.add(luzChave);
+
+        const luzContra = new THREE.DirectionalLight(0xffd0e4, envCarregado ? 0.4 : 1.2);
+        luzContra.position.set(-3, -1, 2);
+        cena.add(luzContra);
+
+        // ==========================================
         // FALLBACK DE VISIBILIDADE DO DIAMANTE
         // ==========================================
         // Sem o mapa de ambiente (PMREM falhou ou o hdri.jpg não chegou),
@@ -408,16 +434,49 @@ export function initHero(onIntroComplete) {
         }
 
         const materiais = [];
+        const descricaoMats = [];
         objeto.traverse((child) => {
             if (child.isMesh && child.material) {
                 const mats = Array.isArray(child.material) ? child.material : [child.material];
                 mats.forEach((mat) => {
+                    // DoubleSide: garante que as faces desenhem mesmo se as
+                    // normais do modelo estiverem invertidas ou se a câmera
+                    // chegar muito perto. Com FrontSide, olhar o interior de
+                    // uma malha não desenha NADA — invisível sem erro nenhum.
+                    // Numa gema facetada isto não muda o visual.
+                    mat.side = THREE.DoubleSide;
+
+                    // metalness=1 + roughness=1 (como vem no .glb) é a pior
+                    // combinação possível para portabilidade: zero difusa, logo
+                    // NADA aparece sem o mapa de ambiente; e rugosidade máxima
+                    // força o mip mais borrado do PMREM, justamente o que o
+                    // WebKit não filtra corretamente.
+                    //
+                    // Um fio de difusa faz as luzes pegarem, e rugosidade menor
+                    // usa mips baixos, que são confiáveis em qualquer GPU — e
+                    // ainda deixa as facetas mais nítidas, que é o que se espera
+                    // de uma gema.
+                    if (mat.metalness !== undefined) mat.metalness = Math.min(mat.metalness, 0.85);
+                    if (mat.roughness !== undefined) mat.roughness = Math.min(mat.roughness, 0.35);
+                    mat.envMapIntensity = 1.3;
+
+                    descricaoMats.push(
+                        mat.type + ' op=' + mat.opacity +
+                        ' metal=' + (mat.metalness ?? '-') +
+                        ' rough=' + (mat.roughness ?? '-'));
+
                     mat.transparent = true;
                     mat.opacity = 0;
+                    mat.needsUpdate = true;
                     materiais.push(mat);
                 });
             }
         });
+
+        if (window.__diag) {
+            window.__diag.materiais = materiais.length + ' mat: ' +
+                descricaoMats.slice(0, 3).join(' | ');
+        }
 
         // ==========================================
         // MASTER TIMELINE
