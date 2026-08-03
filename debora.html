@@ -14,28 +14,8 @@
     <link rel="stylesheet" href="./style.css" />
     <link rel="stylesheet" href="./src/pages/debora/debora.css" />
 
-    <!-- Import map no <head>: precisa vir antes dos modulepreload, que
-         resolvem a árvore de dependências e dependem destes mapeamentos.
-         Aponta para /vendor/ (mesmo domínio) em vez da CDN esm.sh. -->
-    <script type="importmap">
-      {
-        "imports": {
-          "gsap": "/vendor/gsap.js",
-          "gsap/ScrollTrigger": "/vendor/ScrollTrigger.js",
-          "lenis": "/vendor/lenis.js"
-        }
-      }
-    </script>
-
-    <!-- Sem isto, o navegador só descobre /vendor/gsap.js depois de baixar o
-         HTML e os módulos da página: idas e voltas em sequência que, em rede
-         móvel, atrasam a entrada inteira. Declarado aqui, tudo baixa junto. -->
-    <link rel="modulepreload" href="/vendor/gsap.js">
-    <link rel="modulepreload" href="/vendor/ScrollTrigger.js">
-    <link rel="modulepreload" href="/vendor/lenis.js">
-    <link rel="modulepreload" href="/src/core/smooth-scroll.js">
-    <link rel="modulepreload" href="/src/pages/debora/preLoader/preLoader.js">
-    <link rel="modulepreload" href="/src/pages/debora/hero/hero.js">
+    <!-- Sem import map e sem modulepreload manual: o Vite empacota o grafo
+         de módulos desta página e injeta as tags no build. -->
 </head>
 
 <body class="global-body">

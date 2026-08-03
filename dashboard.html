@@ -170,16 +170,7 @@
     </div>
 
     <!-- Bibliotecas via import map (mesma estratégia de index.html e debora.html) -->
-    <script type="importmap">
-      {
-        "imports": {
-          "gsap": "/vendor/gsap.js",
-          "chart.js/auto": "/vendor/chart.js"
-        }
-      }
-    </script>
-
-    <!-- Script principal -->
+    <!-- Script principal (o Vite resolve gsap e chart.js/auto pelo node_modules) -->
     <script type="module" src="./src/pages/dashboard/dashboard.js"></script>
 </body>
 </html>

@@ -11,45 +11,10 @@
     <link rel="stylesheet" href="./style.css" />
     <title>Preciosa</title>
 
-    <!-- ============================================================
-         IMPORT MAP — precisa vir ANTES de qualquer modulepreload.
-         Os preloads abaixo resolvem a árvore de dependências, e para isso
-         especificadores como "gsap" e "lenis" já têm de estar mapeados.
+    <!-- Sem import map e sem modulepreload manual: o Vite empacota tudo num
+         grafo só e injeta aqui, no build, os <script> e os modulepreload
+         corretos. Ver vite.config.js. -->
 
-         Aponta para /vendor/, servido pelo MESMO domínio. Antes vinha da CDN
-         externa esm.sh: medido em celular emulado, no 3G o cristal 3D não
-         chegava a aparecer (os módulos demoravam mais que o watchdog de 9s).
-         Os arquivos são bundles ESM minificados das MESMAS versões que
-         estavam fixadas aqui. Sem passo de build. Ver vendor/README.md.
-         ============================================================ -->
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "/vendor/three.js",
-          "three/addons/loaders/GLTFLoader.js": "/vendor/GLTFLoader.js",
-          "gsap": "/vendor/gsap.js",
-          "gsap/ScrollTrigger": "/vendor/ScrollTrigger.js",
-          "lenis": "/vendor/lenis.js"
-        }
-      }
-    </script>
-
-    <!-- ============================================================
-         CARGA EM PARALELO DA INTRO 3D
-         Sem isto o navegador só descobre /vendor/three.js depois de baixar
-         index.html -> main.js -> hero.js: quatro idas e voltas em sequência.
-         Em 3G (latência ~300ms) é mais de um segundo perdido só esperando,
-         antes do primeiro byte do three. Declarando aqui, tudo começa junto.
-         Medido: é o que decide se o cristal aparece ou não no celular.
-         ============================================================ -->
-    <link rel="modulepreload" href="/main.js">
-    <link rel="modulepreload" href="/vendor/three.js">
-    <link rel="modulepreload" href="/vendor/gsap.js">
-    <link rel="modulepreload" href="/vendor/ScrollTrigger.js">
-    <link rel="modulepreload" href="/vendor/lenis.js">
-    <link rel="modulepreload" href="/vendor/GLTFLoader.js">
-    <link rel="modulepreload" href="/src/pages/precisosa/hero/hero.js">
-    <link rel="modulepreload" href="/src/core/smooth-scroll.js">
     <!-- Assets que a intro 3D precisa antes de poder começar.
          O 'crossorigin' aqui NÃO é opcional: o TextureLoader do three usa
          crossOrigin='anonymous' e o preload as=fetch é sempre modo CORS.
@@ -90,8 +55,19 @@
             }
 
             window.addEventListener('error', function (e) {
-                if (e && e.target && e.target !== window) return; // recurso, não JS
-                liberar();
+                var alvo = e && e.target;
+
+                // Erro de JavaScript: alvo é a própria window.
+                if (!alvo || alvo === window) { liberar(); return; }
+
+                // Falha ao CARREGAR um <script> (o módulo não chegou, ou o
+                // parse foi rejeitado): o evento dispara no elemento, não na
+                // window. Este é justamente o caso que o trinco existe para
+                // cobrir — sem esta linha ele ficava cego para ele.
+                if (alvo.tagName === 'SCRIPT') { liberar(); return; }
+
+                // Qualquer outro recurso (img, link, video) não derruba a
+                // intro: um favicon ausente não pode apagar a abertura.
             }, true);
 
             window.addEventListener('unhandledrejection', liberar);
