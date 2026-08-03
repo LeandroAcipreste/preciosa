@@ -114,48 +114,36 @@ html.skip-preloader .hero-main {
 }
 
 /* ============================================================
-   REDE DE SEGURANÇA DO PRELOADER
-   Ativada pelo watchdog do <head> quando os módulos ES não chegam
-   (mobile com internet lenta/instável). Revela o site em CSS puro,
-   sem depender de GSAP — que é justamente o que pode não ter carregado.
+   REDE DE SEGURANÇA DO PRELOADER — sem uma linha de JavaScript
+   ------------------------------------------------------------
+   Se em 25s nada tiver escondido o preloader (caso extremo: os módulos ES
+   não chegaram), ele sai sozinho e libera a página. Antes isto era um
+   temporizador em script inline no index.html; em CSS é mais confiável,
+   porque não depende de script NENHUM — nem do próprio — que é justamente
+   a condição que a rede de segurança precisa cobrir.
 
-   NOTA: sem !important nas propriedades que o GSAP anima. Estilo inline
-   vence regra de folha de estilo, então se o módulo chegar depois ele
-   reassume a animação normalmente. Só o que ninguém anima leva !important.
+   No caminho normal o JS esconde o preloader em ~2s com a classe
+   .is-hidden, muito antes destes 25s, e a animação nunca chega a aparecer.
    ============================================================ */
-html.preloader-bypass .preloader-overlay {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+.preloader-overlay {
+    animation: preloader-failsafe 0.6s linear 25s forwards;
 }
 
-html.preloader-bypass .hero-main {
-    display: none !important;
-}
-
-/* Destrava a rolagem mesmo se o main.js tiver alcançado a trava da intro */
-html.preloader-bypass body.intro-active {
-    overflow: auto !important;
-    height: auto !important;
-}
-
-html.preloader-bypass .home-text-mask-container {
-    opacity: 1;
-}
-
-html.preloader-bypass .mask-brand-text {
-    opacity: 1;
-    letter-spacing: 15px;
-}
-
-html.preloader-bypass .hero-scroll-indicator {
-    opacity: 1;
-}
-
-@media (max-width: 767px) {
-    html.preloader-bypass .mask-brand-text {
-        letter-spacing: 4px;
+@keyframes preloader-failsafe {
+    to {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
     }
+}
+
+/* A cortina do hero sobe logo depois, pelo mesmo motivo */
+.hero-main {
+    animation: hero-failsafe 1.2s cubic-bezier(0.76, 0, 0.24, 1) 25.4s forwards;
+}
+
+@keyframes hero-failsafe {
+    to { transform: translateY(-100%); }
 }
 
 .preloader-text {

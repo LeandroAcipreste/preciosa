@@ -35,116 +35,6 @@
     </script>
 
     <!-- ============================================================
-         DIAGNÓSTICO — script CLÁSSICO de propósito.
-         Não é módulo e não importa nada: precisa funcionar justamente nos
-         casos em que os módulos falham (import map sem suporte, erro de
-         rede, WebGL indisponível). Sem isto, uma falha no iPhone é invisível
-         — o catch do hero.js engolia o erro em silêncio.
-
-         Para ver no celular, abra a home com  ?diag=1  no fim do endereço.
-         ============================================================ -->
-    <script>
-        (function () {
-            var d = window.__diag = {
-                inicio: Date.now(),
-                ua: navigator.userAgent,
-                importmap: !!(window.HTMLScriptElement && HTMLScriptElement.supports
-                    && HTMLScriptElement.supports('importmap')),
-                modulepreload: !!(window.HTMLLinkElement && HTMLLinkElement.prototype
-                    && 'relList' in HTMLLinkElement.prototype
-                    && document.createElement('link').relList.supports('modulepreload')),
-                erros: [],
-            };
-
-            // WebGL: qual versão o aparelho realmente entrega
-            try {
-                var cv = document.createElement('canvas');
-                var g2 = cv.getContext('webgl2');
-                var g1 = g2 || cv.getContext('webgl') || cv.getContext('experimental-webgl');
-                d.webgl = g2 ? 'webgl2' : (g1 ? 'webgl1' : 'NENHUM');
-                if (g1) {
-                    var info = g1.getExtension('WEBGL_debug_renderer_info');
-                    d.gpu = info ? g1.getParameter(info.UNMASKED_RENDERER_WEBGL) : '(oculto)';
-                    d.maxTex = g1.getParameter(g1.MAX_TEXTURE_SIZE);
-                    // Ter half-float NÃO basta: o PMREM precisa FILTRAR essa
-                    // textura linearmente. Sem OES_texture_float_linear o mapa
-                    // de ambiente carrega sem erro e mesmo assim nao e
-                    // amostravel — foi o que enganou o diagnostico anterior,
-                    // que dizia "half float: sim" com o diamante invisivel.
-                    d.halfFloat = !!(g2 || g1.getExtension('OES_texture_half_float'));
-                    d.floatLinear = !!(g1.getExtension('OES_texture_float_linear') ||
-                        g1.getExtension('OES_texture_half_float_linear'));
-                }
-            } catch (e) { d.webgl = 'ERRO: ' + e.message; }
-
-            window.addEventListener('error', function (e) {
-                d.erros.push((e.message || 'erro') + ' @ ' +
-                    String(e.filename || '').split('/').pop() + ':' + (e.lineno || '?'));
-            }, true);
-            window.addEventListener('unhandledrejection', function (e) {
-                d.erros.push('promise: ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
-            });
-
-            if (!/[?&]diag=1/.test(location.search)) return;
-
-            function mostrar() {
-                var el = document.createElement('div');
-                el.setAttribute('style', 'position:fixed;inset:0;z-index:2147483647;' +
-                    'background:#111;color:#0f0;font:12px/1.5 monospace;padding:16px;' +
-                    'overflow:auto;-webkit-overflow-scrolling:touch;white-space:pre-wrap;word-break:break-word');
-                var linhas = [
-                    'DIAGNÓSTICO PRECIOSA   (toque para fechar)',
-                    '─────────────────────────────',
-                    'import map      : ' + (d.importmap ? 'SIM' : 'NÃO  <-- quebra tudo'),
-                    'modulepreload   : ' + (d.modulepreload ? 'SIM' : 'não (só perde velocidade)'),
-                    'WebGL           : ' + d.webgl,
-                    'GPU             : ' + (d.gpu || '-'),
-                    'textura máx     : ' + (d.maxTex || '-'),
-                    'half float      : ' + (d.halfFloat ? 'sim' : 'NÃO  <-- PMREM falha'),
-                    'filtro float    : ' + (d.floatLinear ? 'sim' : 'NÃO  <-- env nao amostravel'),
-                    '─────────────────────────────',
-                    'main.js rodou   : ' + (d.mainJs ? 'SIM (' + d.mainJs + 'ms)' : 'NÃO'),
-                    'initHero rodou  : ' + (d.initHero ? 'SIM (' + d.initHero + 'ms)' : 'NÃO'),
-                    'renderer criado : ' + (d.renderer || 'NÃO'),
-                    'HDRI            : ' + (d.hdri || 'não terminou'),
-                    'modelo .glb     : ' + (d.glb || 'não terminou'),
-                    'canvas na tela  : ' + (document.querySelector('.hero-canvas') ? 'SIM' : 'NÃO'),
-                    'canvas buffer   : ' + (function () {
-                        var c = document.querySelector('.hero-canvas');
-                        if (!c) return '-';
-                        var r = c.getBoundingClientRect();
-                        return c.width + 'x' + c.height + '  css ' +
-                            Math.round(r.width) + 'x' + Math.round(r.height);
-                    })(),
-                    'janela          : ' + window.innerWidth + 'x' + window.innerHeight +
-                        '  dpr ' + window.devicePixelRatio,
-                    'enquadramento   : ' + (d.enquadramento || '-'),
-                    'diamante        : ' + (d.diamante || '-'),
-                    'gate de GPU     : ' + (d.gateGpu || 'nunca desligou (bom)'),
-                    'materiais       : ' + (d.materiais || '-'),
-                    'modo leve       : ' + !!window.__preciosaLightMode,
-                    'watchdog agiu   : ' + !!window.__preciosaSafeMode,
-                    '─────────────────────────────',
-                    'ERROS (' + d.erros.length + '):',
-                ].concat(d.erros.length ? d.erros : ['  nenhum']).concat([
-                    '─────────────────────────────', d.ua,
-                ]);
-                el.textContent = linhas.join('\n');
-                el.onclick = function () { el.remove(); };
-                document.body.appendChild(el);
-            }
-            // NÃO esperar o evento 'load': ele só dispara quando TODO recurso
-            // termina, incluindo o vídeo de 3,6 MB do hero. No celular isso
-            // levava dezenas de segundos — ou nunca — e o painel não aparecia.
-            // O relógio corre a partir daqui, que é o começo de tudo.
-            setTimeout(function () {
-                if (document.body) mostrar();
-                else document.addEventListener('DOMContentLoaded', mostrar);
-            }, 12000);
-        })();
-    </script>
-
-    <!-- ============================================================
          CARGA EM PARALELO DA INTRO 3D
          Sem isto o navegador só descobre /vendor/three.js depois de baixar
          index.html -> main.js -> hero.js: quatro idas e voltas em sequência.
@@ -168,73 +58,34 @@
     <link rel="preload" as="image" href="/assets/img/hdri.jpg">
     <link rel="preload" as="fetch" href="/assets/img/diamond-compressed.glb">
 
+    <!-- Único script inline da página, e por um motivo que não tem outra
+         saída: precisa decidir ANTES do primeiro pixel se a intro será
+         pulada. Em módulo (que é adiado) o preloader piscaria na tela antes
+         de sumir. São 12 linhas e já existiam aqui antes.
+         A rede de segurança do preloader, que também morava aqui, virou
+         regra de CSS em style.css — lugar dela. -->
     <script>
-        // ANTI-GLITCH & PRELOADER LOGIC
-        // Executado ANTES do corpo renderizar para evitar flashes visuais.
-        //
-        // IMPORTANTE: este bloco é inline e SEM imports de propósito. Ele é a
-        // única parte da lógica do preloader que sempre roda, mesmo que os
-        // módulos ES (three/gsap/lenis, vindos da CDN esm.sh) nunca cheguem —
-        // cenário real no mobile com internet lenta ou instável.
         (function () {
-            var navEntry = performance.getEntriesByType("navigation")[0];
-            var isReload = navEntry && navEntry.type === "reload";
+            var nav = performance.getEntriesByType('navigation')[0];
 
-            if (isReload) {
-                // Se o usuário recarregou a página (F5), ele quer ver a intro novamente
+            if (nav && nav.type === 'reload') {
+                // Recarregou: quer ver a intro de novo.
                 sessionStorage.removeItem('preciosaVisited');
-            } else if (sessionStorage.getItem('preciosaVisited')) {
-                // Pular a intro só faz sentido quando a navegação veio de DENTRO
-                // do site — voltar da página da Débora não deve repetir 15s de
-                // abertura. Era essa a intenção original.
-                //
-                // Antes bastava a flag existir. Mas o sessionStorage vive
-                // enquanto a ABA viver, e no celular abas ficam abertas por
-                // semanas: depois da primeira visita, abrir o link de novo
-                // nunca mais mostrava o cristal. Reproduzido em teste — era a
-                // causa de "no iPhone/Android a intro não aparece".
-                var interno = false;
-                try {
-                    interno = !!document.referrer &&
-                        new URL(document.referrer).origin === location.origin;
-                } catch (e) { interno = false; }
-
-                if (interno) {
-                    document.documentElement.classList.add('skip-preloader');
-                    return;
-                }
-                // Chegada nova (link do WhatsApp, endereço digitado, atalho na
-                // tela inicial): é uma visita, e visita vê a intro.
-                sessionStorage.removeItem('preciosaVisited');
+                return;
             }
+            if (!sessionStorage.getItem('preciosaVisited')) return;
 
-            // ── MODO LEVE: REMOVIDO ──────────────────────────────────────
-            // Nenhuma condição desliga mais o 3D. A referência em
-            // designsystem/Site/script.js roda este MESMO diamante no celular
-            // — mesmo import map, mesmo three, mesmo GLTFLoader, mesmo PMREM,
-            // antialias ligado e DPR cheio — sem uma única verificação dessas,
-            // e funciona. Isso prova que o 3D nunca foi o problema: as travas
-            // defensivas em volta dele é que apagavam o cristal no celular.
-            window.__preciosaLightMode = false;
+            // Pular a intro só vale quando a navegação veio de DENTRO do site
+            // (voltar da página da Débora). Chegada nova — link do WhatsApp,
+            // endereço digitado, atalho — é visita, e visita vê a intro.
+            var interno = false;
+            try {
+                interno = !!document.referrer &&
+                    new URL(document.referrer).origin === location.origin;
+            } catch (e) { interno = false; }
 
-            // ── REDE DE SEGURANÇA ────────────────────────────────────────
-            // O fallback antigo (8s) vivia DENTRO de initHero. Se o módulo não
-            // carregasse, ele nunca era armado e o preloader — opaco e em
-            // z-index 9999 — ficava para sempre na frente da página. Este
-            // temporizador não depende de nada: revela o site na marra.
-            //
-            // Existe para UM caso: os módulos não chegarem. Não é régua de
-            // desempenho — com 9s ele virava isso e cortava a intro de
-            // qualquer celular mais lento. Enquanto espera, o usuário vê o
-            // preloader escrito "Iniciando sua experiência...", não uma tela
-            // morta. initHero cancela este timer ao assumir o controle.
-            window.__preciosaSafeMode = false;
-            window.__preciosaRelease = function () {
-                if (window.__preciosaSafeMode) return;
-                window.__preciosaSafeMode = true;
-                document.documentElement.classList.add('preloader-bypass');
-            };
-            window.__preciosaWatchdog = setTimeout(window.__preciosaRelease, 25000);
+            if (interno) document.documentElement.classList.add('skip-preloader');
+            else sessionStorage.removeItem('preciosaVisited');
         })();
     </script>
 </head>

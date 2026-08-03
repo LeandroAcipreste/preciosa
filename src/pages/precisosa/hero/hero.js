@@ -58,10 +58,6 @@ function setupVideoScrollControl(video) {
 }
 
 export function initHero(onIntroComplete) {
-    // Marcador do painel ?diag=1 — sem ele o painel dizia "initHero: NÃO"
-    // mesmo tendo rodado, o que jogaria a investigação para o lado errado.
-    if (window.__diag) window.__diag.initHero = Date.now() - window.__diag.inicio;
-
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
@@ -166,10 +162,6 @@ export function initHero(onIntroComplete) {
         if (typeof onIntroComplete === "function") onIntroComplete();
     }
 
-    // A aplicação assumiu: o watchdog do <head> não precisa mais agir. A partir
-    // daqui quem protege é o loadTimeout desta função.
-    clearTimeout(window.__preciosaWatchdog);
-
     // ==========================================
     // PULAR PRELOADER SE JÁ ESTIVER NAVEGANDO
     // ==========================================
@@ -198,26 +190,8 @@ export function initHero(onIntroComplete) {
     // Grava no cache da sessão que o site já foi acessado
     sessionStorage.setItem('preciosaVisited', 'true');
 
-    // ==========================================
-    // CAMINHO SEM 3D — um só, e de último caso
-    // ==========================================
-    // A referência de designsystem/Site/script.js roda o mesmo diamante no
-    // celular sem NENHUMA trava: mesmo import map, mesmo three, mesmo GLTF,
-    // mesmo PMREM, antialias ligado e DPR cheio. Ela funciona. Isso prova que
-    // o 3D nunca foi o problema — as travas defensivas em volta dele é que
-    // estavam desligando o cristal no celular.
-    //
-    // Ficou só esta: o watchdog do <head> já revelou a página porque os
-    // módulos NÃO chegaram a tempo. Nesse caso não há três.js carregado para
-    // rodar coisa alguma, então não é uma escolha, é uma constatação.
-    if (window.__preciosaSafeMode) {
-        triggerFallback(true);
-        return;
-    }
-
-    // Prazo generoso de propósito: isto é rede de segurança para download que
-    // FALHOU, não régua de desempenho. Cortar em 8s tirava o cristal de
-    // qualquer celular um pouco mais lento — que é exatamente a reclamação.
+    // Rede de segurança para download que FALHOU, não régua de desempenho:
+    // cortar em 8s tirava o cristal de qualquer celular um pouco mais lento.
     const loadTimeout = setTimeout(() => triggerFallback(false), 20000);
 
     // ==========================================
@@ -254,16 +228,13 @@ export function initHero(onIntroComplete) {
         // tela fica num canvas morto e a intro nunca termina.
         renderizador.domElement.addEventListener('webglcontextlost', (e) => {
             e.preventDefault();
-            if (window.__diag) window.__diag.erros.push('WebGL: contexto perdido');
             triggerFallback(false);
         });
 
-        if (window.__diag) window.__diag.renderer = 'ok';
     } catch (error) {
         // Antes este catch engolia o erro em silêncio — era por isso que uma
         // falha no iPhone ficava invisível.
         console.error('Intro 3D indisponível:', error);
-        if (window.__diag) window.__diag.erros.push('renderer: ' + error.message);
         triggerFallback();
         return;
     }
@@ -289,17 +260,14 @@ export function initHero(onIntroComplete) {
                 texture.dispose();
                 pmrem.dispose();
                 envCarregado = true;
-                if (window.__diag) window.__diag.hdri = 'ok';
             } catch (err) {
                 // PMREM usa render target de half-float. Em WebGL1 sem a
                 // extensão (aparelhos antigos) isso lança. O diamante fica sem
                 // reflexo do ambiente, mas a intro continua — melhor que nada.
                 console.warn('Mapa de ambiente indisponível:', err);
-                if (window.__diag) window.__diag.hdri = 'falhou: ' + err.message;
             }
             resolve();
         }, undefined, () => {
-            if (window.__diag) window.__diag.hdri = 'nao carregou';
             resolve();
         });
     });
@@ -307,10 +275,8 @@ export function initHero(onIntroComplete) {
     let objeto;
     const loadGLTF = new Promise((resolve) => {
         new GLTFLoader().load("/assets/img/diamond-compressed.glb", (gltf) => {
-            if (window.__diag) window.__diag.glb = 'ok';
             resolve(gltf.scene);
         }, undefined, (err) => {
-            if (window.__diag) window.__diag.glb = 'falhou';
             console.warn('Modelo 3D não carregou:', err);
             resolve(null);
         });
@@ -367,12 +333,6 @@ export function initHero(onIntroComplete) {
         const distancia = Math.max(Math.max(distanciaV, distanciaH) * 0.85, raio * 1.6);
         const finalZ = camera.position.z - distancia;
 
-        if (window.__diag) {
-            window.__diag.enquadramento =
-                `raio=${raio.toFixed(2)} aspect=${camera.aspect.toFixed(2)} ` +
-                `dist=${distancia.toFixed(2)} finalZ=${finalZ.toFixed(2)}`;
-        }
-
         // ==========================================
         // LUZ SEMPRE PRESENTE
         // ==========================================
@@ -407,7 +367,6 @@ export function initHero(onIntroComplete) {
         // invisível. Aqui o diamante troca para um material que funciona com
         // LUZES comuns — menos suntuoso, porém SEMPRE visível.
         if (!envCarregado) {
-            if (window.__diag) window.__diag.erros.push('env ausente: usando material de contingência');
 
             const luzPrincipal = new THREE.DirectionalLight(0xffffff, 2.6);
             luzPrincipal.position.set(2, 4, 5);
@@ -434,7 +393,6 @@ export function initHero(onIntroComplete) {
         }
 
         const materiais = [];
-        const descricaoMats = [];
         objeto.traverse((child) => {
             if (child.isMesh && child.material) {
                 const mats = Array.isArray(child.material) ? child.material : [child.material];
@@ -460,11 +418,6 @@ export function initHero(onIntroComplete) {
                     if (mat.roughness !== undefined) mat.roughness = Math.min(mat.roughness, 0.35);
                     mat.envMapIntensity = 1.3;
 
-                    descricaoMats.push(
-                        mat.type + ' op=' + mat.opacity +
-                        ' metal=' + (mat.metalness ?? '-') +
-                        ' rough=' + (mat.roughness ?? '-'));
-
                     mat.transparent = true;
                     mat.opacity = 0;
                     mat.needsUpdate = true;
@@ -472,11 +425,6 @@ export function initHero(onIntroComplete) {
                 });
             }
         });
-
-        if (window.__diag) {
-            window.__diag.materiais = materiais.length + ' mat: ' +
-                descricaoMats.slice(0, 3).join(' | ');
-        }
 
         // ==========================================
         // MASTER TIMELINE
@@ -599,17 +547,8 @@ export function initHero(onIntroComplete) {
     ScrollTrigger.create({
         trigger: ".main-preciosa",
         start: "top bottom",
-        onEnter: () => {
-            heroVisible = false;
-            if (window.__diag) {
-                window.__diag.gateGpu = 'DESLIGOU em ' +
-                    (Date.now() - window.__diag.inicio) + 'ms, scrollY=' + Math.round(window.scrollY);
-            }
-        },
-        onLeaveBack: () => {
-            heroVisible = true;
-            if (window.__diag) window.__diag.gateGpu = 'religou';
-        },
+        onEnter: () => { heroVisible = false; },
+        onLeaveBack: () => { heroVisible = true; },
     });
 
     function animar() {
@@ -634,22 +573,6 @@ export function initHero(onIntroComplete) {
         if (objeto && renderizador && cena && camera) {
             objeto.rotation.y += 0.005;
             renderizador.render(cena, camera);
-
-            // Telemetria do painel ?diag=1: ONDE o diamante está na tela e que
-            // tamanho ocupa. Se ele estiver sendo desenhado fora do quadro, ou
-            // com tamanho zero, é aqui que aparece — sem isso, "canvas na tela:
-            // SIM" não distingue um diamante visível de um invisível.
-            if (window.__diag) {
-                const p = objeto.position.clone().project(camera);
-                const r = renderizador.domElement.getBoundingClientRect();
-                const x = Math.round((p.x * 0.5 + 0.5) * r.width);
-                const y = Math.round((-p.y * 0.5 + 0.5) * r.height);
-                const dist = camera.position.distanceTo(objeto.position);
-                const dentro = p.x >= -1 && p.x <= 1 && p.y >= -1 && p.y <= 1 && p.z < 1;
-                window.__diag.diamante =
-                    `x=${x} y=${y} dist=${dist.toFixed(2)} ` +
-                    `${dentro ? 'NO QUADRO' : 'FORA DO QUADRO'}`;
-            }
         }
     }
     animar();
