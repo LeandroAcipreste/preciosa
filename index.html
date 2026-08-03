@@ -181,31 +181,33 @@
                 sessionStorage.removeItem('preciosaVisited');
             }
 
-            // ── MODO LEVE ────────────────────────────────────────────────
-            // APENAS para conexão realmente inviável (2G real). O `saveData`
-            // saiu do gatilho: muito celular no Brasil roda com "Economizador
-            // de dados" LIGADO no Chrome, e com ele aqui o cristal era cortado
-            // SEMPRE nesses aparelhos — "tudo funciona, só o diamante não
-            // aparece", enquanto no DevTools (saveData=false) funcionava.
-            // O 3D inteiro pesa ~170 KB; não justifica matar a marca do site.
-            var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-            var eff = (conn && conn.effectiveType) || '';
-            var light = !!(conn && (eff === 'slow-2g' || eff === '2g'));
-            window.__preciosaLightMode = light;
+            // ── MODO LEVE: REMOVIDO ──────────────────────────────────────
+            // Nenhuma condição desliga mais o 3D. A referência em
+            // designsystem/Site/script.js roda este MESMO diamante no celular
+            // — mesmo import map, mesmo three, mesmo GLTFLoader, mesmo PMREM,
+            // antialias ligado e DPR cheio — sem uma única verificação dessas,
+            // e funciona. Isso prova que o 3D nunca foi o problema: as travas
+            // defensivas em volta dele é que apagavam o cristal no celular.
+            window.__preciosaLightMode = false;
 
             // ── REDE DE SEGURANÇA ────────────────────────────────────────
             // O fallback antigo (8s) vivia DENTRO de initHero. Se o módulo não
             // carregasse, ele nunca era armado e o preloader — opaco e em
             // z-index 9999 — ficava para sempre na frente da página. Este
             // temporizador não depende de nada: revela o site na marra.
+            //
+            // Existe para UM caso: os módulos não chegarem. Não é régua de
+            // desempenho — com 9s ele virava isso e cortava a intro de
+            // qualquer celular mais lento. Enquanto espera, o usuário vê o
+            // preloader escrito "Iniciando sua experiência...", não uma tela
+            // morta. initHero cancela este timer ao assumir o controle.
             window.__preciosaSafeMode = false;
             window.__preciosaRelease = function () {
                 if (window.__preciosaSafeMode) return;
                 window.__preciosaSafeMode = true;
                 document.documentElement.classList.add('preloader-bypass');
             };
-            // Cancelado por initHero assim que a aplicação assume o controle.
-            window.__preciosaWatchdog = setTimeout(window.__preciosaRelease, light ? 5000 : 9000);
+            window.__preciosaWatchdog = setTimeout(window.__preciosaRelease, 25000);
         })();
     </script>
 </head>

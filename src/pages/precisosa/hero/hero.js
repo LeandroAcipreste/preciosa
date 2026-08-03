@@ -190,24 +190,26 @@ export function initHero(onIntroComplete) {
     sessionStorage.setItem('preciosaVisited', 'true');
 
     // ==========================================
-    // CAMINHOS SEM 3D
+    // CAMINHO SEM 3D — um só, e de último caso
     // ==========================================
-    // 1) O watchdog já revelou a página: o módulo chegou tarde demais e não há
-    //    mais intro a tocar — só ligar o que a página precisa para funcionar.
+    // A referência de designsystem/Site/script.js roda o mesmo diamante no
+    // celular sem NENHUMA trava: mesmo import map, mesmo three, mesmo GLTF,
+    // mesmo PMREM, antialias ligado e DPR cheio. Ela funciona. Isso prova que
+    // o 3D nunca foi o problema — as travas defensivas em volta dele é que
+    // estavam desligando o cristal no celular.
+    //
+    // Ficou só esta: o watchdog do <head> já revelou a página porque os
+    // módulos NÃO chegaram a tempo. Nesse caso não há três.js carregado para
+    // rodar coisa alguma, então não é uma escolha, é uma constatação.
     if (window.__preciosaSafeMode) {
         triggerFallback(true);
         return;
     }
 
-    // 2) Conexão fraca / economia de dados: baixar mapa de ambiente + modelo 3D
-    //    é o que fazia o preloader se arrastar no celular. Entra com a intro
-    //    leve, que não custa nenhum download extra.
-    if (window.__preciosaLightMode) {
-        triggerFallback(false);
-        return;
-    }
-
-    const loadTimeout = setTimeout(() => triggerFallback(false), 8000);
+    // Prazo generoso de propósito: isto é rede de segurança para download que
+    // FALHOU, não régua de desempenho. Cortar em 8s tirava o cristal de
+    // qualquer celular um pouco mais lento — que é exatamente a reclamação.
+    const loadTimeout = setTimeout(() => triggerFallback(false), 20000);
 
     // ==========================================
     // THREE.JS SETUP
@@ -218,15 +220,11 @@ export function initHero(onIntroComplete) {
         camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 4;
 
-        renderizador = new THREE.WebGLRenderer({
-            // No iPhone o antialias multiplica o custo de memória do buffer, e
-            // o iOS derruba o contexto WebGL sob pressão de memória — com dois
-            // vídeos decodificando na mesma página, isso é real. Num diamante
-            // pequeno em tela de alta densidade a diferença não se vê.
-            antialias: !isMobileScreen,
-            alpha: true,
-            powerPreference: 'default',
-        });
+        // Configuração IDÊNTICA à de designsystem/Site/script.js, que roda
+        // este mesmo diamante no celular sem problema. Eu havia desligado o
+        // antialias e baixado o DPR no mobile por precaução — mas era palpite
+        // meu, e a referência prova que não é necessário.
+        renderizador = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         if (!renderizador || !renderizador.getContext()) {
             throw new Error("WebGL indisponível.");
         }
@@ -234,10 +232,9 @@ export function initHero(onIntroComplete) {
         renderizador.outputColorSpace = THREE.SRGBColorSpace;
         renderizador.toneMapping = THREE.ACESFilmicToneMapping;
         renderizador.toneMappingExposure = 1.2;
-        // Clamp do pixel ratio: em telas 2x/3x renderizar em DPR cheio é brutal
-        // para a GPU e não agrega qualidade visível num diamante pequeno.
-        // No mobile o teto cai para 1.5 — o iPhone chega a DPR 3.
-        renderizador.setPixelRatio(Math.min(window.devicePixelRatio, isMobileScreen ? 1.5 : 2));
+        // Único desvio da referência (que usa DPR cheio): teto em 2. Acima
+        // disso são 4x mais pixels sem diferença visível num diamante pequeno.
+        renderizador.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         div3d = document.querySelector(".hero-div3d");
         if (!div3d) { triggerFallback(); return; }
