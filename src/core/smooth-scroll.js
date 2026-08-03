@@ -59,7 +59,25 @@ export function createSmoothScroll(options = {}) {
     gsap.ticker.add((time) => {
         lenis.raf(time * 1000);
     });
-    gsap.ticker.lagSmoothing(0);
+
+    // ⚠️ AQUI MORAVA lagSmoothing(0).
+    //
+    // É a recomendação da documentação do Lenis, para o scroll não "perder"
+    // deslocamento durante um engasgo. Mas lagSmoothing(0) DESLIGA a proteção
+    // do GSAP contra saltos: se um frame demora 3s, toda animação avança 3s
+    // de uma vez.
+    //
+    // A intro do hero é uma sequência cronometrada com tweens de duração ZERO
+    // em instantes fixos (cada letra é um onComplete). Num salto, todos esses
+    // instantes são atravessados no mesmo tick e os onComplete disparam
+    // juntos: as palavras aparecem todas de uma vez e a cortina sobe. No
+    // Safari do iPhone a travada é certa — inicialização do WebGL com dois
+    // vídeos na página e canvas em DPR 3.
+    //
+    // Reproduzido: travando a thread principal por 10s durante a intro, a
+    // cortina subia num único quadro. Com o padrão do GSAP, qualquer frame
+    // acima de 500ms passa a contar como 33ms e a intro segue o roteiro.
+    gsap.ticker.lagSmoothing(500, 33);
 
     // Mantém o ScrollTrigger atualizado a cada scroll do Lenis.
     lenis.on('scroll', ScrollTrigger.update);
