@@ -69,6 +69,10 @@ export function initHero(onIntroComplete) {
 
     const isMobileScreen = window.innerWidth < 768;
 
+    // Vira true só quando a cortina do hero sobe. Enquanto for false, o laço
+    // de render NUNCA pode ser interrompido: a intro está em cena.
+    let introTerminou = false;
+
     function initHeroScrollAnimations() {
         gsap.to(".home-text-mask-container", {
             scrollTrigger: {
@@ -113,6 +117,7 @@ export function initHero(onIntroComplete) {
 
         const heroMain = document.querySelector(".hero-main");
         if (heroMain) heroMain.classList.add("is-gone");
+        introTerminou = true; // libera a economia de GPU do laço de render
 
         document.body.classList.remove("intro-active");
 
@@ -320,9 +325,11 @@ export function initHero(onIntroComplete) {
         const h2s = document.querySelectorAll(".hero-title");
         const splits = Array.from(h2s).map((h2) => splitTextChars(h2));
 
-        const isMobile = window.innerWidth < 768;
-        const startZ = isMobile ? -20 : -12;
-        const startY = isMobile ? 3 : 2;
+        // Sem ramo por tamanho de tela: são os mesmos valores do commit
+        // "introdução funcionando perfeitamente" e do designsystem/Site.
+        // O -20/3 que existia para mobile jogava o diamante longe demais.
+        const startZ = -12;
+        const startY = 2;
 
         objeto = sceneObject;
         objeto.position.z = startZ;
@@ -482,6 +489,7 @@ export function initHero(onIntroComplete) {
         // 5. CORTINA SOBE — vídeo já está rodando continuamente no fundo
         masterTl.add(() => {
             document.querySelector(".hero-main")?.classList.add("is-gone");
+            introTerminou = true; // só a partir daqui o laço pode pular frames
             if (typeof onIntroComplete === "function") onIntroComplete();
         }, endIntroTime);
 
@@ -532,13 +540,38 @@ export function initHero(onIntroComplete) {
     ScrollTrigger.create({
         trigger: ".main-preciosa",
         start: "top bottom",
-        onEnter: () => { heroVisible = false; },
-        onLeaveBack: () => { heroVisible = true; },
+        onEnter: () => {
+            heroVisible = false;
+            if (window.__diag) {
+                window.__diag.gateGpu = 'DESLIGOU em ' +
+                    (Date.now() - window.__diag.inicio) + 'ms, scrollY=' + Math.round(window.scrollY);
+            }
+        },
+        onLeaveBack: () => {
+            heroVisible = true;
+            if (window.__diag) window.__diag.gateGpu = 'religou';
+        },
     });
 
     function animar() {
         requestAnimationFrame(animar);
-        if (!heroVisible) return;              // Fora de tela: não gasta GPU
+
+        // ⚠️ REGRESSÃO CORRIGIDA AQUI.
+        // Este gate ("não gasta GPU fora da tela") não existia no commit
+        // "introdução funcionando perfeitamente" nem no designsystem/Site,
+        // que renderizam sempre. Ele foi acrescentado depois como otimização
+        // de scroll e matava o diamante no iPhone:
+        //
+        // o gatilho é `.main-preciosa` com start "top bottom", e o
+        // .home-content usa min-height:100dvh. No iOS, dvh é EXATAMENTE a
+        // altura visível, então .main-preciosa começa cravado na borda
+        // inferior da tela: o onEnter dispara com scroll ZERO, heroVisible
+        // vira false antes do primeiro frame e o laço nunca desenha nada.
+        // No desktop a conta não bate na borda, por isso lá passava.
+        //
+        // Durante a intro a cortina ESTÁ na tela por definição — não há o que
+        // otimizar. A economia só passa a valer depois que ela sobe.
+        if (introTerminou && !heroVisible) return;
         if (objeto && renderizador && cena && camera) {
             objeto.rotation.y += 0.005;
             renderizador.render(cena, camera);
