@@ -51,12 +51,12 @@
     <link rel="modulepreload" href="/src/pages/precisosa/hero/hero.js">
     <link rel="modulepreload" href="/src/core/smooth-scroll.js">
     <!-- Assets que a intro 3D precisa antes de poder começar.
-         Sem o atributo crossorigin no .glb: o GLTFLoader busca com fetch
-         same-origin, e o preload precisa casar o modo de credenciais —
-         com crossorigin o navegador descartava o preload e baixava o
-         modelo DUAS vezes (aviso visível no console). -->
-    <link rel="preload" as="image" href="/assets/img/hdri.jpg">
-    <link rel="preload" as="fetch" href="/assets/img/diamond-compressed.glb">
+         O 'crossorigin' aqui NÃO é opcional: o TextureLoader do three usa
+         crossOrigin='anonymous' e o preload as=fetch é sempre modo CORS.
+         Sem casar o modo de credenciais o navegador DESCARTA o preload e
+         baixa cada arquivo duas vezes — medido: 2 requisições de cada. -->
+    <link rel="preload" as="image" href="/assets/img/hdri.jpg" crossorigin>
+    <link rel="preload" as="fetch" href="/assets/img/diamond-compressed.glb" crossorigin>
 
     <!-- Nenhum script inline: a decisão de pular ou não a intro vive em
          src/pages/precisosa/hero/hero.js, junto com o resto da lógica do
