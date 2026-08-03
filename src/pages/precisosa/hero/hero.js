@@ -58,6 +58,10 @@ function setupVideoScrollControl(video) {
 }
 
 export function initHero(onIntroComplete) {
+    // Marcador do painel ?diag=1 — sem ele o painel dizia "initHero: NÃO"
+    // mesmo tendo rodado, o que jogaria a investigação para o lado errado.
+    if (window.__diag) window.__diag.initHero = Date.now() - window.__diag.inicio;
+
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }

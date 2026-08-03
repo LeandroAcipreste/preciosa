@@ -112,8 +112,14 @@
                 el.onclick = function () { el.remove(); };
                 document.body.appendChild(el);
             }
-            // 14s: tempo de sobra para a intro tentar carregar em rede móvel
-            window.addEventListener('load', function () { setTimeout(mostrar, 14000); });
+            // NÃO esperar o evento 'load': ele só dispara quando TODO recurso
+            // termina, incluindo o vídeo de 3,6 MB do hero. No celular isso
+            // levava dezenas de segundos — ou nunca — e o painel não aparecia.
+            // O relógio corre a partir daqui, que é o começo de tudo.
+            setTimeout(function () {
+                if (document.body) mostrar();
+                else document.addEventListener('DOMContentLoaded', mostrar);
+            }, 12000);
         })();
     </script>
 
