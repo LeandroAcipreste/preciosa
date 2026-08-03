@@ -58,9 +58,45 @@
     <link rel="preload" as="image" href="/assets/img/hdri.jpg" crossorigin>
     <link rel="preload" as="fetch" href="/assets/img/diamond-compressed.glb" crossorigin>
 
-    <!-- Nenhum script inline: a decisão de pular ou não a intro vive em
-         src/pages/precisosa/hero/hero.js, junto com o resto da lógica do
-         preloader. A rede de segurança virou regra de CSS em style.css. -->
+    <!-- ============================================================
+         TRINCO DE EMERGÊNCIA
+         Script CLÁSSICO (não módulo) e sem imports, de propósito: ele existe
+         para o caso em que o carregamento dos módulos falha, então não pode
+         depender deles.
+
+         Complementa a rede de segurança em CSS (style.css), que age por
+         tempo — 25s. Esta age no INSTANTE do erro.
+
+         Duas guardas que o caso pede e que não são óbvias:
+         · erro de RECURSO (uma imagem 404, por exemplo) também dispara o
+           evento 'error' na fase de captura. Se não filtrasse, um favicon
+           ausente mataria a intro de todo mundo.
+         · só age ANTES da intro começar. Depois que o preloader saiu, um
+           erro tardio em qualquer animação não deve atropelar a sequência.
+         ============================================================ -->
+    <script>
+        (function () {
+            function liberar() {
+                var pre = document.getElementById('preloader');
+                if (!pre || pre.className.indexOf('is-hidden') !== -1) return;
+
+                pre.className += ' is-hidden';
+                var hero = document.querySelector('.hero-main');
+                if (hero) hero.className += ' is-gone';
+                if (document.body) {
+                    document.body.className =
+                        document.body.className.replace('intro-active', '');
+                }
+            }
+
+            window.addEventListener('error', function (e) {
+                if (e && e.target && e.target !== window) return; // recurso, não JS
+                liberar();
+            }, true);
+
+            window.addEventListener('unhandledrejection', liberar);
+        })();
+    </script>
 </head>
 
 <body class="global-body">
