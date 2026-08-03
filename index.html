@@ -58,36 +58,9 @@
     <link rel="preload" as="image" href="/assets/img/hdri.jpg">
     <link rel="preload" as="fetch" href="/assets/img/diamond-compressed.glb">
 
-    <!-- Único script inline da página, e por um motivo que não tem outra
-         saída: precisa decidir ANTES do primeiro pixel se a intro será
-         pulada. Em módulo (que é adiado) o preloader piscaria na tela antes
-         de sumir. São 12 linhas e já existiam aqui antes.
-         A rede de segurança do preloader, que também morava aqui, virou
-         regra de CSS em style.css — lugar dela. -->
-    <script>
-        (function () {
-            var nav = performance.getEntriesByType('navigation')[0];
-
-            if (nav && nav.type === 'reload') {
-                // Recarregou: quer ver a intro de novo.
-                sessionStorage.removeItem('preciosaVisited');
-                return;
-            }
-            if (!sessionStorage.getItem('preciosaVisited')) return;
-
-            // Pular a intro só vale quando a navegação veio de DENTRO do site
-            // (voltar da página da Débora). Chegada nova — link do WhatsApp,
-            // endereço digitado, atalho — é visita, e visita vê a intro.
-            var interno = false;
-            try {
-                interno = !!document.referrer &&
-                    new URL(document.referrer).origin === location.origin;
-            } catch (e) { interno = false; }
-
-            if (interno) document.documentElement.classList.add('skip-preloader');
-            else sessionStorage.removeItem('preciosaVisited');
-        })();
-    </script>
+    <!-- Nenhum script inline: a decisão de pular ou não a intro vive em
+         src/pages/precisosa/hero/hero.js, junto com o resto da lógica do
+         preloader. A rede de segurança virou regra de CSS em style.css. -->
 </head>
 
 <body class="global-body">

@@ -163,10 +163,36 @@ export function initHero(onIntroComplete) {
     }
 
     // ==========================================
-    // PULAR PRELOADER SE JÁ ESTIVER NAVEGANDO
+    // A INTRO DEVE TOCAR?
     // ==========================================
-    // Se o usuário já carregou essa aba antes e só está voltando da página da Débora, pulamos o carregamento 3D inteiro.
-    if (sessionStorage.getItem('preciosaVisited')) {
+    // Esta decisão morava num script inline no index.html. Agora vive aqui,
+    // junto com o resto da lógica do preloader.
+    //
+    //   recarregou (F5 / puxar para atualizar) -> toca de novo
+    //   veio de DENTRO do site (voltar da Débora) -> pula, para não repetir
+    //   chegada nova (WhatsApp, endereço digitado, atalho) -> toca
+    //
+    // O sessionStorage sozinho não serve como critério: ele vive enquanto a
+    // ABA viver, e no celular abas ficam abertas por semanas — depois da
+    // primeira visita, abrir o link de novo nunca mais mostrava o cristal.
+    const navegacao = performance.getEntriesByType('navigation')[0];
+    const recarregou = !!navegacao && navegacao.type === 'reload';
+
+    let veioDeDentro = false;
+    try {
+        veioDeDentro = !!document.referrer &&
+            new URL(document.referrer).origin === location.origin;
+    } catch (e) {
+        veioDeDentro = false;
+    }
+
+    const pularIntro = !recarregou && veioDeDentro &&
+        sessionStorage.getItem('preciosaVisited');
+
+    if (!pularIntro) sessionStorage.removeItem('preciosaVisited');
+
+    if (pularIntro) {
+        document.documentElement.classList.add('skip-preloader');
         document.getElementById("preloader")?.classList.add("is-hidden");
         document.querySelector(".hero-main")?.classList.add("is-gone");
         document.body.classList.remove("intro-active");
@@ -215,9 +241,9 @@ export function initHero(onIntroComplete) {
         renderizador.outputColorSpace = THREE.SRGBColorSpace;
         renderizador.toneMapping = THREE.ACESFilmicToneMapping;
         renderizador.toneMappingExposure = 1.2;
-        // Único desvio da referência (que usa DPR cheio): teto em 2. Acima
-        // disso são 4x mais pixels sem diferença visível num diamante pequeno.
-        renderizador.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        // Igual ao commit "introdução funcionando perfeitamente" e ao
+        // designsystem/Site: DPR cheio, sem teto.
+        renderizador.setPixelRatio(window.devicePixelRatio);
 
         div3d = document.querySelector(".hero-div3d");
         if (!div3d) { triggerFallback(); return; }
@@ -302,36 +328,11 @@ export function initHero(onIntroComplete) {
         objeto.position.y = startY;
         cena.add(objeto);
 
-        // ==========================================
-        // ENQUADRAMENTO FINAL — calculado, não chutado
-        // ==========================================
-        // O valor antigo era fixo: 3.5 no celular contra 3.2 no desktop. Com a
-        // câmera em z=4, isso deixa o diamante a 0,5 unidade no celular e a 0,8
-        // no desktop — ou seja, MAIS PERTO na tela menor, o oposto do
-        // necessário. E o FOV do three é VERTICAL: numa tela estreita e alta a
-        // largura visível encolhe junto (40° viram ~21° de horizontal), então a
-        // janela fica menor que o próprio diamante. A câmera acabava dentro da
-        // malha, e o interior de uma malha com faces viradas para fora não
-        // desenha nada: diamante invisível, sem nenhum erro no console.
-        //
-        // Agora a distância vem do tamanho real do modelo e da proporção real
-        // da tela. Funciona em qualquer aparelho, sem número mágico.
-        const caixa = new THREE.Box3().setFromObject(objeto);
-        const tamanho = caixa.getSize(new THREE.Vector3());
-        const raio = Math.max(tamanho.x, tamanho.y, tamanho.z) / 2;
-
-        const fovV = THREE.MathUtils.degToRad(camera.fov);
-        const distanciaV = raio / Math.tan(fovV / 2);              // cabe na altura
-        const distanciaH = raio / (Math.tan(fovV / 2) * camera.aspect); // cabe na largura
-
-        // 0.85 mantém a intenção original — o diamante fecha a intro tomando a
-        // tela, levemente maior que o quadro. O que muda é que agora isso é
-        // relativo ao tamanho do modelo (raio 1.0) e à proporção real da tela,
-        // então a câmera nunca mais termina DENTRO da malha: no desktop ficava
-        // a 0.8 e no celular a 0.5 de um raio 1.0. O segundo termo é o piso de
-        // segurança que garante isso em qualquer aparelho.
-        const distancia = Math.max(Math.max(distanciaV, distanciaH) * 0.85, raio * 1.6);
-        const finalZ = camera.position.z - distancia;
+        // Mesmo valor do commit "introdução funcionando perfeitamente" e do
+        // designsystem/Site: 3.2 fixo, sem ramo por tamanho de tela. O 3.5 que
+        // existia só para mobile deixava o diamante AINDA mais perto numa tela
+        // menor, o oposto do necessário.
+        const finalZ = 3.2;
 
         // ==========================================
         // LUZ SEMPRE PRESENTE

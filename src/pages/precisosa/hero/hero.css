@@ -52,11 +52,31 @@
     background-color: transparent;
 }
 
+/* O canvas do three.js.
+   Três coisas aqui existem por causa do WebKit (iPhone), onde o diamante era
+   desenhado mas não chegava à tela — o texto da intro animava normalmente,
+   provando que o laço de render rodava:
+
+   1. width junto com height. Antes só a altura era forçada e a largura ficava
+      por conta do estilo inline do three, que usa window.innerHeight. No iOS
+      100vh (a altura do .hero-main) é MAIOR que window.innerHeight por causa
+      da barra do Safari, então o canvas ficava com medidas inconsistentes.
+
+   2. z-index acima dos .hero-bg-left/right, que têm z-index: 0. Sem valor
+      explícito o canvas fica em 'auto' e a ordem de pintura passa a depender
+      de como o navegador promove as camadas.
+
+   3. translateZ(0): força camada de composição própria. O .hero-main é
+      position:fixed com overflow:hidden E transform ao mesmo tempo —
+      combinação que o WebKit sabidamente erra ao compor canvas WebGL. */
 .hero-canvas {
     position: absolute;
-    height: 100% !important;
     top: 0;
     left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1;
+    transform: translateZ(0);
 }
 
 .hero-title {
