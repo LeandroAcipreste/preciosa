@@ -101,6 +101,17 @@
                     'HDRI            : ' + (d.hdri || 'não terminou'),
                     'modelo .glb     : ' + (d.glb || 'não terminou'),
                     'canvas na tela  : ' + (document.querySelector('.hero-canvas') ? 'SIM' : 'NÃO'),
+                    'canvas buffer   : ' + (function () {
+                        var c = document.querySelector('.hero-canvas');
+                        if (!c) return '-';
+                        var r = c.getBoundingClientRect();
+                        return c.width + 'x' + c.height + '  css ' +
+                            Math.round(r.width) + 'x' + Math.round(r.height);
+                    })(),
+                    'janela          : ' + window.innerWidth + 'x' + window.innerHeight +
+                        '  dpr ' + window.devicePixelRatio,
+                    'enquadramento   : ' + (d.enquadramento || '-'),
+                    'diamante        : ' + (d.diamante || '-'),
                     'modo leve       : ' + !!window.__preciosaLightMode,
                     'watchdog agiu   : ' + !!window.__preciosaSafeMode,
                     '─────────────────────────────',

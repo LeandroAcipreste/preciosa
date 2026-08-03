@@ -323,12 +323,48 @@ export function initHero(onIntroComplete) {
         const isMobile = window.innerWidth < 768;
         const startZ = isMobile ? -20 : -12;
         const startY = isMobile ? 3 : 2;
-        const finalZ = isMobile ? 3.5 : 3.2;
 
         objeto = sceneObject;
         objeto.position.z = startZ;
         objeto.position.y = startY;
         cena.add(objeto);
+
+        // ==========================================
+        // ENQUADRAMENTO FINAL — calculado, não chutado
+        // ==========================================
+        // O valor antigo era fixo: 3.5 no celular contra 3.2 no desktop. Com a
+        // câmera em z=4, isso deixa o diamante a 0,5 unidade no celular e a 0,8
+        // no desktop — ou seja, MAIS PERTO na tela menor, o oposto do
+        // necessário. E o FOV do three é VERTICAL: numa tela estreita e alta a
+        // largura visível encolhe junto (40° viram ~21° de horizontal), então a
+        // janela fica menor que o próprio diamante. A câmera acabava dentro da
+        // malha, e o interior de uma malha com faces viradas para fora não
+        // desenha nada: diamante invisível, sem nenhum erro no console.
+        //
+        // Agora a distância vem do tamanho real do modelo e da proporção real
+        // da tela. Funciona em qualquer aparelho, sem número mágico.
+        const caixa = new THREE.Box3().setFromObject(objeto);
+        const tamanho = caixa.getSize(new THREE.Vector3());
+        const raio = Math.max(tamanho.x, tamanho.y, tamanho.z) / 2;
+
+        const fovV = THREE.MathUtils.degToRad(camera.fov);
+        const distanciaV = raio / Math.tan(fovV / 2);              // cabe na altura
+        const distanciaH = raio / (Math.tan(fovV / 2) * camera.aspect); // cabe na largura
+
+        // 0.85 mantém a intenção original — o diamante fecha a intro tomando a
+        // tela, levemente maior que o quadro. O que muda é que agora isso é
+        // relativo ao tamanho do modelo (raio 1.0) e à proporção real da tela,
+        // então a câmera nunca mais termina DENTRO da malha: no desktop ficava
+        // a 0.8 e no celular a 0.5 de um raio 1.0. O segundo termo é o piso de
+        // segurança que garante isso em qualquer aparelho.
+        const distancia = Math.max(Math.max(distanciaV, distanciaH) * 0.85, raio * 1.6);
+        const finalZ = camera.position.z - distancia;
+
+        if (window.__diag) {
+            window.__diag.enquadramento =
+                `raio=${raio.toFixed(2)} aspect=${camera.aspect.toFixed(2)} ` +
+                `dist=${distancia.toFixed(2)} finalZ=${finalZ.toFixed(2)}`;
+        }
 
         // ==========================================
         // FALLBACK DE VISIBILIDADE DO DIAMANTE
@@ -506,6 +542,22 @@ export function initHero(onIntroComplete) {
         if (objeto && renderizador && cena && camera) {
             objeto.rotation.y += 0.005;
             renderizador.render(cena, camera);
+
+            // Telemetria do painel ?diag=1: ONDE o diamante está na tela e que
+            // tamanho ocupa. Se ele estiver sendo desenhado fora do quadro, ou
+            // com tamanho zero, é aqui que aparece — sem isso, "canvas na tela:
+            // SIM" não distingue um diamante visível de um invisível.
+            if (window.__diag) {
+                const p = objeto.position.clone().project(camera);
+                const r = renderizador.domElement.getBoundingClientRect();
+                const x = Math.round((p.x * 0.5 + 0.5) * r.width);
+                const y = Math.round((-p.y * 0.5 + 0.5) * r.height);
+                const dist = camera.position.distanceTo(objeto.position);
+                const dentro = p.x >= -1 && p.x <= 1 && p.y >= -1 && p.y <= 1 && p.z < 1;
+                window.__diag.diamante =
+                    `x=${x} y=${y} dist=${dist.toFixed(2)} ` +
+                    `${dentro ? 'NO QUADRO' : 'FORA DO QUADRO'}`;
+            }
         }
     }
     animar();
