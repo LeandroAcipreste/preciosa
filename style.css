@@ -823,6 +823,41 @@ html.skip-preloader .hero-main {
         max-width: 100%;
         overflow: hidden; /* Necessário para o clip da animação funcionar no mobile */
         pointer-events: none;
+
+        /* Troca da máscara por dois gradientes sobrepostos — só no mobile.
+           mask-image obriga o navegador a compor a camada INTEIRA pixel a pixel
+           contra o gradiente de alfa. Aqui dentro roda uma animação infinita
+           com 10 imagens, então essa recomposição acontece a cada quadro. No
+           WebKit é caro o bastante para travar a rolagem; no Chrome do Android
+           passa batido — casa com "no Android está perfeito".
+
+           O resultado na tela é o mesmo: a máscara revelava o fundo da dobra
+           nas pontas, e estes gradientes pintam exatamente esse mesmo fundo
+           (#fdf2f5) desvanecendo. A diferença é que pintar dois gradientes
+           opacos é trabalho trivial, e mascarar a camada toda não é. */
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+
+    .space-gallery-container::before,
+    .space-gallery-container::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 15%; /* mesma extensão de desvanecimento da máscara original */
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .space-gallery-container::before {
+        top: 0;
+        background: linear-gradient(to bottom, #fdf2f5, rgba(253, 242, 245, 0));
+    }
+
+    .space-gallery-container::after {
+        bottom: 0;
+        background: linear-gradient(to top, #fdf2f5, rgba(253, 242, 245, 0));
     }
 }
 

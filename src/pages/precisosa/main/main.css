@@ -437,6 +437,18 @@
         text-align: center;
         border-radius: 20px;
         padding: 20px 24px;
+
+        /* Sem backdrop-filter no mobile. Ele obriga o navegador a LER de volta
+           tudo que está atrás do elemento e desfocar, a cada quadro em que a
+           camada é composta — durante a rolagem, isso é todo quadro. No WebKit
+           é um dos caminhos mais lentos que existem.
+
+           O fundo sobe de 0.6 para 0.92 de opacidade: com o desfoque removido,
+           é o que mantém o texto legível sobre o que passa atrás. A mesma
+           decisão já havia sido tomada nos cards de serviços (services.css:120). */
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(255, 255, 255, 0.92);
     }
 }
 
@@ -480,11 +492,20 @@
         transform: translateX(-50%) translateZ(0);
     }
 
-    /* Brilho dourado estático nas joias.
+    /* Brilho dourado estático nas joias — SÓ nas pedras grandes.
        (Antes havia uma animação 'gemShimmer' infinita de drop-shadow em CADA
-       imagem do caminho — dezenas de nós SVG repintando sem parar, o que
-       travava o scroll no mobile. Mantemos o glow, sem o repaint contínuo.) */
-    #ornamental-path svg image {
+       imagem do caminho. O shimmer saiu, mas o seletor continuou pegando TODAS
+       as ~150 imagens. Como o clip-path deste container é animado no scrub,
+       cada quadro de rolagem refazia 150 drop-shadows.
+
+       O Chrome do Android engole isso; o WebKit não — filtros SVG lá são bem
+       mais caros e é por isso que o travamento sobrou só no Safari.
+
+       O seletor por atributo mira as pedras grandes sem precisar de classe
+       nenhuma: placeGem() escreve width="36" nelas (a constante LARGE), 13 nas
+       pequenas, e 12/20/32 nos decorativos. São 9 filtros no lugar de 150, e
+       são justamente as pedras onde o glow se enxerga. */
+    #ornamental-path svg image[width="36"] {
         filter: drop-shadow(0 0 4px rgba(196, 96, 126, 0.35));
     }
 }
