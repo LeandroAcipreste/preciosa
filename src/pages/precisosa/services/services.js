@@ -21,46 +21,56 @@ gsap.registerPlugin(ScrollTrigger);
 // só o objeto que está passando tem tween ativo.
 // ============================================
 
-// Proporção das três fases dentro da passagem do objeto pela tela.
-// A permanência é a mais longa de propósito: o texto precisa ficar parado e
-// legível a maior parte do tempo — o fade é moldura, não o efeito principal.
-const ENTRADA    = 1;
-const PERMANENCIA = 1.8;
-const SAIDA      = 1;
+// ⚠️ AQUI MORAVA UM `scrub: 0.6`, E ERA A CAUSA DA TRAVADINHA.
+//
+// Com scrub, a animação não roda no tempo: ela é uma função da POSIÇÃO da
+// rolagem. O quadro só avança quando a página rola, e o quanto ele avança
+// depende de quanto o dedo andou. Isso tem duas consequências ruins aqui:
+//
+//   · Qualquer engasgo no thread principal congela o fade no meio, porque
+//     nenhum quadro novo é calculado enquanto o evento de rolagem não chega.
+//     Depois vem tudo de uma vez, para alcançar a posição atual — exatamente o
+//     "aparece suave, trava alguns segundos, e aparece".
+//
+//   · Parar o dedo PARA a animação. Um card a meio fade fica parado a meio
+//     fade, indefinidamente. Não existe "suave" possível: a suavidade dependia
+//     de o usuário rolar num ritmo constante.
+//
+// Sem scrub, o ScrollTrigger só decide QUANDO começar; o GSAP roda a animação
+// no próprio relógio, com duração e ease fixos. Ela termina sempre igual,
+// independente de o dedo continuar ou parar, e um engasgo momentâneo apenas
+// atrasa a animação em vez de fatiá-la.
+//
+// De quebra é bem mais barato: em vez de recalcular tweens a cada evento de
+// rolagem, só há trabalho durante os ~0,7s de transição de cada objeto.
+const DURACAO_ENTRADA = 0.7;
 
 function revelarComVidaPropria({ gatilho, elementos, stagger = 0 }) {
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: gatilho,
-            // Começa logo abaixo da borda inferior e termina perto da superior:
-            // a animação acompanha a travessia do objeto pela tela.
-            start: "top 88%",
-            end: "bottom 18%",
-            scrub: 0.6,
-            invalidateOnRefresh: true,
+    return gsap.fromTo(elementos,
+        { opacity: 0, y: 40 },
+        {
+            opacity: 1,
+            y: 0,
+            duration: DURACAO_ENTRADA,
+            ease: "power2.out",
+            stagger,
+            scrollTrigger: {
+                trigger: gatilho,
+                start: "top 88%",
+                end: "bottom 15%",
+                // play    ao entrar por baixo      -> aparece
+                // reverse ao sair por cima         -> desaparece
+                // play    ao reentrar por cima     -> reaparece subindo a página
+                // reverse ao sair por baixo        -> desaparece
+                //
+                // A saída é a MESMA animação tocada de trás para frente, então
+                // entrada e saída são simétricas por construção — não há como
+                // uma destoar da outra.
+                toggleActions: "play reverse play reverse",
+                invalidateOnRefresh: true,
+            },
         }
-    });
-
-    tl.to(elementos, {
-        opacity: 1,
-        y: 0,
-        duration: ENTRADA,
-        ease: "sine.out",
-        stagger,
-    }, 0);
-
-    // Espaço vazio na timeline = objeto parado e totalmente visível.
-    tl.to({}, { duration: PERMANENCIA });
-
-    tl.to(elementos, {
-        opacity: 0,
-        y: -24,
-        duration: SAIDA,
-        ease: "sine.in",
-        stagger,
-    });
-
-    return tl;
+    );
 }
 
 function revelarIndividualmente() {
