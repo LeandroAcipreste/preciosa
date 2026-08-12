@@ -1,5 +1,6 @@
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+import { splitIntoWords } from '../../../core/text-reveal.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -198,41 +199,9 @@ function revealIntroWords(isMobile) {
     }, 1.7);
 }
 
-// Envolve cada palavra num <span>, preservando os elementos internos
-// (os destaques .intro-highlight / .intro-soft continuam intactos).
-function splitIntoWords(root) {
-    const words = [];
-
-    const walk = (node) => {
-        // Cópia da lista: vamos substituir nós durante o percurso
-        Array.from(node.childNodes).forEach(child => {
-            if (child.nodeType === Node.TEXT_NODE) {
-                const parts = child.textContent.split(/(\s+)/);
-                const frag = document.createDocumentFragment();
-
-                parts.forEach(part => {
-                    if (!part) return;
-                    if (/^\s+$/.test(part)) {
-                        frag.appendChild(document.createTextNode(" "));
-                        return;
-                    }
-                    const span = document.createElement("span");
-                    span.className = "intro-word";
-                    span.textContent = part;
-                    frag.appendChild(span);
-                    words.push(span);
-                });
-
-                node.replaceChild(frag, child);
-            } else if (child.nodeType === Node.ELEMENT_NODE) {
-                walk(child);
-            }
-        });
-    };
-
-    walk(root);
-    return words;
-}
+// splitIntoWords mudou para src/core/text-reveal.js, onde é compartilhada com
+// as dobras "Nosso Espaço" e "Débora Amorim". A função é idêntica — só o
+// endereço mudou. Ver o import no topo deste arquivo.
 
 // ============================================
 // GERA O CAMINHO DE JOIAS DINAMICAMENTE

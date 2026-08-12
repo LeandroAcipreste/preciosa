@@ -659,6 +659,59 @@ html.skip-preloader .hero-main {
     line-height: 1;
 }
 
+/* ============================================
+   RECORTE DOS TÍTULOS — "NOSSO ESPAÇO" E "DÉBORA AMORIM"
+   --------------------------------------------
+   Em cada dobra o subtítulo entra descendo (vem de cima do eixo) e o título
+   entra subindo (vem de baixo). Quem esconde o texto fora de posição é este
+   overflow:hidden; quem desliza é o <span.slide-mask-inner> que o JS cria
+   dentro (ver src/core/text-reveal.js).
+
+   As duas dobras compartilham a regra porque têm exatamente a mesma anatomia:
+   subtítulo em Cinzel 14px com 20px de respiro, título em 'Great Vibes' com
+   line-height:1 e 25px de respiro. Só as cores diferem, e cor não é assunto
+   deste bloco.
+
+   O par padding/margin de mesmo valor é o detalhe que faz isso funcionar com
+   'Great Vibes': é uma cursiva com hastes que passam da caixa da linha, e
+   line-height:1 as deixaria encostadas na borda do recorte — em repouso elas
+   apareceriam cortadas. O padding afasta a borda do recorte; a margem negativa
+   de igual valor devolve o espaço, então o layout da página não muda em nada.
+   O mesmo padding também abriga o text-shadow do "Débora Amorim", que desce
+   ~6px e seria decepado pelo recorte.
+
+   FALLBACK: se o JS não rodar, não existe .slide-mask-inner, nada é
+   transformado e os quatro títulos continuam visíveis e no lugar. O overflow
+   sozinho não esconde coisa alguma.
+   ============================================ */
+.space-subtitle,
+.space-title,
+.meet-debora-subtitle,
+.meet-debora-title {
+    display: block;
+    overflow: hidden;
+    padding-top: 0.16em;
+    margin-top: -0.16em;
+    padding-bottom: 0.16em;
+}
+
+/* Todos preservam o respiro original abaixo deles, descontando o padding que o
+   recorte acrescentou — o espaçamento na tela fica idêntico ao de antes. */
+.space-subtitle,
+.meet-debora-subtitle {
+    margin-bottom: calc(20px - 0.16em);
+}
+
+.space-title,
+.meet-debora-title {
+    margin-bottom: calc(25px - 0.16em);
+}
+
+.slide-mask-inner {
+    display: block;
+    will-change: transform;
+}
+
 .space-desc {
     font-family: 'Inter', sans-serif;
     font-size: clamp(16px, 1.2vw, 18px);

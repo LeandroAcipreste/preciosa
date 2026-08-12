@@ -28,11 +28,47 @@ const DEFAULT_OPTIONS = {
     orientation: 'vertical',
     gestureOrientation: 'vertical',
     smoothWheel: true,
-    smoothTouch: false,      // CRÍTICO: evita conflito com scroll nativo touch
     wheelMultiplier: 0.4,    // Lento e delicado (era 0.55 no original, 0.9 rápido demais)
     touchMultiplier: 1.0,
     infinite: false,
 };
+
+// ⚠️ Aqui morava `smoothTouch: false`, comentado como "CRÍTICO: evita conflito
+// com scroll nativo touch". Ele NUNCA fez efeito: `smoothTouch` foi removido do
+// Lenis na versão 1.0, e o construtor da 1.1.5 (a instalada) só conhece
+// `syncTouch`. Opção desconhecida é ignorada em silêncio — o Lenis rodava no
+// celular esse tempo todo, acreditando-se desligado.
+//
+// A opção foi retirada em vez de renomeada porque a resposta certa não é
+// ajustar o toque do Lenis: é não ter Lenis no toque. Ver abaixo.
+
+// Aparelho cujo apontador primário é o dedo. É o critério certo aqui — não a
+// largura da tela: o que importa não é o layout ser estreito, é a rolagem
+// chegar por evento de toque.
+function isTouchPrimary() {
+    return typeof window.matchMedia === 'function' &&
+        window.matchMedia('(pointer: coarse)').matches;
+}
+
+// Controle de mesma forma que a instância do Lenis, para quem chama não
+// precisar saber se há Lenis ou não. main.js usa stop()/start() e debora.html
+// usa scrollTo() — os três continuam existindo.
+function nativeScrollControl() {
+    return {
+        // O travamento da intro é feito por CSS (body.intro-active tem
+        // overflow:hidden !important), então não há nada a parar aqui.
+        stop() {},
+        start() {},
+        scrollTo(target, options) {
+            window.scrollTo(0, typeof target === 'number' ? target : 0);
+        },
+        on() {},
+        off() {},
+        raf() {},
+        resize() {},
+        destroy() {},
+    };
+}
 
 export function createSmoothScroll(options = {}) {
     // Registra o plugin uma única vez por página.
@@ -51,6 +87,38 @@ export function createSmoothScroll(options = {}) {
         });
 
         pluginRegistered = true;
+    }
+
+    // ==========================================
+    // NO TOQUE: ROLAGEM NATIVA, SEM LENIS
+    // ==========================================
+    // Este é o padrão do site de referência (designsystem/norma), que tem
+    // rolagem impecável no celular: lá o Lenis só é instanciado quando
+    // `!is_mobile`.
+    //
+    // O motivo é mecânico. O Lenis registra os listeners de toque como NÃO
+    // passivos:
+    //
+    //     addEventListener("touchstart", ..., { passive: false })
+    //     addEventListener("touchmove",  ..., { passive: false })
+    //
+    // Um touchmove não passivo obriga o navegador a esperar o JavaScript rodar
+    // e retornar ANTES de rolar um pixel — mesmo que o handler nunca chame
+    // preventDefault. A rolagem deixa de viver no thread do compositor e passa
+    // a depender do thread principal, que aqui está ocupado com timelines em
+    // scrub, ScrollTrigger.update e repaint de SVG. Cada arrastar de dedo entra
+    // na fila atrás de tudo isso: é a travada.
+    //
+    // Sem Lenis, o toque volta a ser rolagem nativa do compositor, que não
+    // depende do thread principal e não trava nem com a página ocupada. O
+    // ScrollTrigger continua funcionando: sem a ponte do Lenis ele usa o
+    // listener de scroll nativo dele, que é o comportamento padrão.
+    //
+    // No desktop nada muda — lá a entrada é a roda do mouse, o `wheel` não
+    // bloqueia o compositor do mesmo jeito, e o deslizar do Lenis é justamente
+    // o efeito desejado.
+    if (isTouchPrimary()) {
+        return nativeScrollControl();
     }
 
     const lenis = new Lenis({ ...DEFAULT_OPTIONS, ...options });
