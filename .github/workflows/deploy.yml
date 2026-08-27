@@ -1,0 +1,61 @@
+name: Build e Deploy FTP (Hostinger)
+
+on:
+  push:
+    branches: [main]
+  # Permite disparar o deploy manualmente pela aba Actions, sem precisar
+  # de um commit novo (util para reenviar apos corrigir credenciais).
+  workflow_dispatch:
+
+# Duas execucoes simultanteas escreveriam no mesmo diretorio FTP ao mesmo
+# tempo e corromperiam o arquivo de estado da sincronizacao. Uma por vez.
+concurrency:
+  group: deploy-ftp
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do codigo
+        uses: actions/checkout@v4
+
+      - name: Configura Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Instala dependencias
+        run: npm ci
+
+      - name: Build de producao
+        run: npm run build
+
+      - name: Envia dist/ por FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+
+          # Somente o resultado do build sobe. As barras finais sao
+          # obrigatorias nos dois caminhos.
+          local-dir: ./dist/
+          server-dir: /public_html/
+
+          # Assets grandes (video da hero, HDRI, .glb) precisam de mais
+          # folga que os 30s padrao em conexao compartilhada.
+          timeout: 60000
+
+          # Ao declarar exclude, os padroes default da action sao
+          # substituidos - por isso eles sao repetidos aqui.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.DS_Store
+            **/Thumbs.db
+            **/*.md
+            **/.env*
