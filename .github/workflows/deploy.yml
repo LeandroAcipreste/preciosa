@@ -40,6 +40,10 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
 
+          # Hostinger compartilhada expoe FTP puro na porta 21. Este ja e o
+          # default da action, declarado aqui apenas para deixar explicito.
+          protocol: ftp
+
           # Somente o resultado do build sobe. As barras finais sao
           # obrigatorias nos dois caminhos.
           local-dir: ./dist/
