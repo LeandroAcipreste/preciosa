@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Preciosa">
+  <!-- Fundo rosa em quadrado arredondado: no favicon o contorno sozinho some
+       contra abas claras e escuras. O bloco de cor garante o contraste nos
+       dois temas de navegador. -->
+  <rect width="32" height="32" rx="7" fill="#f2cdd8"/>
+  <!-- Diamante lapidado. Traco de 2 unidades em viewBox de 32: mais fino que
+       isso desaparece na renderizacao de 16x16 da aba. -->
+  <g fill="none" stroke="#8f3d57" stroke-width="2"
+     stroke-linejoin="round" stroke-linecap="round">
+    <path d="M16 27 L4 13 L8.5 6 L23.5 6 L28 13 Z"/>
+    <path d="M4 13 H28"/>
+    <path d="M8.5 6 L12 13 L16 27"/>
+    <path d="M23.5 6 L20 13 L16 27"/>
+  </g>
+</svg>
