@@ -1,39 +1,29 @@
-name: Build e Deploy FTP (Hostinger)
+name: Deploy FTP (Hostinger)
 
 on:
   push:
     branches: [main]
-  # Permite disparar o deploy manualmente pela aba Actions, sem precisar
-  # de um commit novo (util para reenviar apos corrigir credenciais).
+  # Permite redisparar o deploy pela aba Actions sem precisar de commit novo.
   workflow_dispatch:
 
-# Duas execucoes simultanteas escreveriam no mesmo diretorio FTP ao mesmo
+# Duas execucoes simultaneas escreveriam no mesmo diretorio FTP ao mesmo
 # tempo e corromperiam o arquivo de estado da sincronizacao. Uma por vez.
 concurrency:
   group: deploy-ftp
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout do codigo
         uses: actions/checkout@v4
 
-      - name: Configura Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: Instala dependencias
-        run: npm ci
-
-      - name: Build de producao
-        run: npm run build
-
-      - name: Envia dist/ por FTP
+      # Sem npm ci e sem build: o site e estatico e as libs (three, gsap,
+      # lenis, chart.js) chegam por CDN via import map nos HTMLs. O que esta
+      # no repositorio e exatamente o que vai para o ar.
+      - name: Envia o site por FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -44,22 +34,28 @@ jobs:
           # default da action, declarado aqui apenas para deixar explicito.
           protocol: ftp
 
-          # Somente o resultado do build sobe. As barras finais sao
-          # obrigatorias nos dois caminhos.
-          local-dir: ./dist/
+          local-dir: ./
           server-dir: /public_html/
 
           # Assets grandes (video da hero, HDRI, .glb) precisam de mais
           # folga que os 30s padrao em conexao compartilhada.
           timeout: 60000
 
-          # Ao declarar exclude, os padroes default da action sao
-          # substituidos - por isso eles sao repetidos aqui.
+          # Como agora sobe a raiz do repositorio, o exclude e o que separa
+          # o site do que nao deve ser publicado. Ao declarar exclude, os
+          # padroes default da action sao substituidos - por isso .git* e
+          # node_modules estao repetidos aqui.
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
+            **/.github/**
+            **/designsystem/**
+            **/dist/**
+            **/*.md
+            **/package.json
+            **/package-lock.json
+            **/vercel.json
             **/.DS_Store
             **/Thumbs.db
-            **/*.md
             **/.env*

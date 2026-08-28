@@ -11,11 +11,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Great+Vibes&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <!--
-      ESTRATÉGIA DE MÓDULOS (unificada): import map + ESM via esm.sh.
-      As três páginas (index, debora, dashboard) carregam GSAP/ScrollTrigger/Lenis/Three
-      e Chart.js pelo mesmo mecanismo. Não há passo de build (site estático).
-      Versões fixadas aqui devem bater com as declaradas em package.json.
+      ESTRATEGIA DE MODULOS: import map + ESM via jsDelivr, sem passo de build.
+      O navegador resolve os specifiers nus ('gsap', 'three', ...) por este mapa,
+      que precisa vir ANTES de qualquer script de modulo da pagina.
+      Ao trocar uma versao aqui, troque tambem em index.html, debora.html e
+      dashboard.html - as tres paginas carregam as libs pelo mesmo mecanismo.
     -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/",
+        "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js",
+        "gsap/ScrollTrigger": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/ScrollTrigger.js",
+        "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.1.5/dist/lenis.mjs",
+        "chart.js": "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.js",
+        "chart.js/auto": "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/auto/auto.js",
+        "@kurkle/color": "https://cdn.jsdelivr.net/npm/@kurkle/color@0.3.4/dist/color.esm.js"
+      }
+    }
+    </script>
 
     <!-- CSS -->
     <link rel="stylesheet" href="./style.css" />
