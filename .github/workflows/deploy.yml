@@ -51,10 +51,7 @@ jobs:
             **/node_modules/**
             **/.github/**
             **/designsystem/**
-            **/dist/**
             **/*.md
-            **/package.json
-            **/package-lock.json
             **/vercel.json
             **/.DS_Store
             **/Thumbs.db
