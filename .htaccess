@@ -1,0 +1,45 @@
+# ============================================================
+# CACHE
+# ============================================================
+# O CDN da Hostinger servia CSS e JS de cache enquanto entregava o HTML
+# fresco. O efeito era um site meio novo e meio velho: o HTML trazia
+# elementos cujas regras de estilo ainda nao tinham chegado.
+#
+# no-cache nao significa "nao guardar". Significa "guarde, mas confirme
+# comigo antes de usar". Quando o arquivo nao mudou o servidor responde 304
+# sem corpo, entao o custo e um ida-e-volta curto, nao um novo download.
+#
+# Os assets de midia continuam com cache longo: eles praticamente nunca
+# mudam e sao o grosso do peso da pagina.
+# ============================================================
+
+<IfModule mod_headers.c>
+    # HTML, CSS e JS: sempre revalidar.
+    <FilesMatch "\.(html|css|js|mjs)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+
+    # Imagens, video, fontes e modelos 3D: um ano. Ao trocar um destes,
+    # troque tambem o nome do arquivo.
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|woff2?|ttf|otf|glb|gltf)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # O arquivo de estado do deploy nao deveria ser servido nem guardado.
+    <FilesMatch "^\.">
+        Header set Cache-Control "no-store"
+    </FilesMatch>
+</IfModule>
+
+# ============================================================
+# ACESSO
+# ============================================================
+# Impede a leitura publica dos arquivos que o deploy deixa na raiz e que nao
+# fazem parte do site.
+<FilesMatch "^\.(ftp-deploy-sync-state|deploy-state|gitignore|env)">
+    Require all denied
+</FilesMatch>
+
+# Sem listagem de diretorio: sem isto, uma pasta sem index.html expoe todo o
+# seu conteudo.
+Options -Indexes

@@ -5,10 +5,10 @@
    debora.html linka apenas style.css (globais/fontes) + este arquivo.
    A ordem abaixo replica a ordem original dos <link>.
    ============================================================ */
-@import url('./preLoader/preLoader.css');
-@import url('./hero/hero.css');
-@import url('./about/section-about.css');
-@import url('./book/book.css');
-@import url('./chapters/chapters.css');
-@import url('./event/event.css');
-@import url('./footer/footer.css');
+@import url('./preLoader/preLoader.css?v=20260828a');
+@import url('./hero/hero.css?v=20260828a');
+@import url('./about/section-about.css?v=20260828a');
+@import url('./book/book.css?v=20260828a');
+@import url('./chapters/chapters.css?v=20260828a');
+@import url('./event/event.css?v=20260828a');
+@import url('./footer/footer.css?v=20260828a');
