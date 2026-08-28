@@ -39,9 +39,13 @@ jobs:
           # diretorio, que nada serve - era para la que os deploys iam.
           server-dir: /domains/espacomulherpreciosa.com.br/public_html/
 
-          # Assets grandes (video da hero, HDRI, .glb) precisam de mais
-          # folga que os 30s padrao em conexao compartilhada.
-          timeout: 60000
+          # 60s davam Timeout (control socket) em conexao compartilhada ja
+          # bastante usada hoje. 120s da folga para a resposta do controle.
+          timeout: 120000
+
+          # Temporario, para o log dizer em qual comando FTP ele trava.
+          # Remover assim que o deploy estabilizar.
+          log-level: verbose
 
           # Como agora sobe a raiz do repositorio, o exclude e o que separa
           # o site do que nao deve ser publicado. Ao declarar exclude, os
