@@ -12,6 +12,25 @@ concurrency:
   group: deploy-ftp
   cancel-in-progress: false
 
+# Valores compartilhados pelas duas tentativas de envio. Ficam aqui para que
+# nao exista risco de alterar um passo e esquecer o outro.
+env:
+  FTP_LOCAL_DIR: ./
+  FTP_SERVER_DIR: /domains/espacomulherpreciosa.com.br/public_html/
+  FTP_TIMEOUT: 120000
+  FTP_EXCLUDE: |
+    **/.git*
+    **/.git*/**
+    **/node_modules/**
+    **/.github/**
+    **/.claude/**
+    **/designsystem/**
+    **/*.md
+    **/vercel.json
+    **/.DS_Store
+    **/Thumbs.db
+    **/.env*
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -23,39 +42,56 @@ jobs:
       # Sem npm ci e sem build: o site e estatico e as libs (three, gsap,
       # lenis, chart.js) chegam por CDN via import map nos HTMLs. O que esta
       # no repositorio e exatamente o que vai para o ar.
+      #
+      # O FTP da Hostinger emudece o socket de controle de tempo em tempo e a
+      # action morre por timeout. Ja aconteceu com 60s e com 120s de limite, e
+      # nas duas vezes a execucao seguinte passou sem nenhuma mudanca - logo o
+      # problema e intermitencia do servidor, nao configuracao. Aumentar o
+      # timeout so faz a falha demorar mais; o que resolve e tentar de novo.
+      #
+      # A repeticao e segura porque a action e idempotente: ela compara o
+      # arquivo de estado no servidor com os arquivos locais e reenvia apenas
+      # a diferenca. Se a primeira tentativa subiu metade, a segunda continua
+      # de onde parou.
       - name: Envia o site por FTP
+        id: ftp1
+        continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-
-          # Hostinger compartilhada expoe FTP puro na porta 21. Este ja e o
-          # default da action, declarado aqui apenas para deixar explicito.
+          # Hostinger compartilhada expoe FTP puro na porta 21.
           protocol: ftp
+          local-dir: ${{ env.FTP_LOCAL_DIR }}
+          server-dir: ${{ env.FTP_SERVER_DIR }}
+          timeout: ${{ env.FTP_TIMEOUT }}
+          exclude: ${{ env.FTP_EXCLUDE }}
 
-          local-dir: ./
-          # Raiz real do site. O /public_html/ na home do usuario e outro
-          # diretorio, que nada serve - era para la que os deploys iam.
-          server-dir: /domains/espacomulherpreciosa.com.br/public_html/
+      - name: Segunda tentativa (o FTP da Hostinger cai de vez em quando)
+        if: steps.ftp1.outcome == 'failure'
+        id: ftp2
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          local-dir: ${{ env.FTP_LOCAL_DIR }}
+          server-dir: ${{ env.FTP_SERVER_DIR }}
+          timeout: ${{ env.FTP_TIMEOUT }}
+          exclude: ${{ env.FTP_EXCLUDE }}
 
-          # 60s davam Timeout (control socket) em conexao compartilhada ja
-          # bastante usada hoje. 120s da folga para a resposta do controle.
-          timeout: 120000
-
-          # Como agora sobe a raiz do repositorio, o exclude e o que separa
-          # o site do que nao deve ser publicado. Ao declarar exclude, os
-          # padroes default da action sao substituidos - por isso .git* e
-          # node_modules estao repetidos aqui.
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/.github/**
-            **/.claude/**
-            **/designsystem/**
-            **/*.md
-            **/vercel.json
-            **/.DS_Store
-            **/Thumbs.db
-            **/.env*
+      - name: Terceira tentativa
+        if: steps.ftp1.outcome == 'failure' && steps.ftp2.outcome == 'failure'
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          local-dir: ${{ env.FTP_LOCAL_DIR }}
+          server-dir: ${{ env.FTP_SERVER_DIR }}
+          timeout: ${{ env.FTP_TIMEOUT }}
+          exclude: ${{ env.FTP_EXCLUDE }}
