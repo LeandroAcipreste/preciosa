@@ -35,7 +35,9 @@ jobs:
           protocol: ftp
 
           local-dir: ./
-          server-dir: /public_html/
+          # Raiz real do site. O /public_html/ na home do usuario e outro
+          # diretorio, que nada serve - era para la que os deploys iam.
+          server-dir: /domains/espacomulherpreciosa.com.br/public_html/
 
           # Assets grandes (video da hero, HDRI, .glb) precisam de mais
           # folga que os 30s padrao em conexao compartilhada.
