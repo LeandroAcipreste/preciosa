@@ -1146,3 +1146,175 @@ html.skip-preloader .hero-main {
         justify-content: center;
     }
 }
+
+/* ============================================================
+   BANNER DE CONSENTIMENTO DE COOKIES (LGPD)
+   Global: aparece na home, na pagina da Debora e na politica.
+   Fica em style.css, e nao num arquivo por pagina, porque o aviso
+   e do site inteiro e assim nao ha risco de esquecer de linkar.
+   ============================================================ */
+.cookie-banner {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    z-index: 9999;
+    width: min(1080px, calc(100% - 32px));
+    margin-bottom: 16px;
+    padding: 20px 24px;
+    border-radius: 16px;
+    background: #fdf2f5;
+    border: 1px solid #f0c8d5;
+    box-shadow: 0 12px 40px rgba(38, 19, 27, 0.18);
+
+    /* Estado inicial: fora da tela. A classe .is-visivel traz para cima. */
+    transform: translate(-50%, calc(100% + 24px));
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
+}
+
+.cookie-banner.is-visivel {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+.cookie-banner-conteudo {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.cookie-banner-texto-bloco {
+    flex: 1 1 420px;
+    min-width: 0;
+}
+
+.cookie-banner-titulo {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #26131b;
+    margin: 0 0 6px;
+}
+
+.cookie-banner-texto {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    /* Vinho escuro sobre o rosa claro: contraste bem acima do minimo AA. */
+    color: #5A3A46;
+    margin: 0;
+}
+
+.cookie-banner-texto a {
+    color: #a8365a;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.cookie-banner-texto a:hover {
+    color: #26131b;
+}
+
+.cookie-banner-acoes {
+    display: flex;
+    gap: 12px;
+    flex: 0 0 auto;
+}
+
+.cookie-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 12px 26px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+/* Aceitar e recusar tem o mesmo peso visual de proposito: a LGPD exige que a
+   recusa seja tao facil quanto o aceite. Muda a cor, nao a proeminencia. */
+.cookie-btn-aceitar {
+    background: #c4607e;
+    color: #ffffff;
+    border: 1px solid #c4607e;
+}
+
+.cookie-btn-aceitar:hover {
+    background: #a8365a;
+    border-color: #a8365a;
+}
+
+.cookie-btn-recusar {
+    background: transparent;
+    color: #a8365a;
+    border: 1px solid #dda6b8;
+}
+
+.cookie-btn-recusar:hover {
+    background: #f7dde5;
+    border-color: #c4607e;
+}
+
+.cookie-btn:focus-visible {
+    outline: 2px solid #26131b;
+    outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+    .cookie-banner {
+        padding: 18px;
+        width: calc(100% - 20px);
+        margin-bottom: 10px;
+    }
+
+    .cookie-banner-conteudo {
+        gap: 16px;
+    }
+
+    .cookie-banner-acoes {
+        width: 100%;
+    }
+
+    /* No celular os botoes dividem a largura: alvos de toque grandes e
+       igualmente faceis de acertar. */
+    .cookie-btn {
+        flex: 1 1 0;
+        padding: 13px 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cookie-banner {
+        transition: opacity 0.2s ease;
+        transform: translate(-50%, 0);
+    }
+}
+
+/* Link da politica no rodape. Vale para os dois rodapes (home e Debora):
+   ambos sao escuros e usam .footer-bottom / .debora-footer-bottom em flex
+   com wrap, entao um terceiro item se acomoda sozinho. */
+.footer-privacidade {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.55);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 2px;
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.footer-privacidade:hover {
+    color: #ffffff;
+    border-bottom-color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-privacidade:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+}

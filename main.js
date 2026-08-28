@@ -4,6 +4,7 @@ import { initLuxuryServicesSection } from './src/pages/precisosa/services/servic
 import { revealTextOnScroll, slideTextIntoView } from './src/core/text-reveal.js';
 import { createSmoothScroll } from './src/core/smooth-scroll.js';
 import { pauseWhenOffscreen } from './src/core/pause-offscreen.js';
+import { initCookieConsent } from './src/core/cookie-consent.js';
 
 let lenis;
 
@@ -15,6 +16,12 @@ function start() {
     // consome compositor e rouba quadros da rolagem — pausa enquanto não é
     // visível. Independe da intro, por isso fica aqui e não no callback.
     pauseWhenOffscreen('.space-gallery-container');
+
+    // Aviso de privacidade: so aparece depois que a abertura termina e o nome
+    // PRECIOSA ja esta na tela. Fica fora do callback de initHero porque nao
+    // pode depender de a intro 3D dar certo — o modulo tem espera maxima
+    // propria e aparece de qualquer forma se o evento nunca chegar.
+    initCookieConsent({ aguardarEvento: 'preciosa:intro-concluida' });
 
     // Trava o scroll durante a intro
     lenis.stop();

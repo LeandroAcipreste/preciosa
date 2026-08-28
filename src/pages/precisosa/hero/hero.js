@@ -97,6 +97,16 @@ export function initHero(onIntroComplete) {
     }
 
     // ==========================================
+    // Sinaliza que a abertura terminou e o nome PRECIOSA ja esta na tela.
+    // Quem escuta: o aviso de privacidade, que nao deve cobrir a intro.
+    // Dispara uma unica vez, por qualquer um dos caminhos de conclusao.
+    let introAvisada = false;
+    function avisarIntroConcluida() {
+        if (introAvisada) return;
+        introAvisada = true;
+        window.dispatchEvent(new CustomEvent('preciosa:intro-concluida'));
+    }
+
     // MECANISMO DE FALLBACK
     // ==========================================
     // Definido ANTES de qualquer decisão: os caminhos de "conexão fraca" e de
@@ -158,6 +168,7 @@ export function initHero(onIntroComplete) {
         }
 
         setTimeout(() => initHeroScrollAnimations(), instant ? 0 : 2200);
+        setTimeout(avisarIntroConcluida, instant ? 0 : 2800);
 
         if (typeof onIntroComplete === "function") onIntroComplete();
     }
@@ -193,6 +204,7 @@ export function initHero(onIntroComplete) {
 
     if (pularIntro) {
         document.documentElement.classList.add('skip-preloader');
+        avisarIntroConcluida();
         document.getElementById("preloader")?.classList.add("is-hidden");
         document.querySelector(".hero-main")?.classList.add("is-gone");
         document.body.classList.remove("intro-active");
@@ -534,6 +546,7 @@ export function initHero(onIntroComplete) {
             initHeroScrollAnimations();
             const video = document.getElementById("home-video");
             setupVideoScrollControl(video);
+            avisarIntroConcluida();
         }, finalTime + 0.1);
     });
 

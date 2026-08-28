@@ -583,6 +583,7 @@
         <!-- Rodapé inferior -->
         <div class="debora-footer-bottom">
             <p>&copy; 2026 Débora Bispo Amorim. Todos os direitos reservados.</p>
+            <a href="/politica-de-privacidade.html" class="footer-privacidade">Política de Privacidade e Segurança</a>
             <a href="index.html" class="debora-footer-back-link">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M15 18L9 12L15 6"/>
@@ -605,6 +606,7 @@
         import { initDeboraChapters } from './src/pages/debora/chapters/chapters.js';
         import { initDeboraEvent } from './src/pages/debora/event/event.js';
         import { createSmoothScroll } from './src/core/smooth-scroll.js';
+        import { initCookieConsent } from './src/core/cookie-consent.js';
 
         // Desativa a memória de rolagem do navegador para que ele não tente restaurar a última posição visitada
         if ('scrollRestoration' in history) {
@@ -648,6 +650,10 @@
                 // Callback executado ao finalizar a tela de preloader
                 console.log("Preloader finalizado. Iniciando Hero animada.");
                 initDeboraHero();
+
+                // Atraso maior que o padrao: deixa a hero da Debora entrar antes
+                // de o aviso de privacidade subir por cima.
+                initCookieConsent({ atraso: 2500 });
             });
         });
     </script>
