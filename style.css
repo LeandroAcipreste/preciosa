@@ -1296,10 +1296,11 @@ html.skip-preloader .hero-main {
     }
 }
 
-/* Link da politica no rodape. Vale para os dois rodapes (home e Debora):
+/* Links legais no rodape (politica e termos). Vale para os dois rodapes
+   (home e Debora):
    ambos sao escuros e usam .footer-bottom / .debora-footer-bottom em flex
    com wrap, entao um terceiro item se acomoda sozinho. */
-.footer-privacidade {
+.footer-legal {
     font-family: 'Inter', sans-serif;
     font-size: 13px;
     color: rgba(255, 255, 255, 0.55);
@@ -1309,12 +1310,12 @@ html.skip-preloader .hero-main {
     transition: color 0.3s ease, border-color 0.3s ease;
 }
 
-.footer-privacidade:hover {
+.footer-legal:hover {
     color: #ffffff;
     border-bottom-color: rgba(255, 255, 255, 0.6);
 }
 
-.footer-privacidade:focus-visible {
+.footer-legal:focus-visible {
     outline: 2px solid #ffffff;
     outline-offset: 3px;
 }

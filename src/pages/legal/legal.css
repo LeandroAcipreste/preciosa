@@ -1,16 +1,16 @@
 /* ============================================================
-   POLITICA DE PRIVACIDADE E SEGURANCA
+   PAGINAS LEGAIS (politica de privacidade e termos de uso)
    Fundo: os mesmos paineis laterais de background_preciosa.svg usados na
    home, para a pagina nao parecer de outro site. O texto vive num cartao
    claro por cima — texto longo direto sobre o diamante fica ilegivel.
    ============================================================ */
 
-.privacidade-body {
+.legal-body {
     background-color: #fdf2f5;
     color: #26131b;
 }
 
-.privacidade-main {
+.legal-main {
     position: relative;
     min-height: 100vh;
     padding: 0 0 80px;
@@ -18,8 +18,8 @@
 }
 
 /* Paineis do diamante — identicos aos de .main-bg-left/right */
-.privacidade-bg-left,
-.privacidade-bg-right {
+.legal-bg-left,
+.legal-bg-right {
     position: fixed;
     top: 0;
     width: 50%;
@@ -31,24 +31,24 @@
     z-index: 0;
 }
 
-.privacidade-bg-left  { left: 0;  background-position: left center; }
-.privacidade-bg-right { right: 0; background-position: right center; }
+.legal-bg-left  { left: 0;  background-position: left center; }
+.legal-bg-right { right: 0; background-position: right center; }
 
 /* No celular o SVG central come a area util do texto: some com os paineis e
    fica so a cor de fundo. */
 @media (max-width: 900px) {
-    .privacidade-bg-left,
-    .privacidade-bg-right { display: none; }
+    .legal-bg-left,
+    .legal-bg-right { display: none; }
 }
 
-.privacidade-topo {
+.legal-topo {
     position: relative;
     z-index: 1;
     padding: 48px 24px 32px;
     text-align: center;
 }
 
-.privacidade-voltar {
+.legal-voltar {
     display: inline-block;
     margin-bottom: 28px;
     font-family: 'Inter', sans-serif;
@@ -60,9 +60,9 @@
     text-decoration: none;
 }
 
-.privacidade-voltar:hover { color: #26131b; }
+.legal-voltar:hover { color: #26131b; }
 
-.privacidade-kicker {
+.legal-kicker {
     display: block;
     font-family: 'Inter', sans-serif;
     font-size: 12px;
@@ -73,7 +73,7 @@
     margin-bottom: 12px;
 }
 
-.privacidade-titulo {
+.legal-titulo {
     font-family: 'Cinzel', serif;
     font-weight: 700;
     font-size: clamp(1.8rem, 4.5vw, 3rem);
@@ -82,7 +82,7 @@
     margin: 0;
 }
 
-.privacidade-data {
+.legal-data {
     font-family: 'Inter', sans-serif;
     font-size: 13px;
     color: #7d5b67;
@@ -90,7 +90,7 @@
 }
 
 /* O cartao: fundo quase opaco garante o contraste do texto sobre o diamante. */
-.privacidade-cartao {
+.legal-cartao {
     position: relative;
     z-index: 1;
     max-width: 820px;
@@ -102,7 +102,7 @@
     box-shadow: 0 18px 60px rgba(38, 19, 27, 0.10);
 }
 
-.privacidade-cartao h2 {
+.legal-cartao h2 {
     font-family: 'Cinzel', serif;
     font-size: clamp(1.05rem, 2.2vw, 1.35rem);
     font-weight: 700;
@@ -112,13 +112,13 @@
     border-top: 1px solid #f4dbe3;
 }
 
-.privacidade-cartao h2:first-of-type {
+.legal-cartao h2:first-of-type {
     margin-top: 0;
     padding-top: 0;
     border-top: none;
 }
 
-.privacidade-cartao h3 {
+.legal-cartao h3 {
     font-family: 'Inter', sans-serif;
     font-size: 15px;
     font-weight: 600;
@@ -126,8 +126,8 @@
     margin: 24px 0 8px;
 }
 
-.privacidade-cartao p,
-.privacidade-cartao li {
+.legal-cartao p,
+.legal-cartao li {
     font-family: 'Inter', sans-serif;
     font-size: 15.5px;
     line-height: 1.75;
@@ -135,34 +135,34 @@
     color: #4a2f39;
 }
 
-.privacidade-cartao p { margin: 0 0 14px; }
+.legal-cartao p { margin: 0 0 14px; }
 
-.privacidade-cartao ul,
-.privacidade-cartao ol {
+.legal-cartao ul,
+.legal-cartao ol {
     margin: 0 0 18px;
     padding-left: 22px;
 }
 
-.privacidade-cartao li { margin-bottom: 8px; }
+.legal-cartao li { margin-bottom: 8px; }
 
-.privacidade-cartao strong { color: #26131b; font-weight: 600; }
+.legal-cartao strong { color: #26131b; font-weight: 600; }
 
-.privacidade-cartao a {
+.legal-cartao a {
     color: #a8365a;
     text-decoration: underline;
     text-underline-offset: 2px;
     word-break: break-word;
 }
 
-.privacidade-cartao a:hover { color: #26131b; }
+.legal-cartao a:hover { color: #26131b; }
 
 /* Tabela de cookies: rola sozinha no celular em vez de esticar a pagina. */
-.privacidade-tabela-wrap {
+.legal-tabela-wrap {
     overflow-x: auto;
     margin: 0 0 20px;
 }
 
-.privacidade-tabela {
+.legal-tabela {
     width: 100%;
     border-collapse: collapse;
     font-family: 'Inter', sans-serif;
@@ -170,8 +170,8 @@
     min-width: 520px;
 }
 
-.privacidade-tabela th,
-.privacidade-tabela td {
+.legal-tabela th,
+.legal-tabela td {
     text-align: left;
     padding: 11px 14px;
     border-bottom: 1px solid #f4dbe3;
@@ -179,14 +179,14 @@
     vertical-align: top;
 }
 
-.privacidade-tabela th {
+.legal-tabela th {
     background: #fdf2f5;
     color: #26131b;
     font-weight: 600;
     letter-spacing: 0.4px;
 }
 
-.privacidade-tabela code {
+.legal-tabela code {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 12.5px;
     background: #fdf2f5;
@@ -195,7 +195,7 @@
     color: #a8365a;
 }
 
-.privacidade-destaque {
+.legal-destaque {
     background: #fdf2f5;
     border-left: 3px solid #c4607e;
     border-radius: 0 10px 10px 0;
@@ -203,9 +203,9 @@
     margin: 0 0 22px;
 }
 
-.privacidade-destaque p:last-child { margin-bottom: 0; }
+.legal-destaque p:last-child { margin-bottom: 0; }
 
-.privacidade-rodape {
+.legal-rodape {
     position: relative;
     z-index: 1;
     max-width: 820px;
@@ -216,3 +216,11 @@
     font-size: 13px;
     color: #7d5b67;
 }
+
+.legal-rodape a {
+    color: #a8365a;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.legal-rodape a:hover { color: #26131b; }
